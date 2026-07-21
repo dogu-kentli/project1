@@ -1,0 +1,76 @@
+/* udef-bootstrap-redesign.css
+   Minimal redesign overrides to apply a cleaner Bootstrap-based theme
+   Scoped under html.bs-redesign so it won't affect other themes unless enabled */
+
+html.bs-redesign {
+  --bs-body-bg: #f7f9fc;
+  --bs-body-color: #212529;
+  font-family: 'Roboto', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background-color: #f4f6f9;
+}
+
+html.bs-redesign .top-header {
+  background: #fff;
+  border-bottom: 1px solid #e9ecef;
+  box-shadow: 0 1px 6px rgba(18, 38, 63, 0.04);
+}
+
+html.bs-redesign .navbar .nav-link {
+  color: #495057;
+  padding: .5rem .75rem;
+}
+
+html.bs-redesign .navbar .nav-link:hover {
+  color: #0d6efd;
+}
+
+html.bs-redesign .notify-badge {
+  background: #dc3545;
+  color: #fff;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: .75rem;
+}
+
+html.bs-redesign .avatar-initials {
+  color: #fff;
+  font-weight: 700;
+}
+
+html.bs-redesign .avatar.avatar-30 {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tame feedback button look */
+html.bs-redesign .feedback-container {
+  background: linear-gradient(135deg, #0d6efd, #0069d9);
+}
+
+/* Slightly softer dropdowns */
+html.bs-redesign .dropdown-menu {
+  border-radius: .5rem;
+  box-shadow: 0 6px 18px rgba(34, 41, 47, 0.08);
+}
+
+/* Forms */
+html.bs-redesign .form-control, html.bs-redesign .form-select {
+  border-radius: .375rem;
+  border: 1px solid #e6e9ef;
+}
+
+/* Small utility */
+html.bs-redesign .btn-outline-info {
+  color: #0d6efd;
+  border-color: rgba(13,110,253,0.15);
+}
+
+/* Make sure offcanvas uses the new background */
+html.bs-redesign .offcanvas {
+  background: #fff;
+}
