@@ -1,0 +1,13 @@
+
+<div id="etkinlik-data"></div>
+
+<script>
+$('#etkinlik-data').delegate('.sort', 'click', function(e) {
+ $('#cover-spin').show(0);
+ e.preventDefault();
+	
+$('#etkinlik-data').load(this.href);
+});
+
+$('#etkinlik-data').load('index.php?route=extension/dashboard/etkinlik/dataetkinlik&user_token={{ user_token }}');
+</script>

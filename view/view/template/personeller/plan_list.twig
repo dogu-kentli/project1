@@ -1,0 +1,842 @@
+{{ header }}{{ column_left }}
+<main id="etkinlik-takvimi" class="page-content border-box">
+    <div class="table-responsive-sm">
+        <div class="header d-flex justify-content-between align-items-center mb-3">
+            <div class="nav-buttons">
+                <button id="prevMonthBtn" class="btn btn-outline-primary btn-sm me-1"><i class="bi bi-arrow-left"></i></button>
+                <button id="todayBtn" class="btn btn-outline-secondary btn-sm me-1">Bugün</button>
+                <button id="nextMonthBtn" class="btn btn-outline-primary btn-sm"><i class="bi bi-arrow-right"></i></button>
+            </div>
+
+            <div class="current-month-year fw-bold fs-5"></div>
+
+            <div class="view-options" > 
+                <!-- Birimler dropdown -->
+                <div class="btn-group dropup" style="display:{% if parent_id == 1 %} block {% else %} none {% endif %}">
+                    <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownBirimler" data-bs-toggle="dropdown" aria-expanded="false">
+                        Takvim Seçin
+                    </button>
+                    <ul class="dropdown-menu p-2" aria-labelledby="dropdownBirimler" style="max-height:400px; overflow-y:auto; min-width:220px;">
+                       {% for birim in birimler %}
+                        <li>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="personel_birim_id[]" value="{{birim.personel_birim_id}}" id="birim{{ birim.personel_birim_id }}">
+                                <label class="form-check-label" for="birim{{ birim.personel_birim_id }}">{{birim.name}}</label>
+                            </div>
+                        </li>
+                        {% endfor %}
+
+                    </ul>
+                </div>
+                <button class="btn btn-light btn-sm d-none">Gün</button>
+                <button class="btn btn-light btn-sm d-none">Hafta</button>
+                <button class="btn btn-primary btn-sm active">Ay</button>
+                <button type="button" id="button-setting" title="Ayarlar" class="btn btn-light btn-sm" style="display:none;">
+                    <i class="fa fa-cog"></i>
+                </button>
+
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="calendar-days-header row text-center g-0 mb-2">
+        <div class="col-12 col-sm bg-udef fw-bold py-2 border">PZT</div>
+        <div class="col-12 col-sm bg-udef fw-bold py-2 border">SAL</div>
+        <div class="col-12 col-sm bg-udef fw-bold py-2 border">ÇAR</div>
+        <div class="col-12 col-sm bg-udef fw-bold py-2 border">PER</div>
+        <div class="col-12 col-sm bg-udef fw-bold py-2 border">CUM</div>
+        <div class="col-12 col-sm bg-udef fw-bold py-2 border">CMT</div>
+        <div class="col-12 col-sm bg-udef fw-bold py-2 border">PAZ</div>
+    </div>
+
+    <div class="calendar-grid"></div>
+    </div>
+    </div>
+</main>
+{{footer}}
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalTitle">Etkinlik Oluştur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="eventForm">
+                    <input type="hidden" id="eventModalMode" value="add">
+                    <input type="hidden" id="eventOriginalDate" value="">
+                    <input type="hidden" id="eventIndex" value="">
+                    <input type="hidden" id="eventId" value="0">
+
+                    <div class="mb-3">
+                        <input type="text" name="title" class="form-control" placeholder="Etkinlik Başlığını yazınız." id="eventTitle" required>
+                    </div>
+
+                    <div class="mb-3 {% if parent_id !=1 %} d-none {% endif %}" >
+                        <label for="event_birim" class="form-label fw-bold">Sorumlu</label>
+                        <select name="select_item" id="event_select" class="form-select">  
+                            <option value="">{{"--Seçim Yapın--"}}</option> 
+                            <option value="1">{{"Personel"}}</option>
+                            <option value="2">{{"Birim"}}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 personel-birim {% if parent_id !=1 %} d-none {% endif %}" id="personeller" style="display:none;">
+                        <input type="text" name="filter_personel" class="form-control" placeholder="Personel seçin." id="eventPersonel" >
+                        <input type="hidden" name="personel_id" id="eventPersonelId" class="form-control" placeholder="Personel seçin."  >
+        
+                    </div>
+                    
+                    <div class="mb-3 personel-birim" id="birimler" style="display:none;">
+                        <label for="event_birim" class="form-label fw-bold">Birimler</label>
+                        <select name="birim_id" id="event_birim" class="form-select">
+                            <option value="">{{"--Seçim Yapın--"}}</option>
+                            {% for birim in birimler %}
+                            <option value="{{birim.personel_birim_id}}">{{birim.name}} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <textarea name="description" rows="4" class="form-control" placeholder="Etkinlikle ilgili kısa açıklama..." id="eventDescription"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <label for="eventdate_start" class="form-label fw-bold">Başlangıç Tarihi</label>
+                            <input type="date" name="date_start" class="form-control" id="eventdate_start" required>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label for="eventdate_end" class="form-label fw-bold">Bitiş Tarihi</label>
+                            <input type="date" name="date_end" class="form-control" id="eventdate_end" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <label for="eventstart_time" class="form-label fw-bold">Başlangıç Saati</label>
+                            <input type="time" name="start_time" class="form-control" id="eventstart_time">
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label for="eventend_time" class="form-label fw-bold">Bitiş Saati</label>
+                            <input type="time" name="end_time" class="form-control" id="eventend_time">
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mb-2">
+                        <label for="eventColorInput" class="form-label fw-bold">Renk Seçimi</label>
+                        <input type="color" name="color" class="form-control form-control-color" id="eventColorInput" value="#018bd3" title="Renk seçin">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveEventBtn">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade event-details-modal" id="viewEventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Etkinlik Detayları</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="event-title-display" id="viewEventTitleDisplay"></div>
+                <div class="detail-item d-flex align-items-center">
+                <input type="hidden" id="etkinlik-takvimi-id" value="">
+                <i class="bi bi-calendar-event-fill me-2 text-info"></i>
+                <p class="mb-0">
+                    <span id="viewEventDate"></span> 
+                </p>
+               
+                </div>
+
+                <div class="detail-item d-flex align-items-center">
+               
+                <i class="bi bi-clock-fill me-2 text-info"></i>
+                
+                <p class="mb-0">
+                    <span id="viewEventTime"></span>
+                </p>
+                </div>
+
+                
+                <div class="detail-item d-flex align-items-start mb-3">
+                    <div class="flex-grow-1">
+                        
+                        <div id="viewEventDescription" class="border rounded p-2 bg-light" style="max-height: 150px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info me-auto" id="editEventBtn">Düzenle</button>
+                <button type="button" class="btn btn-danger" id="deleteEventBtn">Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="view/stylesheet/takvim.css" rel="stylesheet" />
+
+<script>
+    const calendarState = {
+        currentDate: new Date(),
+        events: {{calendars|raw}},
+        selectedDate: null,
+        selectedEvent: null,
+        currentColor: '#018bd3'
+    };
+
+    // DOM elementleri
+    const prevMonthBtn = document.getElementById('prevMonthBtn');
+    const nextMonthBtn = document.getElementById('nextMonthBtn');
+    const todayBtn = document.getElementById('todayBtn');
+    const currentMonthYearDisplay = document.querySelector('.current-month-year');
+    const calendarGrid = document.querySelector('.calendar-grid');
+    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+    const viewEventModal = new bootstrap.Modal(document.getElementById('viewEventModal'));
+    const saveEventBtn = document.getElementById('saveEventBtn');
+    const eventForm = document.getElementById('eventForm');
+    const eventModalTitle = document.getElementById('eventModalTitle');
+    const eventModalModeInput = document.getElementById('eventModalMode');
+    const eventOriginalDateInput = document.getElementById('eventOriginalDate');
+    const eventIndexInput = document.getElementById('eventIndex');
+    const eventIdInput = document.getElementById('eventId');
+    const eventdate_startInput = document.getElementById('eventdate_start');
+    const eventdate_endInput = document.getElementById('eventdate_end');
+    const eventstart_timeInput = document.getElementById('eventstart_time');
+    const eventend_timeInput = document.getElementById('eventend_time');
+    const eventTitleInput = document.getElementById('eventTitle');
+    const eventDescriptionInput = document.getElementById('eventDescription');
+    const eventColorInput = document.getElementById('eventColorInput');
+
+    // View Event Modal Elementleri
+    const viewEventTitleDisplay = document.getElementById('viewEventTitleDisplay');
+    const viewEventDate = document.getElementById('viewEventDate');
+    const viewEventTime = document.getElementById('viewEventTime');
+    const editEventBtn = document.getElementById('editEventBtn');
+    const deleteEventBtn = document.getElementById('deleteEventBtn');
+  
+    const fontSizeSelect = document.getElementById('fontSizeSelect');
+
+    function updateCalendar() {
+        const year = calendarState.currentDate.getFullYear();
+        const month = calendarState.currentDate.getMonth();
+
+        currentMonthYearDisplay.textContent =`${calendarState.currentDate.toLocaleString('tr-TR', { month: 'long'})} - ${year}`;
+
+        const firstDayOfMonth = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDayOfWeek = firstDayOfMonth.getDay();
+        const startDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+        calendarGrid.innerHTML = '';
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const cellElements = [];
+
+        for (let i = startDayOfWeek - 1; i >= 0; i--) {
+            const day = daysInPrevMonth - i;
+            const prevMonth = month - 1 < 0 ? 11 : month - 1;
+            const prevYear = month - 1 < 0 ? year - 1 : year;
+            const dateStr = formatDate(prevYear, prevMonth, day);
+            const cell = createDayCell(day, dateStr, true);
+            calendarGrid.appendChild(cell);
+
+            cellElements.push(cell);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = formatDate(year, month, day);
+            const cellDate = new Date(year, month, day);
+
+            cellDate.setHours(0, 0, 0, 0);
+
+            const cell = createDayCell(day, dateStr, false);
+
+            if (cellDate.getTime() === today.getTime()) {
+                cell.classList.add('today');
+            }
+
+            calendarGrid.appendChild(cell);
+            cellElements.push(cell);
+        }
+
+        const totalCells = startDayOfWeek + daysInMonth;
+
+        let cellsToAdd = 0;
+
+        if (totalCells < 35) {
+            cellsToAdd = 35 - totalCells;
+        } else if (totalCells < 42) {
+            cellsToAdd = 42 - totalCells;
+        }
+
+        const nextMonth = month + 1 > 11 ? 0 : month + 1;
+
+        const nextYear = month + 1 > 11 ? year + 1 : year;
+
+        for (let day = 1; day <= cellsToAdd; day++) {
+            const dateStr = formatDate(nextYear, nextMonth, day);
+            const cell = createDayCell(day, dateStr, true);
+            calendarGrid.appendChild(cell);
+            cellElements.push(cell);
+        }
+
+        const allUniqueEvents = [];
+        const seenEventIds = new Set();
+
+        for (const startDate in calendarState.events) {
+            if (!calendarState.events.hasOwnProperty(startDate)) {
+                continue;
+            }
+
+            calendarState.events[startDate].forEach((event, index) => {
+                const uniqueKey = event.id && event.id !== '0' ? event.id : `${event.date_start}_${event.title}_${index}`;
+
+                if (!seenEventIds.has(uniqueKey)) {
+                    seenEventIds.add(uniqueKey);
+                    allUniqueEvents.push({...event, originalDate: startDate,index});
+                }
+            });
+        }
+
+        allUniqueEvents.sort((a, b) => {
+            const aMulti = a.date_start !== a.date_end;
+            const bMulti = b.date_start !== b.date_end;
+
+            if (aMulti && !bMulti) return -1;
+            if (!aMulti && bMulti) return 1;
+
+            return (
+                a.date_start.localeCompare(b.date_start) ||
+                a.date_end.localeCompare(b.date_end) ||
+                (a.start_time || '').localeCompare(b.start_time || '')
+            );
+        });
+
+        const weekLaneMap = {};
+
+        const dayLaneUsage = {};
+
+        allUniqueEvents.forEach(event => {
+            let startIdx = cellElements.findIndex(c => c.dataset.date === event.date_start);
+
+            let endIdx = cellElements.findIndex(c => c.dataset.date === event.date_end);
+
+            if (startIdx === -1 && endIdx === -1) {
+                return;
+            }
+
+            if (startIdx === -1) {
+                startIdx = 0;
+            }
+
+            if (endIdx === -1) {
+                endIdx = cellElements.length - 1;
+            }
+
+            const isMultiDay = event.date_start !== event.date_end;
+
+            if (!isMultiDay) {
+                const targetCell = cellElements[startIdx];
+                const wrapper = targetCell.querySelector('.events-wrapper');
+
+                if (!wrapper) return;
+                const dateKey = targetCell.dataset.date;
+                const usedLanes = dayLaneUsage[dateKey] || [];
+                const maxLane = usedLanes.length ? Math.max(...usedLanes) + 1 : 0;
+
+                const item = document.createElement('div');
+
+                item.className = 'event-item-single';
+                item.style.background = event.color;
+                item.style.color = `#fff`;
+                item.style.borderLeft = `3px solid ${event.color}`;
+                item.style.marginTop = `${maxLane * 22}px`;
+                item.textContent = event.title;
+                item.addEventListener('click', (e) => {e.stopPropagation();openViewEventModal(event,event.originalDate,event.index);});
+                wrapper.appendChild(item);
+
+                return;
+            }
+
+            let segmentStart = startIdx;
+
+            while (segmentStart <= endIdx) {
+                const currentWeek = Math.floor(segmentStart / 7);
+                const weekStart = currentWeek * 7;
+                const weekEnd = weekStart + 6;
+                const segmentEnd = Math.min(endIdx, weekEnd);
+
+                if (!weekLaneMap[currentWeek]) {
+                    weekLaneMap[currentWeek] = [];
+                }
+
+                let lane = 0;
+
+                while (true) {
+                    let occupied = false;
+
+                    for (const used of weekLaneMap[currentWeek]) {
+
+                        if (used.lane !== lane) {
+                            continue;
+                        }
+
+                        const overlap = !(
+                            segmentEnd < used.start ||
+                            segmentStart > used.end
+                        );
+
+                        if (overlap) {
+                            occupied = true;
+                            break;
+                        }
+                    }
+
+                    if (!occupied) {
+                        break;
+                    }
+
+                    lane++;
+                }
+
+                weekLaneMap[currentWeek].push({lane,start: segmentStart,end: segmentEnd});
+
+                for (let i = segmentStart; i <= segmentEnd; i++) {
+                    const dateKey = cellElements[i].dataset.date;
+
+                    if (!dayLaneUsage[dateKey]) {
+                        dayLaneUsage[dateKey] = [];
+                    }
+
+                    dayLaneUsage[dateKey].push(lane);
+                }
+
+                const startCell = cellElements[segmentStart];
+                const endCell = cellElements[segmentEnd];
+                const left = startCell.offsetLeft + 4;
+                const top = startCell.offsetTop + 34 + (lane * 24);
+                const width = (endCell.offsetLeft + endCell.offsetWidth) - startCell.offsetLeft - 4;
+                const strip = document.createElement('div');
+
+                strip.className = 'event-row-strip';
+                strip.style.left = `${left}px`;
+                strip.style.top = `${top}px`;
+                strip.style.width = `${width}px`;
+                strip.style.background = event.color;
+                strip.style.color = `#fff`;
+                strip.style.borderLeft = `4px solid ${event.color}`;
+
+                strip.innerHTML = segmentStart === startIdx ? event.title : `➜ ${event.title}`;
+
+                strip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openViewEventModal(event,event.originalDate,event.index);
+                });
+
+                calendarGrid.appendChild(strip);
+                segmentStart = segmentEnd + 1;
+            }
+        });
+    }
+
+    function createDayCell(day, dateStr, isOtherMonth) {
+        const cell = document.createElement('div');
+        cell.classList.add('calendar-day');
+        if (isOtherMonth) cell.classList.add('other-month-day');
+
+        cell.setAttribute('data-date', dateStr);
+
+        cell.innerHTML = `
+            <div class="day-number">${day}</div>
+            <div class="events-wrapper"></div> 
+            <button class="add-event-btn" data-date="${dateStr}">Ekle</button>
+        `;
+        const addButton = cell.querySelector('.add-event-btn');
+        addButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openAddEventModal(dateStr);
+        });
+        return cell;
+    }
+
+    function formatDate(year, month, day) {
+        return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+
+    function formatDateForDisplay(dateStr) {
+        if (!dateStr) return '';
+        const [year, month, day] = dateStr.split('-');
+        return `${day}.${month}.${year}`;
+    }
+
+    function formatTimeForDisplay(timeStr) {
+        if (!timeStr) return 'Belirtilmemiş';
+        const [hours, minutes] = timeStr.split(':');
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+
+    function openAddEventModal(dateStr) {
+        eventModalTitle.textContent = 'Yeni Etkinlik Ekle';
+        eventModalModeInput.value = 'add';
+        eventOriginalDateInput.value = '';
+        eventIdInput.value = '0';
+        eventIndexInput.value = '';
+        eventTitleInput.value = '';
+        eventPersonel.value = '';
+        eventPersonelId.value = '';
+        event_birim.value = '';
+        eventDescriptionInput.value = '';
+        eventdate_startInput.value = dateStr;
+        eventdate_endInput.value = dateStr;
+        eventstart_timeInput.value = '';
+        eventend_timeInput.value = '';
+        eventColorInput.value = calendarState.currentColor;
+        saveEventBtn.textContent = 'Kaydet';
+        eventModal.show();
+    }
+
+    function formatDateSimple(dateStr) {
+        const date = new Date(dateStr);
+         return date.toLocaleDateString("tr-TR", {day: "numeric",month: "long",year: "numeric"});
+    }
+
+    function openViewEventModal(event, dateStr, index, eventId) {
+        calendarState.selectedEvent = {...event,originalDate: dateStr,index: index };
+        editEventBtn.disabled = '';
+        deleteEventBtn.disabled = '';
+        viewEventTitleDisplay.textContent = event.title;
+        viewEventDescription.textContent = event.description;
+        viewEventDate.textContent = `${formatDateSimple(event.date_start)} ${event.date_start !== event.date_end ? ' - ' + formatDateSimple(event.date_end) : ''}`;
+        viewEventTime.textContent = `${formatTimeForDisplay(event.start_time)} - ${formatTimeForDisplay(event.end_time)}`;
+        document.getElementById("etkinlik-takvimi-id").value = event.id;
+        editEventBtn.disabled = event.button;
+        deleteEventBtn.disabled = event.button;
+        viewEventModal.show();
+    }
+
+    function openEditEventModal(eventData) {
+        eventModalTitle.textContent = 'Etkinliği Düzenle';
+        eventModalModeInput.value = 'edit';
+        eventOriginalDateInput.value = eventData.originalDate;
+        eventIndexInput.value = eventData.index;
+        eventIdInput.value = eventData.id;
+        eventTitleInput.value = eventData.title;
+        event_select.value = '1';
+        eventPersonelId.value = eventData.personel_id;
+        eventPersonel.value = eventData.personel;
+        event_birim.value = eventData.birim_id;
+        eventDescriptionInput.value = eventData.description;
+        eventdate_startInput.value = eventData.date_start;
+        eventdate_endInput.value = eventData.date_end;
+        eventstart_timeInput.value = eventData.start_time;
+        eventend_timeInput.value = eventData.end_time;
+        eventColorInput.value = eventData.color;
+        calendarState.currentColor = eventData.color;
+        saveEventBtn.textContent = 'Güncelle';
+
+         
+        if(eventData.personel_id > 0) {
+            event_select.value = '1';
+            $('#personeller').show();
+        }
+
+        if(eventData.birim_id > 0) {
+            event_select.value = '2';
+        }
+
+        eventModal.show();
+        viewEventModal.hide();
+ 
+    }
+
+    saveEventBtn.addEventListener('click', () => {
+        const id = eventIdInput.value;
+        const eventSelect = event_select.value;
+        const personel = eventPersonel.value;
+        const personel_id = eventPersonelId.value;
+        const birim_id = event_birim.value;
+        const mode = eventModalModeInput.value;
+        const title = eventTitleInput.value.trim();
+        const description = eventDescriptionInput.value.trim();
+        const date_start = eventdate_startInput.value;
+        const date_end = eventdate_endInput.value;
+        const start_time = eventstart_timeInput.value;
+        const end_time = eventend_timeInput.value;
+        const color = eventColorInput.value;
+
+        if (!title) {
+            alerterror('Lütfen bir başlık yazınız.');
+            return;
+        }
+
+        if (eventSelect == 2 && personel_id == '') {
+            alerterror('Lütfen personel seçiniz.');
+            return;
+        }
+
+        if (eventSelect == 3 && birim_id == '') {
+            alerterror('Lütfen birim seçiniz.');
+            return;
+        }
+
+        if (!date_start || !date_end) {
+            alerterror('Lütfen başlangıç ve bitiş tarihlerini girin.');
+            return;
+        }
+        if (new Date(date_start) > new Date(date_end)) {
+            alerterror('Başlangıç tarihi bitiş tarihinden ileri olamaz.');
+            return;
+        }
+
+        const newEvent = {id,title,personel,personel_id,birim_id,description,date_start,date_end,start_time,end_time,color};
+
+        if (mode === 'add') {
+            const dateKey = date_start;
+            if (!calendarState.events[dateKey]) {
+                calendarState.events[dateKey] = [];
+            }
+            calendarState.events[dateKey].push(newEvent);
+            saveFunction(newEvent, mode, 0);
+        } else if (mode === 'edit') {
+            const originalDate = eventOriginalDateInput.value;
+            const eventIndex = parseInt(eventIndexInput.value, 10);
+            const eventId = eventIdInput.value;
+
+            if (originalDate !== date_start && calendarState.events[originalDate]) {
+                calendarState.events[originalDate].splice(eventIndex, 1);
+                if (calendarState.events[originalDate].length === 0) {
+                    delete calendarState.events[originalDate];
+                }
+                if (!calendarState.events[date_start]) {
+                    calendarState.events[date_start] = [];
+                }
+                calendarState.events[date_start].push(newEvent);
+            } else {
+                calendarState.events[originalDate][eventIndex] = newEvent;
+            }
+
+            saveFunction(newEvent, mode, eventId);
+        }
+    });
+
+    eventColorInput.addEventListener('input', (e) => {
+        calendarState.currentColor = e.target.value;
+    });
+
+    prevMonthBtn.addEventListener('click', async () => {
+        calendarState.currentDate.setMonth(calendarState.currentDate.getMonth() - 1);
+        const yil = calendarState.currentDate.getFullYear();
+        const ay  = calendarState.currentDate.getMonth() + 1;
+        fetchFreshEvents(ay, yil);
+        
+    });
+
+    nextMonthBtn.addEventListener('click', async () => {
+        calendarState.currentDate.setMonth(calendarState.currentDate.getMonth() + 1);
+        const yil = calendarState.currentDate.getFullYear();
+        const ay  = calendarState.currentDate.getMonth() + 1;
+        
+        fetchFreshEvents(ay, yil);
+        
+    });
+
+    todayBtn.addEventListener('click', async () => {
+        calendarState.currentDate = new Date();
+        const yil = calendarState.currentDate.getFullYear();
+        const ay  = calendarState.currentDate.getMonth() + 1; // 1-12 arası 
+        fetchFreshEvents(ay, yil);
+    });
+
+    //Checkbox birimler için  
+    document.querySelectorAll('.form-check-input[name="personel_birim_id[]"]').forEach(chk => {
+        chk.addEventListener('change', () => {
+            const yil = calendarState.currentDate.getFullYear();
+            const ay  = calendarState.currentDate.getMonth() + 1;
+
+            console.log("Checkbox değişti:", chk.value, "Durum:", chk.checked);
+            fetchFreshEvents(ay, yil);
+        });
+    });
+
+    editEventBtn.addEventListener('click', () => {
+        if (calendarState.selectedEvent) {
+            openEditEventModal(calendarState.selectedEvent);
+        }
+    });
+
+    
+    deleteEventBtn.addEventListener('click', () => {
+        if (calendarState.selectedEvent && confirm('Etkinliği silmek istediğinizden emin misiniz?')) {
+            const {originalDate,index,id} = calendarState.selectedEvent;
+            
+            if (calendarState.events[originalDate]) {
+                calendarState.events[originalDate].splice(index, 1);
+                if (calendarState.events[originalDate].length === 0) {
+                    delete calendarState.events[originalDate];
+                }
+                updateCalendar();
+                viewEventModal.hide();
+                remove(id);
+                
+            }
+        }
+    });
+   
+    document.addEventListener('DOMContentLoaded', () => {
+       
+        updateCalendar();
+    });
+</script>
+
+<script>
+    function saveFunction(newEvent, mode, eventId) {
+        $.ajax({
+            url: 'index.php?route=personeller/plan/save&user_token={{ user_token }}',
+            type: 'post',
+            dataType: 'json',
+            data: {
+                mode: mode,
+                etkinlik_takvim_id: eventId,
+                title: newEvent.title,
+                personel: newEvent.personel,
+                personel_id: newEvent.personel_id,
+                birim_id: newEvent.birim_id,
+                description: newEvent.description,
+                date_start: newEvent.date_start,
+                date_end: newEvent.date_end,
+                start_time: newEvent.start_time,
+                end_time: newEvent.end_time,
+                color: newEvent.color
+            },
+            success: function(json) {
+                if (json.error && json.error.warning) {
+                    alerterror(json.error.warning);
+                    return;
+                }
+
+                const dateKey = newEvent.date_start;
+
+                if (mode === 'add') {
+                    if (json.etkinlik_takvimi_id) {
+                        const lastIndex = calendarState.events[dateKey].length - 1;
+                        calendarState.events[dateKey][lastIndex].id = json.etkinlik_takvimi_id;
+                        eventIdInput.value = json.etkinlik_takvimi_id;
+                    }
+                    alertsuccess('Etkinlik başarıyla eklendi!');
+                } else if (mode === 'edit') {
+                    alertsuccess('Etkinlik başarıyla güncellendi!');
+                }
+                updateCalendar();
+                eventModal.hide();
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.error(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                alerterror('Veritabanına kaydedilirken bir hata oluştu.');
+            }
+        });
+    }
+
+    function remove(eventId) {
+        $.ajax({
+            url: 'index.php?route=personeller/plan/remove&user_token={{ user_token }}',
+            type: 'post',
+            dataType: 'json',
+            data: { etkinlik_takvimi_id: eventId },
+            success: function(json) {
+                if (json.error && json.error.warning) {
+                    alerterror(json.error.warning);
+                } else {
+                    alertsuccess('Etkinlik başarıyla silindi!');
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.error(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+
+  function fetchFreshEvents(ay,yil) {
+    const selectedBirimler = Array.from(document.querySelectorAll('input[name="personel_birim_id[]"]:checked')).map(el => el.value);
+
+    $.ajax({
+            url: 'index.php?route=personeller/plan/dataTakvim&user_token={{ user_token }}&ay=' + ay + '&yil=' + yil,
+            type: 'post', // post kullanırsan data parametresiyle array rahat gider
+            dataType: 'json',
+            data: { personel_birim_id: selectedBirimler },
+            success: function(json) {
+                if (json.error && json.error.warning) {
+                    alerterror(json.error.warning);
+                } else {
+                    calendarState.events = json.calendars;
+                    updateCalendar();
+                   
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.error(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+</script>
+<script>
+$('#event_select').on('change', function() {
+    $('.personel-birim').hide();
+   var sorumlu = $(this).val();
+
+   if(sorumlu == 1) {
+    $('#personeller').show();
+   }
+
+   if(sorumlu == 2) {
+    $('#birimler').show();
+   }
+});
+</script>
+
+<script>
+$('input[name^=\'filter_personel\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/autocompletePersoneller&user_token={{ user_token }}&filter_personel=' +  encodeURIComponent(request),
+       dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['personel_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_personel\']').val(item['label']);
+      $('#eventPersonelId').val(item['value']);
+    }
+  });
+</script>
+{#
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const today = new Date();
+    const dayIndex = today.getDay(); 
+    const dayHeaders = document.querySelectorAll(".calendar-days-header .col-sm, .calendar-days-header .col-12");
+    const mapping = {1:0, 2:1, 3:2, 4:3, 5:4, 6:5, 0:6};
+
+    const todayIndex = mapping[dayIndex];
+    if (dayHeaders[todayIndex]) {
+        dayHeaders[todayIndex].classList.add("today-highlight");
+    }
+});
+</script>
+#}

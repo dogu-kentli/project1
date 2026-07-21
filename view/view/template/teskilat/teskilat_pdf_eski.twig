@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ title }}</title>
+    <base href="{{ base }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <link rel="icon" type="image/png" href="view/image/favicon.png">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+            --success-color: #27ae60;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; background-color: #f4f7f6; margin: 0; padding: 0; }
+        .report-wrapper { background: white; max-width: 1100px; margin: 20px auto; padding: 40px; box-shadow: 0 0 20px rgba(0,0,0,0.1); border-radius: 8px; }
+        
+        /* Header */
+        .report-header { border-bottom: 3px solid var(--primary-color); padding-bottom: 20px; margin-bottom: 30px; position: relative; }
+        .logo-area { text-align: center; margin-bottom: 20px; }
+        .signature-box { border-left: 4px solid var(--accent-color); padding-left: 20px; margin: 20px 0; color: #555; }
+        
+        /* Typography */
+        h2 { text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
+        .section-title { 
+            background: var(--primary-color); color: white; padding: 12px 18px; 
+            border-radius: 6px; margin: 30px 0 15px 0; font-size: 1rem; 
+            display: flex; align-items: center; font-weight: bold;
+        }
+        .section-title i { margin-right: 12px; font-size: 1.2rem; }
+
+        /* Stats Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        .stat-card { 
+            background: var(--bg-light); border: 1px solid var(--border-color); 
+            padding: 15px; text-align: center; border-radius: 10px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .stat-card span { display: block; font-size: 0.75rem; color: #7f8c8d; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; line-height: 1.2; }
+        .stat-card strong { font-size: 1.25rem; color: var(--primary-color); }
+
+        /* Tables */
+        .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.9rem; }
+        .custom-table th { background: #ecf0f1; padding: 12px; border: 1px solid var(--border-color); text-align: left; color: var(--primary-color); }
+        .custom-table td { padding: 12px; border: 1px solid var(--border-color); vertical-align: middle; }
+        .sub-header { background: #fdfdfd; font-weight: bold; color: var(--accent-color); border-left: 4px solid var(--accent-color) !important; }
+        
+        /* Tanıtım Birimi Özel Tasarım */
+        .promo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .promo-card { background: white; border: 1px solid #eee; border-radius: 8px; padding: 15px; }
+        .promo-item { 
+            display: flex; align-items: center; padding: 10px; 
+            border-bottom: 1px solid #f1f1f1; justify-content: space-between;
+        }
+        .promo-item:last-child { border-bottom: none; }
+        .promo-info { display: flex; align-items: center; gap: 10px; }
+        .promo-val { font-weight: bold; color: var(--accent-color); }
+        .promo-desc { font-size: 0.8rem; color: #95a5a6; font-style: italic; }
+
+        /* Icons Colors */
+        .fa-facebook { color: #3b5998; }
+        .fa-instagram { color: #e1306c; }
+        .fa-twitter-x { color: #000; }
+        .fa-youtube { color: #ff0000; }
+
+        @media print {
+            body { background: white; }
+            .report-wrapper { box-shadow: none; margin: 0; width: 100%; padding: 0; }
+            #btnPrint { display: none; }
+            .section-title { -webkit-print-color-adjust: exact; background-color: #2c3e50 !important; }
+            .stat-card { -webkit-print-color-adjust: exact; background-color: #f8f9fa !important; border: 1px solid #dee2e6 !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="row" align="right" style="margin:5px;margin-right:100px;">
+<button type="button" id="btnPrint" class="btn btn-info" style="cursor:pointer; padding:10px 20px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold;"><i class="fa fa-file-pdf"></i> PDF İNDİR</button>
+</div>
+<div class="report-wrapper" id="teskilat-raporu">
+    <div class="report-header">
+        <div class="logo-area">
+            {% if store_logo %} <img src="{{ store_logo }}" style="max-height: 80px;"/> {% else %} <img src="view/image/logo.png" style="max-height: 80px;" /> {% endif %}
+        </div>
+        <div class="signature-box">
+            <h4 style="margin:0 0 5px 0;">Kıymetli Dernek Başkanım;</h4>
+            <p style="margin:0;">Kurumunuzun aylık raporunu zamanında ve eksiksiz doldurduğunuz için teşekkür ederiz.</p>
+            <div style="margin-top:15px; font-size: 0.9rem;">
+                <strong>Abdullah Muhammed İslam</strong> / Genel Başkan
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 30px;">
+            <h2 style="margin:0; color: var(--primary-color);">{{ name }}</h2>
+            <h4 style="margin:5px 0; color: var(--accent-color); text-transform: uppercase;">{{ donemi }} AYI FAALİYET RAPORU</h4>
+        </div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-university"></i> DERNEK GENEL BİLGİLERİ</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>Yönetim Kurulu <br>Üye Sayısı</span><strong>{{ dernek_bilgileri['yonetim_kurulu'] }} Üye</strong></div>
+        <div class="stat-card"><span>Toplantı Periyodu</span><strong>{{ dernek_bilgileri['toplanti_periyodu1'] }}</strong></div>
+        <div class="stat-card"><span>İcra Kurulu <br>Üye Sayısı</span><strong>{{ dernek_bilgileri['icra_kurulu'] }} Üye</strong></div>
+        <div class="stat-card"><span>Hanımlar Komisyonu <br>Mevcut Mu</span><strong>{{ dernek_bilgileri['hanimlar_komisyonu'] }}</strong></div>
+        <div class="stat-card"><span>Web Adresi</span><strong style="font-size:0.8rem;">{{ dernek_bilgileri['web'] }}</strong></div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-chart-pie"></i> ÖĞRENCİ ÇALIŞMALARI İSTATİSTİKLERİ</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>Hedef Öğrenci Sayısı</span><strong>{{ ogrenci_calisma_istatistik['hedef_ogrenci_sayisi'] }}</strong></div>
+        <div class="stat-card"><span>Mevcut Öğrenci Sayısı</span><strong>{{ ogrenci_calisma_istatistik['mevcut_ogrenci_sayisi'] }}</strong></div>
+        <div class="stat-card"><span>Yeni Tanışılan <br>Öğrenci Sayısı</span><strong>{{ ogrenci_calisma_istatistik['yeni_tanisilan'] }}</strong></div>
+        <div class="stat-card"><span>Ülke Başkanı Sayısı</span><strong>{{ ogrenci_calisma_istatistik['ulke_baskani_sayisi'] }}</strong></div>
+        <div class="stat-card"><span>İrtibatlı Öğrenci Birliği Sayısı</span><strong>{{ ogrenci_calisma_istatistik['irtibatli_ogrenci_birligi_sayisi'] }}</strong></div>
+    </div>
+    
+    <div class="stats-grid" style="margin-top:10px;">
+        <div class="stat-card" ><span>Toplam Burslu Öğrenci Sayısı</span><strong>{{ ogrenci_calisma_istatistik['toplam_burslu_ogrenci'] }}</strong></div>
+        <div class="stat-card" ><span>Yönettiğiniz Öğrenci Evi Sayısı</span><strong>{{ ogrenci_calisma_istatistik['ogrenci_evleri_yonetim_sayisi'] }}</strong></div>
+        <div class="stat-card" ><span>Yönetilen Evlerdeki Öğrenci Sayısı</span><strong>{{ ogrenci_calisma_istatistik['ogrenci_evleri_ogrenci_sayisi'] }}</strong></div>
+        <div class="stat-card" ><span>İrtibatta Olduğunuz Öğrenci Evi Sayısı</span><strong>{{ ogrenci_calisma_istatistik['ogrenci_evleri_irtibat_sayisi'] }}</strong></div>
+        <div class="stat-card" ><span>İrtibattaki Evlerdeki Öğrenci Sayısı</span><strong>{{ ogrenci_calisma_istatistik['ogrenci_evleri_irtibat_ogrenci_sayisi'] }}</strong></div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-graduation-cap"></i> EĞİTİM VE ÖĞRENCİ FAALİYETLERİ</div>
+    <table class="custom-table">
+        <thead>
+            <tr class="sub-header"><th colspan="4">A) MUTAD VE DİĞER EĞİTİM ÇALIŞMALARI</th></tr>
+            <tr>
+                <th style="width:25%">Faaliyet Adı</th>
+                <th style="width:10%; text-align:center;">Katılım</th>
+                <th style="width:15%; text-align:center;">Tarih</th>
+                <th>Açıklama</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for value in egitim_calismalari1 %}
+            <tr>
+                <td><strong>{{ value.faaliyet_adi }}</strong></td>
+                <td style="text-align:center;"><span >{{ value.katilim_sayisi }}</span></td>
+                <td style="text-align:center;">{{ value.tarih ? value.tarih | date("d.m.Y") : '-' }}</td>
+                <td>{{ value.aciklama }}</td>
+            </tr>
+            {% endfor %}
+            {% for key, value in egitim_calismalari %}{% if key > 0 %}
+            <tr>
+                <td>{{ value.faaliyet_adi }}</td>
+                <td style="text-align:center;">{{ value.katilim_sayisi }}</td>
+                <td style="text-align:center;">{{ value.tarih | date("d.m.Y") }}</td>
+                <td>{{ value.aciklama }}</td>
+            </tr>
+            {% endif %}{% endfor %}
+        </tbody>
+         <thead>
+            <tr class="sub-header"><th colspan="4">b) Diğer Eğitim Çalışmaları</th></tr>
+            <tr>
+                <th style="width:25%">Faaliyet Adı</th>
+                <th style="width:10%; text-align:center;">Katılım</th>
+                <th style="width:15%; text-align:center;">Tarih</th>
+                <th>Açıklama</th>
+            </tr>
+        </thead>
+        <tbody>
+           {% for key, value in egitim_calismalari %}
+            {% if key > 0 %}
+            <tr>
+                <td class="text-center">{{ value.faaliyet_adi }}</td>
+                <td class="text-center">{{ value.katilim_sayisi }}</td>
+                <td class="text-center">{{ value.tarih | date("d.m.Y")}}</td>
+                <td colspan="3" style="text-align:justify;"><span class="description-short">{{ value.aciklama | length > 100 ? value.aciklama[:100] ~ '<a href="javascript:void(0)" class="btn btn-link btn-xs"> Devamı...</a>' : value.aciklama }}</span> <span class="description-long" style="display:none;">{{ value.aciklama }}</span></td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="custom-table">
+        <thead>
+            <tr class="sub-header"><th colspan="4">ÖĞRENCİ ÇALIŞMALARI</th></tr>
+        </thead>
+        <tbody>
+           
+            {% for key, value in sosyal_calismalar %}{% if key > 0 %}
+            <tr style="background:#fcfcfc">
+                <td> {{ value.faaliyet_adi }}</td>
+                <td style="text-align:center;">{{ value.katilim_sayisi }}</td>
+                <td style="text-align:center;">{{ value.tarih | date("d.m.Y") }}</td>
+                <td>{{ value.aciklama }}</td>
+            </tr>
+            {% endif %}{% endfor %}
+        </tbody>
+    </table>
+
+    <table class="custom-table">
+        <thead>
+            <tr class="sub-header"><th colspan="4">SOSYAL ÇALIŞMALAR</th></tr>
+        </thead>
+        <tbody>
+            
+            {% for key, value in sosyal_calismalar %}
+            {% if key > 0 %}
+            <tr>     
+                <td class="text-center">{{ value.faaliyet_adi }}</td>
+                <td class="text-center">{{ value.katilim_sayisi }}</td>
+                <td class="text-center">{{ value.tarih | date("d.m.Y")}}</td>
+               <td colspan="3" style="text-align:justify;"><span class="description-short">{{ value.aciklama | length > 100 ? value.aciklama[:100] ~ '<a href="javascript:void(0)" class="btn btn-link btn-xs"> Devamı...</a>' : value.aciklama }}</span> <span class="description-long" style="display:none;">{{ value.aciklama }}</span></td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+     <table class="custom-table">
+        <thead>
+            <tr class="sub-header"><th colspan="4">GENEL ÇALIŞMALAR</th></tr>
+        </thead>
+        <tbody>
+          
+           {% for key,value in genel_calismalar %}
+        
+            <tr>     
+                <td class="text-center">{{ value.faaliyet_adi }}</td>
+                <td class="text-center">{{ value.katilim_sayisi }}</td>
+                <td class="text-center">{{ value.tarih | date("d.m.Y")}}</td>
+               <td colspan="3" style="text-align:justify;"><span class="description-short">{{ value.aciklama | length > 100 ? value.aciklama[:100] ~ '<a href="javascript:void(0)" class="btn btn-link btn-xs"> Devamı...</a>' : value.aciklama }}</span> <span class="description-long" style="display:none;">{{ value.aciklama }}</span></td>
+            </tr>
+    
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="promo-grid">
+        <div>
+            <div class="section-title"><i class="fa fa-bullhorn"></i> TANITIM BİRİMİ</div>
+            <div class="promo-card">
+                <div class="promo-item">
+                    <div class="promo-info"><i class="fab fa-facebook"></i> Facebook</div>
+                    <div style="text-align:right">
+                        <div class="promo-val">{{ tanitim_birimi['facebook'] }}</div>
+                        <div class="promo-desc">{{ tanitim_birimi['icerik_facebook2'] }}</div>
+                    </div>
+                </div>
+                <div class="promo-item">
+                    <div class="promo-info"><i class="fab fa-instagram"></i> Instagram</div>
+                    <div style="text-align:right">
+                        <div class="promo-val">{{ tanitim_birimi['instagram'] }}</div>
+                        <div class="promo-desc">{{ tanitim_birimi['icerik_instagram2'] }}</div>
+                    </div>
+                </div>
+                <div class="promo-item">
+                    <div class="promo-info"><i class="fab fa-twitter"></i> Twitter</div>
+                    <div style="text-align:right">
+                        <div class="promo-val">{{ tanitim_birimi['twitter'] }}</div>
+                        <div class="promo-desc">{{ tanitim_birimi['icerik_twitter2'] }}</div>
+                    </div>
+                </div>
+                <div class="promo-item">
+                    <div class="promo-info"><i class="fab fa-youtube"></i> Youtube</div>
+                    <div style="text-align:right">
+                        <div class="promo-val">{{ tanitim_birimi['youtube'] }}</div>
+                        <div class="promo-desc">{{ tanitim_birimi['icerik_youtube2'] }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-title"><i class="fa fa-wallet"></i> MALİYE & KURUMSAL</div>
+            <div class="promo-card">
+                <div class="promo-item"><span>Bireysel Bağışçı</span><span class="promo-val">{{ maliye_kurumsal_iliskiler_birimi['bireysel_bagisci_sayisi'] }}</span></div>
+                <div class="promo-item"><span>Mevcut Kumbara</span><span class="promo-val">{{ maliye_kurumsal_iliskiler_birimi['toplam_mevcut_kumbara_sayisi'] }}</span></div>
+                <div class="promo-item"><span>Aidat Veren Kişi</span><span class="promo-val">{{ maliye_kurumsal_iliskiler_birimi['toplam_aidat_veren_kisi_sayisi'] }}</span></div>
+                <div class="promo-item"><span>Kurumsal Ziyaret</span><span class="promo-val">{{ maliye_kurumsal_iliskiler_birimi['gidilen_kurumsal_ziyaret_sayisi'] }}</span></div>
+                <div class="promo-item"><span>Gelen Ziyaret</span><span class="promo-val">{{ maliye_kurumsal_iliskiler_birimi['gelen_kurumsal_ziyaret_sayisi'] }}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-rocket"></i> GELECEK AY PLANLAMASI</div>
+    <table class="custom-table" style="margin-bottom:0;">
+        <thead>
+            <tr>
+                <th style="width:20%">Birim</th>
+                <th style="width:30%">Faaliyet Adı</th>
+                <th style="width:15%; text-align:center;">Tarih</th>
+                <th>Açıklama </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, value in gelecek_ay_planlama %}{% if key > 0 %}
+            <tr>
+                <td><strong>{{ value.birim }}</strong></td>
+                <td>{{ value.faaliyet_adi }}</td>
+                <td style="text-align:center;">{{ value.planlanan_tarih | date("d.m.Y") }}</td>
+                <td style="font-size:0.8rem; color:#666;">{{ value.aciklama }}</td>
+            </tr>
+            {% endif %}{% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $('#btnPrint').click(function () {
+        window.print();
+    });
+</script>
+
+</body>
+</html>

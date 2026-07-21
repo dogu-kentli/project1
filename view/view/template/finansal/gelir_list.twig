@@ -1,0 +1,636 @@
+{{ header }}{{ column_left }}
+<main id="isportali" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end">
+    <!-- Ekle butonu ayrı -->
+    <button type="button" onclick="addGelir();" data-toggle="tooltip" title="Yeni Ekle" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg"></i> Ekle
+    </button>
+
+    <!-- Dropdown menü -->
+    <div class="btn-group">
+        <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            Diğer İşlemler
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width:220px;">
+            <li>
+                <button type="button" id="button-import" class="dropdown-item">
+                    <i class="bi bi-upload"></i> İçe Aktar
+                </button>
+            </li>
+            <li>
+                <a href="{{ sample_excel }}" class="dropdown-item" download>
+                    <i class="bi bi-file-excel"></i> Örnek
+                </a>
+            </li>
+            <li>
+                <a href="{{ export }}" class="dropdown-item">
+                    <i class="bi bi-download"></i> Excel
+                </a>
+            </li>
+            <li>
+                <button type="button" id="button-remove-all" class="dropdown-item">
+                    <i class="bi bi-trash"></i> Sil
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+
+            <div id="table-filter" class="card-header py-2">
+                    <div class="row g-1 ">
+                       <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_bagisci" data-for="adsoyad" value="{{filter_bagisci}}" placeholder="Bağışçı seçin" class="form-control auto-complete input-sm px-4" />
+                                 <input type="hidden" name="filter_bagisci_id" value="{{filter_bagisci_id}}" class="form-control auto-filter input-hidden"/>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-6 mb-2">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="dateFilterDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <i class="bi bi-calendar-alt me-2"></i> Tarih
+                            </button>
+
+                            <div class="dropdown-menu p-3 shadow" aria-labelledby="dateFilterDropdown" style="min-width: 200px;">
+                                
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="small text-muted">Başlangıç:</label>
+                                        <input type="date" name="date_start" value="{{filter_date_start}}" class="form-control input-sm">
+                                        <input type="date" name="filter_date_start" value="" class="form-control auto-filter" style="display:none;">
+                                    </div>
+                                    <div class="col-12 mt-2">
+                                        <label class="small text-muted">Bitiş:</label>
+                                        <input type="date" name="date_end" value="{{filter_date_end}}" class="form-control input-sm" >
+                                        <input type="date" name="filter_date_end" value="" class="form-control auto-filter" style="display:none;">
+                                    </div>
+                                </div>
+                                <div class="mt-3 d-grid">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btn-apply">Uygula</button>
+                                </div>
+                            </div>
+                        </div>
+                       </div>
+                       <div class="col-lg-1 col-6 mb-2">
+                          <select name="filter_bolum" class="form-select auto-filter">
+                            <option value="">{{"--Seçim--"}}</option>
+                            <option value="">{{ "-Bölüm seçin-" }}</option>
+                            {% for key,value in bolumler %}
+                            <option value="{{key}}" {% if filter_bolum == key %} selected {% endif %}>{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                        </div>
+                       <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_hesap" data-for="1" placeholder="Hesap Seçin" value="{{filter_hesap}}" class="form-control auto-complete input-sm px-4"/>
+                                <input type="hidden" name="filter_hesap_id" value="{{filter_hesap_id}}" class="form-control auto-filter input-hidden"/>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_tur" data-for="2" value="{{filter_tur}}" placeholder="Tür Seçin" class="form-control auto-complete input-sm px-4" />
+                                <input type="hidden" name="filter_tur_id" value="{{filter_tur_id}}" class="form-control auto-filter auto-filter input-hidden"/>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_fon" data-for="4" value="{{filter_fon}}" placeholder="Fon seçin" class="form-control auto-complete input-sm px-4"/>
+                                <input type="hidden" name="filter_fon_id" value="{{filter_fon_id}}" class="form-control auto-filter input-hidden"/>
+                            </div>
+                        </div>
+
+                         <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_gelir" data-for="5" value="{{filter_gelir}}" placeholder="Gelir Şekli" class="form-control auto-complete input-sm px-4" />
+                                <input type="hidden" name="filter_gelir_id" value="{{filter_gelir_id}}" class="form-control auto-filter input-hidden"/>
+                            </div>
+                        </div>
+
+                         <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_category" data-for="6" value="{{filter_category}}" placeholder="Kategori Seçin" class="form-control auto-complete input-sm px-4" />
+                                <input type="hidden" name="filter_category_id" value="{{filter_category_id}}" class="form-control auto-filter input-hidden"/>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_proje" data-for="7" value="{{filter_proje}}" placeholder="Proje/Faaliyet" class="form-control auto-complete input-sm px-4" />
+                                <input type="hidden" name="filter_proje_id" value="{{filter_proje_id}}" class="form-control auto-filter input-hidden"/>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_birim" data-for="8" value="{{filter_birim}}" placeholder="Birim" class="form-control auto-complete input-sm px-4" />
+                                <input type="hidden" name="filter_birim_id" value="{{filter_birim_id}}" class="form-control auto-filter input-hidden"/>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-6 mb-2">
+                          <select name="filter_doviz" class="form-select auto-filter">
+                          <option value="">{{ "--Seçim Yapın--"}}</option>
+                          {% for currency in currencys %}
+                          <option value="{{currency.code}}" {% if currency.code == filter_doviz %} selected {% endif %}>{{ currency.title}}</option>
+                          {% endfor %}
+                        </select>
+                        </div>
+
+                        <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                               <input type="text" name="filter_tutar" value="{{filter_tutar}}" placeholder="Tutar" class="form-control auto-filter px-4">
+                            </div>
+                        </div>
+
+                       <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                               <input type="text" name="filter_description"  value="{{filter_description}}" placeholder="Açıklama" class="form-control auto-filter input-sm px-4" />
+                            </div>
+                        </div>
+
+                       
+                       <div class="col-lg-1 col-6 mb-2">
+                          <select name="limit" class="form-select auto-filter" id="select-limit">
+                          {% for key,value in limits %}
+						               <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+						               {% endfor %}
+                         </select>
+                        </div>
+                    </div>
+                </div>
+                 
+                 
+          <div class="card-body" id="tab-data"></div>
+        </div>
+        </div>
+
+
+    </div>
+
+  {{footer}}  
+</main>
+
+<!-- MALİ GROUP EKLEME MODAL -->
+<div class="modal fade" id="modal-bagisci" tabindex="-1" aria-labelledby="modalBagisciLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalBagisciLabel">İsim Ekle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-modal-bagisci">
+          <div class="mb-3">
+            <label for="input-ad" class="form-label">Adı:</label>
+            <input type="text" name="ad" placeholder="Adı" class="form-control" id="input-ad">
+          </div>
+
+          <div class="mb-3">
+            <label for="input-soyad" class="form-label">Soyadı:</label>
+            <input type="text" name="soyad" placeholder="Soyadı" class="form-control" id="input-soyad">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick="saveBagisci()" class="btn btn-primary">Kaydet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="modal fade" id="modal-import" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable  modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive-sm" style="max-height:400px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="saveImport();">
+          <i class="fa fa-save"></i> Kaydet
+        </button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+<link rel="stylesheet" href="view/javascript/jquery/jquery-ui/jquery-ui.css">
+<script src="view/javascript/jquery/jquery-ui/jquery-ui.min.js"></script>
+<script id="jquery-ui-dragdrop-tag" src="view/javascript/dragdrop.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#tab-data').delegate('.pagination a', 'click', function(e) {
+        e.preventDefault();
+        $('#tab-data').load(this.href, initializeDragDrop);
+    });
+
+    $('#tab-data').load('index.php?route=finansal/gelir/dataGelir&user_token={{ user_token }}', initializeDragDrop);
+});
+
+$('.auto-filter').on('change', function(e) {
+  e.preventDefault();
+ 
+  url = 'index.php?route=finansal/gelir/dataGelir&user_token={{ user_token }}';
+
+  if ($('input[name^="filter_bagisci_id"]').val()) {
+  url += '&filter_bagisci_id=' + encodeURIComponent($('input[name^="filter_bagisci_id"]').val());
+  url += '&filter_bagisci=' + encodeURIComponent($('input[name^="filter_bagisci"]').val());
+ }
+
+ if ($('input[name=\'filter_date_start\']').val()) {
+    url += '&filter_date_start=' + encodeURIComponent($('input[name=\'filter_date_start\']').val());
+ }
+
+  if ($('input[name=\'filter_date_end\']').val()) {
+    url += '&filter_date_end=' + encodeURIComponent($('input[name=\'filter_date_end\']').val());
+  }
+
+if ($('select[name^="filter_bolum"]').val()) {
+  url += '&filter_bolum=' + encodeURIComponent($('select[name^="filter_bolum"]').val());
+}
+
+if ($('input[name^="filter_hesap_id"]').val()) {
+  url += '&filter_hesap_id=' + encodeURIComponent($('input[name^="filter_hesap_id"]').val());
+  url += '&filter_hesap=' + encodeURIComponent($('input[name^="filter_hesap"]').val());
+}
+
+if ($('input[name^="filter_tur_id"]').val()) {
+  url += '&filter_tur_id=' + encodeURIComponent($('input[name^="filter_tur_id"]').val());
+  url += '&filter_tur=' + encodeURIComponent($('input[name^="filter_tur"]').val());
+}
+
+if ($('input[name^="filter_fon_id"]').val()) {
+  url += '&filter_fon_id=' + encodeURIComponent($('input[name^="filter_fon_id"]').val());
+  url += '&filter_fon=' + encodeURIComponent($('input[name^="filter_fon"]').val());
+}
+
+if ($('input[name^="filter_gelir_id"]').val()) {
+  url += '&filter_gelir_id=' + encodeURIComponent($('input[name^="filter_gelir_id"]').val());
+  url += '&filter_gelir=' + encodeURIComponent($('input[name^="filter_gelir"]').val());
+}
+
+if ($('input[name^="filter_category_id"]').val()) {
+  url += '&filter_category_id=' + encodeURIComponent($('input[name^="filter_category_id"]').val());
+  url += '&filter_category=' + encodeURIComponent($('input[name^="filter_category"]').val());
+}
+
+if ($('input[name^="filter_proje_id"]').val()) {
+  url += '&filter_proje_id=' + encodeURIComponent($('input[name^="filter_proje_id"]').val());
+  url += '&filter_proje=' + encodeURIComponent($('input[name^="filter_proje"]').val());
+}
+
+if ($('input[name^="filter_birim_id"]').val()) {
+  url += '&filter_birim_id=' + encodeURIComponent($('input[name^="filter_birim_id"]').val());
+  url += '&filter_birim=' + encodeURIComponent($('input[name^="filter_birim"]').val());
+}
+
+if ($('select[name^="limit"]').val()) {
+  url += '&limit=' + encodeURIComponent($('select[name^="limit"]').val());
+}
+
+if ($('select[name^="filter_doviz"]').val()) {
+  url += '&filter_doviz=' + encodeURIComponent($('select[name^="filter_doviz"]').val());
+}
+
+if ($('input[name^="filter_tutar"]').val()) {
+  url += '&filter_tutar=' + encodeURIComponent($('input[name^="filter_tutar"]').val());
+}
+
+if ($('input[name^="filter_description"]').val()) {
+  url += '&filter_description=' + encodeURIComponent($('input[name^="filter_description"]').val());
+}
+	
+  $('#cover-spin').show(0);
+	
+	$('#tab-data').load(url,initializeDragDrop);
+
+});
+
+</script>
+<script>
+$('.auto-complete').autocomplete({
+    source: function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/gelirgroupautocomplete&user_token={{ user_token }}&bolum=' + $(this).attr('data-for') + '&filter_name=' + encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item.name,
+              value: item.id
+            };
+          }));
+        }
+      });
+    },
+    select: function(item) {
+      $(this).val(item.label);
+      $(this).siblings('.auto-filter').val(item.value).trigger('change');
+  
+    }
+  });
+
+</script>
+<script>
+function saveImport() {
+     var url = 'index.php?route=finansal/gelir/dataGelir&user_token={{ user_token }}';
+     $.ajax({
+      url: 'index.php?route=finansal/gelir/saveImport&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-import').serialize(),
+      success: function(json) {
+        if (json.error.warning) {
+           alerterror(json.error.warning);
+        }
+         
+        if (json.success) {
+          $('#modal-import').modal('hide');
+          $('#tab-data').load(url, initializeDragDrop);  
+          alertsuccess(json.success); 
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  }
+
+ function remove(id) {
+    var url_filter = $('input[name^="filter_url"]').val();
+    if (confirm('Dikkat : Bu işlem geri alınamaz. Bu veriyi silmek istediğinize emin misiniz?') == false) {    
+        exit();
+    }
+   
+     $.ajax({
+      url: 'index.php?route=finansal/gelir/delete&user_token={{ user_token }}&id='  + id,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        if (json.error.warning) {
+           alerterror(json.error.warning);
+        }
+         
+        if (json.success) {
+          $('#tab-data').load(url_filter, initializeDragDrop);  
+           alertsuccess(json.success);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  }
+
+//--></script>
+
+<script>
+$('#button-remove-all').on('click', function() {
+  var url = 'index.php?route=finansal/gelir/dataGelir&user_token={{ user_token }}';
+     if (confirm('Dikkat : Seçili verileri silmek istediğinize emin misiniz?') == false) {    
+        exit();
+     }
+   
+     $.ajax({
+      url: 'index.php?route=finansal/gelir/deleteAll&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-gelir').serialize(),
+      beforeSend: function() {
+        $('#button-remove-all').buttonanimate('loading');
+      },
+      complete: function() {
+        $('#button-remove-all').buttonanimate('reset');
+      },
+      success: function(json) {
+        if (json.error.warning) {
+           alerterror(json.error.warning);
+        }
+         
+        if (json.success) {
+          $('#tab-data').load(url, initializeDragDrop);  
+           alertsuccess(json.success);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+//--></script>
+<script>
+
+function saveBagisci() {
+    $.ajax({
+      url: 'index.php?route=finansal/bagisci/saveBagisci&user_token={{ user_token }}&form=new',
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-modal-bagisci').serialize(),
+      success: function(json) {
+        $('#modal-bagisci .text-danger').remove();
+
+        if (json.error.warning) {
+          $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error.warning +'</div>'); 
+        }
+
+        if (json.error['ad']) {
+         $('input[name^=\'ad\']').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error['ad'] +'</span>');
+        }
+
+        if (json.error['soyad']) {
+         $('input[name^=\'soyad\']').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error['soyad'] +'</span>');
+        }
+
+        if (json.success) {
+          $('#modal-bagisci').modal('hide');         
+          $('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.success +'</div>');
+        }
+
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ }
+</script>
+
+<script type="text/javascript"><!--
+$('#button-import').on('click', function() {
+	$('#form-upload').remove();
+
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+		clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+
+			$.ajax({
+				url: 'index.php?route=finansal/gelir/import&user_token={{ user_token }}',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				beforeSend: function() {
+					$('#button-import').buttonanimate('loading');
+				},
+				complete: function() {
+					$('#button-import').buttonanimate('reset');
+				},
+				success: function(json) {
+                   $('#modal-import .table-responsive-sm table').remove();
+					if (json.error.warning) {
+                    alerterror(json.error.warning);
+                    }
+
+					if (json['html']) {
+
+						$('#modal-import .table-responsive-sm').append(json['html']);
+                        alertsuccess(json.success);
+                        $('#modal-import').modal('show');
+					 }
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+//--></script>
+
+<script>
+$('#button-clear').on('click', function() {
+  $('#tab-data').load('index.php?route=finansal/gelir/dataGelir&user_token={{ user_token }}', initializeDragDrop);
+});
+
+ $('#btn-apply').on('click', function() {
+   var date_start = $('input[name="date_start"]').val();
+   var date_end   = $('input[name="date_end"]').val();
+
+   $('.dropdown-menu').click();
+   $('input[name="filter_date_start"]').val(date_start).trigger('change');
+   $('input[name="filter_date_end"]').val(date_end).trigger('change');
+});
+//--></script>
+
+<style>
+/* Hesap kolonu */
+
+/* Form elemanlarının tabloyu şişirmesini engelle */
+#table-isportali input.form-control, 
+#table-isportali select.form-control {
+    min-width: 80px; /* Inputlar çok küçülmesin ama tabloyu da patlatmasın */
+}
+.drag-handle {
+    cursor: move;
+    width: 30px;
+    text-align: center;
+    vertical-align: middle !important;
+    padding: 5px 8px;
+}
+.drag-handle:active { cursor: grabbing; }
+
+/* SÜRÜKLENEN KOPYA (HELPER) İÇİN */
+.ui-draggable-dragging {
+    opacity: 0.8;
+    background-color: #f7f7f7; /* Helper kopyasının arka planı */
+    border: 1px dashed #337ab7;
+}
+
+.row-source-dragging {
+    border: 2px dashed #007bff;
+    animation: dash-border 0.6s linear infinite;
+}
+
+@keyframes dash-border {
+    0% { border-style: dashed; border-color: #007bff; }
+    50% { border-color: #3399ff; }
+    100% { border-color: #007bff; }
+}
+
+.row-selected {
+    background-color: #d1dff1ff !important; /* Hedef satır arka plan vurgusu */
+    border: 1px solid #bee5eb;
+}
+
+.row-copied-success {
+    background-color: #d4edda !important;
+    transition: background-color 0.5s;
+}
+
+/* Sürükleme yasaklandığında droppable alanın stili */
+.ui-droppable-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+</style>
+
+
+<style>
+.bg-info {
+    background-color: #70a4acff !important;
+}
+
+.bg-warning {
+    background-color: #f5ce85ff !important;
+}
+
+.alert-light {
+    background-color: #edf1e1ff;
+}
+.popover { max-width: 300px; }
+.popover-content .form-group { margin-bottom: 10px; }
+
+
+
+</style>
+
+
+

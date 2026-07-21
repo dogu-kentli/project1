@@ -1,0 +1,939 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+            <a href="javascript:void(0)" id="button-report" data-toggle="tooltip" title="{{ "Sosyal Medya Tasarımlı Raporu Oluştur" }}" class="btn btn-rainbow-custom btn-glow-purple btn-sm"><i class="bi bi-pie-chart-fill"></i> {{" Rapor Oluştur "}}</a>
+
+            <button type="button" data-bs-toggle="tooltip" title="Etkinlik Ekle" class="btn btn-info btn-sm" onclick="$('#modal-etkinlik').modal('show'); $('#modal-etkinlik .form-select,.form-control').val('');$('#button-file-download').prop('href','').addClass('d-none');$('.img-thumbnail img').attr('src','{{thumb}}');"><i class="bi bi-plus-lg"></i> Ekle</button>
+
+            <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm" onclick="confirm('{{ text_confirm }}') ? $('#form-information').submit() : false;"><i class="bi bi-trash"></i> Sil</button>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-lg-4 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{filter_name}}" id="input-filter-name" placeholder="Konusunu yazınız" class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 col-md-3">
+                            {% set ListArray = [] %}
+                            {% for custom_field in custom_fields %}
+                            {% if custom_field.location_sort == 'account20' %}
+                            <select name="filter_category" class="form-select auto-filter">
+                                <option value="">{{text_select}}</option>
+                                {% for custom_field_value in custom_field.custom_field_value %}
+                                {% if custom_field_value.group not in ListArray %}
+                                <option value="{{ custom_field_value.group }}" {% if custom_field_value.group == filter_category %} selected {% endif %}>{{ custom_field_value.group }}</option>
+                                {% set ListArray = ListArray|merge([custom_field_value.group]) %}
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-lg-2 col-6 col-md-3">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="dateFilterDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <i class="bi bi-calendar-alt me-2"></i> Tarih
+                            </button>
+
+                            <div class="dropdown-menu p-3 shadow" aria-labelledby="dateFilterDropdown" style="min-width: 200px;">
+                                
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="small text-muted">Başlangıç:</label>
+                                        <input type="date" name="date_start" value="{{filter_date_start}}" class="form-control input-sm">
+                                        <input type="date" name="filter_date_start" value="" class="form-control auto-filter" style="display:none;">
+                                    </div>
+                                    <div class="col-12 mt-2">
+                                        <label class="small text-muted">Bitiş:</label>
+                                        <input type="date" name="date_end" value="{{filter_date_end}}" class="form-control input-sm" >
+                                        <input type="date" name="filter_date_end" value="" class="form-control auto-filter" style="display:none;">
+                                    </div>
+                                </div>
+                                <div class="mt-3 d-grid">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btn-apply">Uygula</button>
+                                </div>
+                            </div>
+                        </div>
+                       </div>
+
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select name="filter_store" class="form-select auto-filter">
+                                <option value="">{{text_all}}</option>
+                                {% for store in stores %}
+                                <option value="{{ store.store_id }}" {% if filter_store == store.store_id %} selected="selected" {% endif %}>{{store.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        <div class="col-lg-1 co1-6 col-md-3">
+                            <select name="limit" class="form-select auto-filter">
+                                {% for key,value in limits %}
+                                <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-information">
+                    <div class="card-body">
+
+                        <div class="table-responsive-sm">
+                            <table class="table table-bordered table-striped align-middle mb-0">
+                                <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                    <tr>
+                                        <th style="width: 1px;" class="text-center">
+                                            <input type="checkbox" class="form-check-input" onclick="$('input[name*=\'selected\']').trigger('click');" /></td>
+                                        <th class="text-start">
+                                            {{ column_title }}
+                                         </td>
+                                        <th class="text-start">
+                                            {{ column_category1 }}
+                                        </th>
+                                        <th class="text-right">
+                                            {{ column_yer }}
+                                        </th>
+                                        <th class="text-right">
+                                            {{ column_sort_order }}
+                                        </th>
+                                        {% if store_id == 0 %}
+                                        <th class="text-start">
+                                            {{ column_store }}
+                                        </th>
+                                        {% endif %}
+                                        <th class="text-center" colspan="2" style="width:1%;">{{ column_action }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if informations %}
+                                    {% for information in informations %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input" name="selected[]" value="{{ information.etkinlik_id }}" {% if information.etkinlik_id in selected %} checked="checked" {% endif %} />
+                                        </td>
+                                        <td class="text-start">{{ information.title }}</td>
+                                        <td class="text-start">{{ information.category1 }}</td>
+                                        <td class="text-center">{{ information.kisi_sayisi }}</td>
+                                        <td class="text-right">{{ information.tarih }}</td>
+
+                                        {% if store_id == 0 %}
+                                        <td class="text-start">
+                                            <div class="border rounded p-2 bg-light">
+                                                {{ information.store.name }}
+                                            </div>
+                                        </td>
+                                        {% endif %}
+                                        <td class="text-center">
+                                            <button type="button" data-toggle="tooltip" title="{{ button_edit }}" onclick="edit('{{information.etkinlik_id }}');" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></button>
+                                        </td>
+                                         <td class="text-center">
+                                            <button type="button" data-toggle="tooltip" title="{{ "Katılım Listesi" }}" onclick="katilim('{{information.etkinlik_id }}');" class="btn btn-warning btn-sm"><i class="bi bi-person"></i></button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td class="text-center" colspan="4">{{ text_no_results }}</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+                                {{ pagination }}
+                            </div>
+                            <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+                                {{ results }}
+                            </div>
+                        </div>
+
+                </form>
+            </div>
+        </div>
+
+<input type="hidden" name="etkinlik_id" value="0" class="form-control">
+    </div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal-etkinlik-katilim" tabindex="-1" aria-labelledby="modalEtkinlikLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEtkinlikLabel"><i class="bi bi-person"></i> Katılımcılar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      
+      <!-- Body -->
+      <div class="modal-body" id="katilim-listesi">
+        
+        
+      </div>
+      
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button type="button" id="button-modal-katilim" class="btn btn-info"><i class="bi bi-save"></i> Kaydet</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+<div id="modal-etkinlik" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-card-text"></i> Etkinlik Bilgileri
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="form-modal-etkinlik">
+                    <input type="hidden" name="etkinlik_id" value="0" class="form-control">
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="tab-general" role="tabpanel">
+                                <div class="card bg-light border shadow-none">
+                                    <div class="card-body">
+                                        
+                                        <div class="mb-2">
+                                            <label class="form-label fw-bold">{{ entry_title }}</label>
+                                            <input type="text" name="etkinlik_adi" id="input-etkinlik-adi" placeholder="Etkinlik Adı" value="" class="form-control">
+                                            <input type="hidden" name="title" value="" id="etkinlik-title" class="form-control " />
+                                        </div>
+
+                                       <div class="row">
+                                         <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-bold">{{ entry_komisyon }}</label>
+                                            <select name="komisyon_id" class="form-select">
+                                                <option value="">{{ text_select }}</option>
+                                                <option value="1">{{ text_komisyon1 }}</option>
+                                                <option value="2">{{ text_komisyon2 }}</option>
+                                            </select>
+                                        </div>
+
+                                           <!-- Etkinlik kategorisi -->
+                                        {% for custom_field in custom_fields %}
+                                        {% if custom_field.location_sort == 'account20' %}
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-bold">Etkinlik Kategorisi</label>
+                                            <select name="etkinlik_category_id" id="etkinlik-category" class="form-select" onchange="$('#etkinlik-title').val($(this).find('option:selected').data('group'));">
+                                                <option value="">{{ text_select }}</option>
+                                                {% set ListArray = [] %}
+                                                {% set gruprow = 1 %}
+                                                {% for value in custom_field.custom_field_value %}
+                                                {% if value.group not in ListArray %}
+                                                <option disabled class="bg-warning">{{ gruprow }}. {{ value.group }}</option>
+                                                {% set ListArray = ListArray|merge([value.group]) %}
+                                                {% set gruprow = gruprow + 1 %}
+                                                {% endif %}
+                                                <option data-group="{{ value.group }}" value="{{ value.custom_field_value_id }}">
+                                                    {{ value.name }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+
+                                        </div>
+
+                                     
+                                        <!-- Kişi sayısı ve tarih -->
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label fw-bold">{{ entry_sort_order }}</label>
+                                                <input type="number" name="kisi_sayisi" value="{{ kisi_sayisi }}" class="form-control">
+                                            </div>
+                                            <div class="col-md-6 mb-3 ">
+                                                <label class="form-label fw-bold">{{ entry_date_added }}</label>
+                                                <input type="date" name="date_added" value="{{ date_added }}" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <!-- Açıklama -->
+                                        <div class="mb-2">
+                                            <label class="form-label fw-bold">{{ entry_description }}</label>
+                                            <textarea name="description" class="form-control" rows="4"></textarea>
+                                            <small>(Etkinlik ile ilgili kısa bir açıklama ve değerlendirme yazınız. Eğitim faaliyetlerinde sunum yapan kişi, kurumsal ziyaretlerde görüşülen kurum ve kişiler vs. gibi)</small>
+                                        </div>
+
+                                         <!-- Dosya ekleme -->
+                                        <div class="mb-2">
+                                            <label class="form-label fw-bold"><strong>Dosya Ekle</strong></label>
+                                            <div class="input-group">
+                                                <input type="text" name="filename" value="" id="input-filename" class="form-control" readonly />
+                                                <input type="hidden" name="code" value="" id="input-code" />
+                                                <a href='' type="button" id="button-file-download" title="Dosyayı İndir" class="btn btn-warning d-none" disabled><i class="bi bi-download"></i></a>
+                                                <button type="button" id="button-upload" class="btn btn-outline-primary"><i class="bi bi-upload"></i></button>
+                                            </div>
+                                           <small> Etkinlikle ilgili raporları, pdf veya word belgesi olarak ekleyebilirsiniz.</small>
+                                        </div>
+
+                                        <div class="row text-center mt-0">
+                                          <div class="col-4">
+                                              <div class="image-container">
+                                                  <a href="javascript:void(0)" id="img1" class="img-thumbnail">
+                                                      <img src="{{ thumb1 }}" id="thumb-img1" class="img-fluid border rounded">
+                                                  </a>
+                                                  <a href="javascript:void(0);" id="download-img1" download class="download-icon-btn" title="Dosyayı İndir">
+                                                      <i class="bi bi-download"></i>
+                                                  </a>
+                                                  <input type="hidden" name="banner_image[img1]" value="" id="input-img1" />
+                                              </div>
+                                          </div>
+
+                                          <div class="col-4">
+                                              <div class="image-container">
+                                                  <a href="javascript:void(0)" id="img2" class="img-thumbnail">
+                                                      <img src="{{ thumb2 }}" id="thumb-img2" class="img-fluid border rounded">
+                                                  </a>
+                                                  <a href="javascript:void(0);" id="download-img2" class="download-icon-btn" title="Dosyayı İndir" download>
+                                                      <i class="bi bi-download"></i>
+                                                  </a>
+                                                  <input type="hidden" name="banner_image[img2]" value="" id="input-img2" />
+                                              </div>
+                                          </div>
+
+                                          <div class="col-4">
+                                              <div class="image-container">
+                                                  <a href="javascript:void(0)" id="img3" class="img-thumbnail">
+                                                      <img src="{{ thumb3 }}" id="thumb-img3" class="img-fluid border rounded">
+                                                  </a>
+                                                  <a href="javascript:void(0);" id="download-img3" download class="download-icon-btn" title="Dosyayı İndir">
+                                                      <i class="bi bi-download"></i>
+                                                  </a>
+                                                  <input type="hidden" name="banner_image[img3]" value="" id="input-img3" />
+                                              </div>
+                                          </div>
+                                          
+                                          <small class="text-muted mt-0 d-block">Etkinlik ile alakalı en iyi 3 görsel ekleyiniz.Yüklemek için üzerine tıklayın</small>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="button-modal-save" class="btn btn-info"><i class="bi bi-save"></i> Kaydet</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div id="modal-report-setting" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm" style="max-width:480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fa fa-cog"></i> Sosyal Medya Etkinlik Raporu
+                    </h5>
+                    <button type="button" id="button-close" class="btn-close" data-bs-dismiss="modal" title="{{ button_close }}"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-rapor" class="row g-3">
+                        <input type="hidden" name="id" value="">
+
+                        <!-- Mağaza seçimi -->
+                        <div class="mb-3">
+                            <select name="store_id" id="store-id" class="form-select" style="display: {% if user_store_id == 0 %} block; {% else %} none; {% endif %}">
+                                <option value="">{{text_select}}</option>
+                                {% for store in stores %}
+                                <option value="{{ store.store_id }}">{{store.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Başlık -->
+                        <div class="text-center mb-3">
+                            <span class="badge bg-light-primary text-dark">Rapor Formatını Seçiniz</span>
+                        </div>
+
+                        <!-- Butonlar -->
+                        <div class="d-flex justify-content-center gap-2 mb-3">
+                            <button type="button" id="button-months" name="1" class="btn btn-info">
+                                Aylık Rapor Oluştur
+                            </button>
+                            <button type="button" id="button-years" name="2" class="btn btn-primary">
+                                Yıllık Rapor Oluştur
+                            </button>
+                        </div>
+
+                        <!-- Dönem seçimi -->
+                        <div class="row mb-3" id="donem" style="display:none;">
+                            <div class="col-sm-6">
+                                <select name="months" id="months" class="form-select">
+                                    {% for key, value in months %}
+                                    <option value="{{key}}">{{value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-6">
+                                <select name="years" id="years" class="form-select">
+                                    {% for year in years %}
+                                    <option value="{{year.text}}">{{year.text}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Görsel -->
+                        <div class="text-center mb-3" id="image" style="display:none;">
+                            <img src="" id="report-image" class="img-fluid" style="max-height:450px;" />
+                        </div>
+
+                        <!-- Kaydet / İndir -->
+                        <div class="text-center">
+                            <button type="button" id="button-save" data-loading-text="{{ text_loading }}" class="btn btn-success" disabled>
+                                
+                                <i class="bi bi-gear"></i> Raporu Oluştur
+                            </button>
+                            <a href="javascript:void(0);" id="button-download" class="btn btn-outline-warning d-none" download>
+                                <i class="bi bi-download"></i>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{footer}}
+</main>
+<script>
+$('.auto-filter').on('change', function(e) {
+  e.preventDefault();
+
+  $('#cover-spin').show(0);
+ 
+  url = 'index.php?route=catalog/information&user_token={{ user_token }}';
+
+  if ($('input[name^="filter_name"]').val()) {
+   url += '&filter_name=' + encodeURIComponent($('input[name^="filter_name"]').val());
+  }
+
+  if ($('select[name^="filter_store"]').val()) {
+   url += '&filter_store=' + encodeURIComponent($('select[name^="filter_store"]').val());
+  }
+
+  if ($('input[name^="filter_date_start"]').val()) {
+   url += '&filter_date_start=' + encodeURIComponent($('input[name^="filter_date_start"]').val());
+  }
+
+  if ($('input[name^="filter_date_end"]').val()) {
+   url += '&filter_date_end=' + encodeURIComponent($('input[name^="filter_date_end"]').val());
+  }
+
+  if ($('select[name^="filter_category"]').val()) {
+   url += '&filter_category=' + encodeURIComponent($('select[name^="filter_category"]').val());
+  }
+
+  if ($('select[name^="limit"]').val()) {
+   url += '&limit=' + encodeURIComponent($('select[name^="limit"]').val());
+  }
+
+  location = url;
+
+});
+
+
+document.getElementById('button-clear').addEventListener('click', function () {
+    let url = 'index.php?route=catalog/information&user_token={{ user_token }}';
+    window.location.href = url;
+});
+</script>
+
+<script type="text/javascript">
+    <!--
+    $('#button-report').on('click', function() {
+        var text = $(this).text();
+        $('#button-save').prop('disabled', true);
+        $('#button-save').button('reset');
+        $('#image').hide();
+        $('.rapor-item').show();
+        $('#donem').hide();
+        $('#loader').hide();
+        $('#button-save').show();
+        $('#button-download').hide();
+        $('#modal-report-setting').modal('show');
+    });
+
+    $('#button-months').on('click', function() {
+        $('input[name^=\'id\']').val($(this).attr('name'));
+        $('#button-save').prop('disabled', false);
+        $('#months').prop('disabled', false);
+        $('#donem').show();
+    });
+
+    $('#button-years').on('click', function() {
+        $('#button-save').prop('disabled', false);
+        $('input[name^=\'id\']').val($(this).attr('name'));
+        $('#donem').show();
+        $('#months').prop('disabled', true);
+    });
+    //
+    -->
+</script>
+
+<script>
+    $('#button-save').on('click', function() {
+        var $btn = $(this);
+        $('#image').hide();
+        $('#loader').show();
+        $('#alert').html(''); // Önceki uyarıları temizle
+
+        $.ajax({
+            url: 'index.php?route=catalog/information/report&user_token={{ user_token }}&id=' + $('input[name="id"]').val(),
+            type: 'post',
+            data: $('#form-rapor').serialize(),
+
+            beforeSend: function() {
+                $btn.find(".loading").removeClass("visually-hidden");
+                $btn.find(".reset").addClass("visually-hidden");
+            },
+            complete: function() {
+                $btn.find(".loading").addClass("visually-hidden");
+                $btn.find(".reset").removeClass("visually-hidden");
+            },
+
+            success: function(json) {
+                if (json.error.warning) {
+                    alerterror(json.error.warning);
+                    $('#loader').hide();
+                    return;
+                }
+
+                if (json.success) {
+                    $('#loader').hide();
+                    $('#image').show();
+                    $('.rapor-item').hide();
+                    $('#button-save').hide();
+                    $('#button-download').attr('href', json.download).show();
+                    $('#report-image').attr('src', json.success);
+                }
+            },
+
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                $('#loader').hide();
+            }
+        });
+    });
+</script>
+<script type="text/javascript">
+    <!--
+    $('#button-modal-save').on('click', function() {
+        var etkinlik_id = $('#form-modal-etkinlik input[name="etkinlik_id"]').val();
+        $.ajax({
+            url: 'index.php?route=catalog/information/save&user_token={{ user_token }}&etkinlik_id=' + etkinlik_id,
+            type: 'post',
+            data: $('#form-modal-etkinlik').serialize(),
+            dataType: 'json',
+
+            beforeSend: function() {
+                $('#button-modal-save').buttonanimate('loading');
+            },
+            complete: function() {
+                $('#button-modal-save').buttonanimate('reset');
+            },
+
+            success: function(json) {
+                if (json.error.warning) {
+                   alerterror(json.error.warning);
+                }
+
+                if (json.success) {
+                    location = json.success;
+                }
+
+            },
+
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+
+        });
+    });
+    //
+    -->
+</script>
+<script>
+    document.getElementById('button-modal-katilim').addEventListener('click', async function() {
+        const btn = this;
+        const etkinlik_id = document.querySelector('input[name="etkinlik_id"]').value;
+        const form = document.getElementById('form-katilim');
+
+        try {
+
+            // loading efekti (senin buttonanimate yerine)
+            btn.disabled = true;
+            btn.innerText = 'Yükleniyor...';
+
+            const response = await fetch(
+                'index.php?route=catalog/information/addOgrenci&user_token={{ user_token }}&etkinlik_id=' + etkinlik_id, {
+                    method: 'POST',
+                    body: new FormData(form)
+                }
+            );
+
+            const json = await response.json();
+
+            // hata
+            if (json?.error?.warning) {
+                alerterror(json.error.warning);
+            }
+
+            // başarılı
+            if (json?.success) {
+                const listResponse = await fetch(
+                    'index.php?route=catalog/information/datakatilim&user_token={{ user_token }}&etkinlik_id=' + etkinlik_id
+                );
+
+                const html = await listResponse.text();
+                document.getElementById('katilim-listesi').innerHTML = html;
+                alertsuccess(json.success);
+            }
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            // reset
+            btn.disabled = false;
+            btn.innerText = 'Kaydet';
+        }
+
+    });
+</script>
+<script>
+    function edit(etkinlik_id) {
+        $('#modal-etkinlik .form-select,.form-control').val('');
+        $('#button-file-download').prop('href', '').addClass('d-none').prop('disabled', true);
+        $('#thumb-img1').attr('src', '{{ thumb1 }}');
+        $('#thumb-img2').attr('src', '{{ thumb2 }}');
+        $('#thumb-img3').attr('src', '{{ thumb3 }}');
+        $('#input-img1,#input-img2,#input-img3').val('');
+        $('#download-img1,#download-img2,#download-img3').attr('href', 'javascript:void(0)');
+
+        $('#modal-etkinlik input[name="etkinlik_id"]').val(etkinlik_id);
+
+        $.ajax({
+            url: 'index.php?route=catalog/information/viewForm&user_token={{ user_token }}&etkinlik_id=' + etkinlik_id,
+            type: 'get',
+            dataType: 'json',
+
+            success: function(json) {
+                if (json.error && json.error.warning) {
+                    alerterror(json.error.warning);
+                }
+
+                if (json.etkinlik_adi) {
+                    $('#modal-etkinlik input[name^=\'etkinlik_adi\']').val(json.etkinlik_adi);
+                }
+
+                if (json.title) {
+                    $('#modal-etkinlik input[name^=\'title\']').val(json.title);
+                }
+
+                if (json.komisyon_id) {
+                    $('#modal-etkinlik select[name^=\'komisyon_id\']').val(json.komisyon_id);
+                }
+
+                if (json.etkinlik_category_id) {
+                    $('#modal-etkinlik select[name^=\'etkinlik_category_id\']').val(json.etkinlik_category_id);
+                }
+
+                if (json.kisi_sayisi) {
+                    $('#modal-etkinlik input[name^=\'kisi_sayisi\']').val(json.kisi_sayisi);
+                }
+
+                if (json.date_added) {
+                    $('#modal-etkinlik input[name^=\'date_added\']').val(json.date_added);
+                }
+
+                if (json.description) {
+                    $('#modal-etkinlik textarea[name^=\'description\']').val(json.description);
+                }
+
+                if (json.thumb1) {
+                    $('#thumb-img1').attr('src', json.thumb1);
+                    $('#input-img1').val(json.image1);
+                    $('#download-img1').attr('href', json.download1);
+                }
+
+                if (json.thumb2) {
+                    $('#thumb-img2').attr('src', json.thumb2);
+                    $('#input-img2').val(json.image2);
+                    $('#download-img2').attr('href', json.download2);
+                }
+
+                if (json.thumb3) {
+                    $('#thumb-img3').attr('src', json.thumb3);
+                    $('#input-img3').val(json.image3); 
+                    $('#download-img3').attr('href', json.download3);
+                }
+
+                if (json.filename) {
+                    $('#modal-etkinlik input[name^=\'filename\']').val(json.filename);
+                    $('#modal-etkinlik input[name^=\'code\']').val(json.code);
+                    $('#button-file-download').prop('href', json.file_url).removeClass('d-none').prop('disabled', false);
+                }
+
+
+                $('#modal-etkinlik').modal('show');
+            },
+
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.error(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+
+    function katilim(etkinlik_id) {
+      $('#katilim-listesi').empty();
+      $('input[name="etkinlik_id"]').val(etkinlik_id);
+      $('#katilim-listesi').load('index.php?route=catalog/information/datakatilim&user_token={{ user_token }}&etkinlik_id=' + etkinlik_id);
+      $('#modal-etkinlik-katilim').modal('show');
+     
+    }
+</script>
+
+<script type="text/javascript">
+    <!--
+    $('.img-thumbnail').on('click', function() {
+        var id = $(this).attr('id');
+        $('#form-upload').remove();
+
+        $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+        $('#form-upload input[name=\'file\']').trigger('click');
+
+        if (typeof timer != 'undefined') {
+            clearInterval(timer);
+        }
+
+        timer = setInterval(function() {
+            if ($('#form-upload input[name=\'file\']').val() != '') {
+                clearInterval(timer);
+
+                $.ajax({
+                    url: 'index.php?route=tool/upload/uploadImage&user_token={{ user_token }}',
+                    type: 'post',
+                    dataType: 'json',
+                    data: new FormData($('#form-upload')[0]),
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+
+                    beforeSend: function() {
+                        $('#cover-spin').show(0);
+                    },
+                    complete: function() {
+                        $('#cover-spin').hide(0);
+                    },
+
+                    success: function(json) {
+                        if (json.error) {
+                            alerterror(json.error);
+                        }
+
+                        if (json.success) {
+                            $('#input-' + id).val(json.image);
+                            $('#thumb-' + id).attr('src', json.thumb);
+                            alertsuccess(json.success);
+                            saveImage();
+
+                        }
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                    }
+                });
+            }
+        }, 500);
+    });
+
+
+    $('#button-upload').on('click', function() {
+        $('#form-upload').remove();
+        $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+        $('#form-upload input[name=\'file\']').trigger('click');
+
+        if (typeof timer != 'undefined') {
+            clearInterval(timer);
+        }
+
+        timer = setInterval(function() {
+            var fileInput = $('#form-upload input[name=\'file\']');
+            var file = fileInput.prop('files')[0];
+
+            if (file && fileInput.val() != '') {
+                clearInterval(timer);
+
+                var allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']; // PDF, Word ve DOCX
+                if (allowedTypes.indexOf(file.type) === -1) {
+                    alerterror('Geçersiz dosya türü! Lütfen PDF veya Word dosyası yükleyin.');
+                    return;
+                }
+
+                $.ajax({
+                    url: 'index.php?route=tool/upload/upload&user_token={{ user_token }}',
+                    type: 'post',
+                    dataType: 'json',
+                    data: new FormData($('#form-upload')[0]),
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+
+                    beforeSend: function() {
+                        $('#button-upload').buttonanimate('loading').prop('disabled', true);
+                    },
+
+                    complete: function() {
+                        $('#button-upload').buttonanimate('reset');
+                    },
+
+                    success: function(json) {
+                        if (json.error) {
+                            alerterror(json.error);
+                        }
+
+                        if (json.success) {
+                           alertsuccess(json.success);
+
+                            $('#modal-etkinlik input[name=\'filename\']').val(json.filename);
+                            $('#modal-etkinlik input[name=\'code\']').val(json.code);
+                        }
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                    }
+                });
+            }
+        }, 500);
+    });
+
+    //
+    -->
+</script>
+<script>
+ $('#btn-apply').on('click', function() {
+   var date_start = $('input[name="date_start"]').val();
+   var date_end   = $('input[name="date_end"]').val();
+
+   $('.dropdown-menu').click();
+   $('input[name="filter_date_start"]').val(date_start).trigger('change');
+   $('input[name="filter_date_end"]').val(date_end).trigger('change');
+});
+
+function saveImage() {
+    var etkinlik_id = $('#form-modal-etkinlik input[name="etkinlik_id"]').val();
+    
+    if (etkinlik_id > 0) {
+        $.ajax({
+            url: 'index.php?route=catalog/information/save&user_token={{ user_token }}&etkinlik_id=' + etkinlik_id,
+            type: 'post',
+            data: $('#form-modal-etkinlik').serialize(),
+            dataType: 'json',
+            
+        });
+    }
+}
+
+</script>
+<script>
+    var error_warning = '{{error_warning}}';
+    var success = '{{success}}';
+    $(document).ready(function() {
+        if (error_warning) {
+            alerterror(error_warning);
+        }
+
+        if (success) {
+            alertsuccess(success);
+        }
+    });
+</script>
+<style>
+/* Kapsayıcıyı göreceli yapıyoruz ki buton buna göre konumlansın */
+.image-container {
+  position: relative;
+  display: inline-block;
+  width: 90px;   /* kare boyut */
+  height: 90px;
+  overflow: hidden;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* İndirme butonu tasarımı */
+.download-icon-btn {
+    position: absolute;
+    bottom: 2px;    /* Alttan boşluk */
+    right: 10px;     /* Sağdan boşluk */
+    background-color: rgba(255, 193, 7, 0.8); /* btn-warning rengi + hafif şeffaflık */
+    color: #000;
+    padding: 5px 8px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    opacity: 0;       /* Başlangıçta gizli */
+    visibility: hidden;
+    transition: all 0.3s ease; /* Yumuşak geçiş efekti */
+    z-index: 10;
+}
+
+.download-icon-btn:hover {
+    background-color: #ffc107; /* Üzerine gelince tam opak sarı */
+    color: #000;
+}
+
+/* Resmin üzerine gelindiğinde butonu göster */
+.image-container:hover .download-icon-btn {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Thumbnail'in taşmasını önlemek için */
+.img-thumbnail {
+    display: block;
+    padding: 0;
+}
+</style>

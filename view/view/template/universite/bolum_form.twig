@@ -1,0 +1,113 @@
+﻿{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">Bölüm Düzenleme Formu</h5>
+            <div class="ms-auto">
+              <button type="submit" form="form-bolum" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-save"></i>
+              </button>
+               <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm bg-white btn-sm">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-bolum" class="row g-4">
+            
+            <div class="col-12">
+              <label class="form-label" for="input-name">{{ entry_name }}</label>
+              <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control"/>
+              {% if error_name %}
+                <div class="text-danger">{{ error_name }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label" for="input-name">{{ entry_universite }}</label>
+             <select name="universite_id" id="input-universite" onchange="universite(this, '{{ fakulte_id }}');" class="single-select">
+              <option value="">{{ text_select }}</option>
+                  {% for universite in universites %}
+                  <option value="{{ universite.universite_id }}"  {% if universite.universite_id == universite_id %} selected="selected" {% endif %}>{{ universite.name }}</option>
+                  {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label" for="input-name">{{ entry_fakulte }}</label>
+             <select name="fakulte_id" id="input-fakulte" class="single-select">
+             
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label d-block">{{ entry_status }} (Aktif / Pasif)</label>
+              <div class="form-check form-switch">
+                {% if status %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                <input class="form-check-input" type="checkbox" {{ checked }} name="status" value="1" id="statusSwitch" style="width:3rem;height:1.5rem;">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ footer }}
+</main>
+<script type="text/javascript"><!--
+function universite(element, index, fakulte_id) {
+	$.ajax({
+		url: 'index.php?route=customer/customer/universite&user_token={{ user_token }}&universite_id=' + element.value,
+		dataType: 'json',
+		beforeSend: function() {
+			$('select[name=\'universite_id\']').prop('disabled', true);
+		},
+		complete: function() {
+			$('select[name=\'universite_id\']').prop('disabled', false);
+		},
+		success: function(json) {
+			
+			html = '<option value="">{{ text_select }}</option>';
+
+			if (json['fakulte'] && json['fakulte'] != '') {
+				for (i = 0; i < json['fakulte'].length; i++) {
+					html += '<option value="' + json['fakulte'][i]['fakulte_id'] + '"';
+
+					if (json['fakulte'][i]['fakulte_id'] == '{{ fakulte_id }}') {
+						html += ' selected="selected"';
+					}
+
+					html += '>' + json['fakulte'][i]['name'] + '</option>';
+				}
+			} else {
+				html += '<option value="0">{{ text_none }}</option>';
+			}
+
+			$('select[name=\'fakulte_id\']').html(html);
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+}
+
+$('select[name$=\'universite_id\']').trigger('change');
+//--></script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

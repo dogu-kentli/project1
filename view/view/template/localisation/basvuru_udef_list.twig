@@ -1,0 +1,291 @@
+{{ header }}{{ column_left }}
+<main id="page-basvuru" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+      
+         <a href="{{ add }}" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Ekle</a>
+         <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm" onclick="confirm('{{ text_confirm }}') ? $('#form-basvuru').submit() : false;"><i class="bi bi-trash"></i> Sil</button>
+          <button type="button" id="button-clear" data-toggle="tooltip" title="{{ "Filtreyi Temizle" }}" class="btn btn-light border border-dark shadow-sm bg-white btn-sm" ><i class="bi bi-filter"></i></button>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-lg-4 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{filter_name}}" id="input-filter-name" placeholder="Bavuru ismi..." class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6 ">
+                            <div class="ms-auto position-relative">
+                                <input type="date" name="filter_date_start" value="{{ filter_date_start }}" id="input-filter-name" placeholder="Başlangıç Tarihi" class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6 ">
+                            <div class="ms-auto position-relative">
+                                <input type="date" name="filter_date_end" value="{{ filter_date_end }}" id="input-filter-name" placeholder="Başlangıç Tarihi" class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                     
+
+                        <div class="col-lg-1 co1-6 col-md-3">
+                            <select name="limit" class="form-select auto-filter">
+                                {% for key,value in limits %}
+                                <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-basvuru">
+                    <div class="card-body">
+
+                        <div class="table-responsive-sm">
+                            <table class="table table-bordered table-striped align-middle mb-0 ">
+                           <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                   <tr>
+                                    <th style="width: 1px;" class="text-center">
+                                    <input type="checkbox" class="form-check-input" onclick="$('input[name*=\'selected\']').trigger('click');" /></th>
+                                   
+                                      <th class="text-start">
+                                      {{ column_name }}            
+                                    </th>
+                                    <th class="text-start">
+                                      {{ column_date_start }}            
+                                    </th>
+                                    <th class="text-start">
+                                      {{ column_date_end }}           
+                                    </th>
+                                    <th class="text-center">
+                                      {{ column_student }}            
+                                    </th>
+                                    <th class="text-center">
+                                      {{ column_store }}            
+                                    </th>
+                                    <th class="text-center">
+                                      {{ column_status }}
+                                    </td>
+                                    <th colspan="2" class="text-center">{{ column_action }}</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                   {% if basvurular %}
+                                {% for basvuru in basvurular %}
+                                <tr>
+                                  <td class="text-center">
+                                    <input type="checkbox" class="form-check-input" name="selected[]" value="{{ basvuru.basvuru_id }}" />
+                                    
+                                  </td>
+                                  
+                                  <td class="text-start">{{ basvuru.name }}</td>
+                                  <td class="text-start">{{ basvuru.date_start}}</td>
+                                  <td class="text-start">{{ basvuru.date_end }}</td>
+                                  <td class="text-center">{{ basvuru.total }}</td>
+                                  <td class="text-center">
+                                   <div class="border rounded p-2 bg-light">
+                                  {{ basvuru.store.name }}
+                                  </div>
+                                  </td>
+                                  <td class="text-center">
+                                    {% if basvuru.status == 1 and bugun <= basvuru.bitis_tarihi %}
+                                      <span class="badge bg-success">Aktif</span></div>
+                                    {% else  %}
+                                      <span class="badge bg-secondary">Pasif</span></div>
+                                    {% endif  %}
+
+                                  </td>
+                                  <td class="text-center">
+                                  <a href="{{ basvuru.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
+                                  </td>
+                                  <td class="text-center">
+                                  <a href="{{ basvuru.report }}" data-toggle="tooltip" title="{{ "Raporları görüntüle" }}" class="btn btn-outline-warning btn-sm text-dark"><i class="bi bi-pie-chart-fill"></i></a>
+                                  </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                  <td class="text-center" colspan="5">{{ text_no_results }}</td>
+                                </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+<div id="modal-report-setting" class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:480px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fa fa-cog"></i> Sosyal medya Etkinlik Görsel hazırlama ekranı
+        </h5>
+        <button type="button" id="button-close" class="btn-close" data-bs-toggle="tooltip" 
+                data-bs-dismiss="modal" title="{{ button_close }}"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-rapor" class="row g-3">
+          <input type="hidden" name="id" value="">
+
+          <div class="text-center mb-3">
+            <h3>
+              <span class="badge bg-light-primary text-dark">{{ "Rapor Formatını Seçiniz" }}</span>
+            </h3>
+          </div>
+
+          <div class="text-center mb-3">
+            <div class="ms-auto">
+              <button type="button" id="button-months" name="1" class="btn btn-info">
+                Aylık Rapor Oluştur
+              </button>
+              <button type="button" id="button-years" name="2" class="btn btn-primary">
+                Yıllık Rapor Oluştur
+              </button>
+            </div>
+          </div>
+
+          <div class="row mb-3" id="donem" style="display:none;">
+            <div class="col-sm-6 mb-3">
+              <select name="months" id="months" class="form-select">
+                {% for key, value in months %}
+                  <option value="{{key}}">{{value}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-sm-6 mb-3">
+              <select name="years" id="years" class="form-select">
+                {% for year in years %}
+                  <option value="{{year.text}}">{{year.text}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3 text-center" id="image" style="display:none;">
+            <a href="javascript:void(0)">
+              <img src="" id="report-image" class="img-fluid" style="max-height:450px;" />
+            </a>
+          </div>
+
+          <div class="text-center">
+            <button type="button" id="button-save" data-loading-text="{{ text_loading }}" class="btn btn-success" disabled>
+               <span class="spinner-border spinner-border-sm loading visually-hidden" role="status" aria-hidden="true"></span>
+               <span class="reset"><i class="bi bi-gear"></i> Raporu Oluştur</span>
+            </button>
+            <a href="javascript:void(0);" id="button-download" class="btn btn-outline-warning" style="display:none;" download>
+              <i class="bi bi-download"></i>
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+    {{footer}}
+</main>
+<script type="text/javascript"><!--
+
+$('.auto-filter').on('change', function() {
+   $('#cover-spin').show(0);
+	url = 'index.php?route=localisation/basvuru_udef&user_token={{ user_token }}';
+
+	var filter_name = $('input[name=\'filter_name\']').val();
+
+	if (filter_name) {
+		url += '&filter_name=' + encodeURIComponent(filter_name);
+	}
+	
+	var filter_date_start = $('input[name=\'filter_date_start\']').val();
+
+	if (filter_date_start) {
+		url += '&filter_date_start=' + encodeURIComponent(filter_date_start);
+	}
+
+  var filter_date_end = $('input[name=\'filter_date_end\']').val();
+
+	if (filter_date_end) {
+		url += '&filter_date_end=' + encodeURIComponent(filter_date_end);
+	}
+
+  var filter_store = $('select[name=\'filter_store\']').val();
+
+	if (filter_store) {
+		url += '&filter_store=' + encodeURIComponent(filter_store);
+	}
+
+  if ($('select[name=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name=\'limit\']').val());
+	}
+
+	location = url;
+});
+
+$('#button-clear').on('click', function() {
+	url = 'index.php?route=localisation/basvuru_udef&user_token={{ user_token }}';
+	location = url;
+});
+//--></script>
+
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      $('#alert').prepend(
+              '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + error_warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );
+     }
+
+     if (success) {
+	      $('#alert').append(
+              '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + success + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );  
+    }
+});
+</script>

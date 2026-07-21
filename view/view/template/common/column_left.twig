@@ -1,0 +1,47 @@
+<aside class="sidebar-wrapper" data-simplebar="true">
+  <div class="sidebar-header " style="padding:25px;">
+    <div>
+      <a href="{{ home }}"><i class="bi bi-list" style="font-size:20px;color:{{icon_color}}"></i>
+    </div>
+    <div>
+      <h4 class="logo-text"><a href="{{ home }}">
+      <img src="view/image/udef-logo-scaled.png" width="80" alt="logo icon"></a></h4>
+    </div>
+    <div class="toggle-icon ms-auto"><i class="bi bi-chevron-double-left fa-2x"></i></div>
+  </div>
+
+  <ul class="metismenu" id="menu">
+    {% for menu in menus %}
+      {# Menü etiketi (label) #}
+      {% if menu.label is defined %}
+        <li class="menu-label">{{ menu.label }}</li>
+
+      {% else %}
+        <li>
+          {# Ana Menü Anchor: Alt menü varsa has-arrow, yoksa direkt link #}
+          <a href="{% if menu.children|length > 0 %}javascript:;{% else %}{{ menu.href }}{% endif %}" 
+             {% if menu.children|length > 0 %} class="has-arrow" {% endif %} 
+             {% if not menu.children and menu.target %}target="{{ menu.target }}"{% endif %}>
+
+            <div class="parent-icon"><i class="{{ menu.icon }}" style="color:{{icon_color}}"></i></div>
+            <div class="menu-title">{{ menu.name }}</div>
+          </a>
+
+          {# Alt menü (Child Seviye) #}
+          {% if menu.children and menu.children|length > 0 %}
+            <ul>
+              {% for child in menu.children %}
+                {# Sadece alt menü linki olanları gösteriyoruz. Eğer bir alt menünün de alt menüsü varsa (3. seviye), bu link de yine 2. seviyede kalır. #}
+                <li>
+                  <a href="{{ child.href }}" {% if child.target %}target="{{ child.target }}"{% endif %}>
+                    <i class="bi bi-arrow-right-short"></i>{{ child.name }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</aside>

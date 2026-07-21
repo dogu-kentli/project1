@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ title }}</title>
+    <base href="{{ base }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <link rel="icon" type="image/png" href="view/image/favicon.png">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+            --success-color: #27ae60;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; background-color: #f4f7f6; margin: 0; padding: 0; }
+        .report-wrapper { background: white; max-width: 1100px; margin: 20px auto; padding: 40px; box-shadow: 0 0 20px rgba(0,0,0,0.1); border-radius: 8px; box-sizing: border-box; }
+        
+        /* Header */
+        .report-header { border-bottom: 3px solid var(--primary-color); padding-bottom: 20px; margin-bottom: 30px; position: relative; }
+        .logo-area { text-align: center; margin-bottom: 20px; }
+        .signature-box { border-left: 4px solid var(--accent-color); padding-left: 20px; margin: 20px 0; color: #555; }
+        
+        /* Typography */
+        h2 {  letter-spacing: 2px; font-weight: 800; }
+        .section-title { 
+            background: var(--primary-color); color: white; padding: 12px 18px; 
+            border-radius: 6px; margin: 30px 0 15px 0; font-size: 1rem; 
+            display: flex; align-items: center; font-weight: bold;
+        }
+        .section-title i { margin-right: 12px; font-size: 1.2rem; }
+
+        /* Stats Cards - Tablo genişliği ile uyumlu hale getirildi */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 20px; 
+            width: 100%;
+        }
+        .stat-card { 
+            background: var(--bg-light); 
+            border: 1px solid var(--border-color); 
+            padding: 15px; 
+            text-align: center; 
+            border-radius: 10px;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center;
+            box-sizing: border-box;
+        }
+        .stat-card span { display: block; font-size: 0.75rem; color: #7f8c8d; margin-bottom: 8px; font-weight: 700;  line-height: 1.2; }
+        .stat-card strong { font-size: 1.1rem; color: var(--primary-color); word-break: break-word; }
+
+        /* Tables - Genişlik ve hizalama ayarı */
+        .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 0.9rem; table-layout: fixed; }
+        .custom-table th { background: #ecf0f1; padding: 12px; border: 1px solid var(--border-color); text-align: left; color: var(--primary-color); }
+        .custom-table td { padding: 12px; border: 1px solid var(--border-color); vertical-align: middle; word-wrap: break-word; }
+        .text-center { text-align: center !important; }
+        .sub-header { background: #fdfdfd; font-weight: bold; color: var(--accent-color); border-left: 4px solid var(--accent-color) !important; }
+
+        @media print {
+            body { background: white; }
+            .report-wrapper { box-shadow: none; margin: 0; width: 100%; padding: 20px; }
+            #btnPrint { display: none; }
+            .section-title { -webkit-print-color-adjust: exact; background-color: #2c3e50 !important; color: white !important; }
+            .stat-card { -webkit-print-color-adjust: exact; background-color: #f8f9fa !important; border: 1px solid #dee2e6 !important; }
+            .custom-table th { -webkit-print-color-adjust: exact; background-color: #ecf0f1 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="row" align="right" style="margin:5px; margin-right:50px;">
+    <button type="button" id="btnPrint" style="cursor:pointer; padding:10px 20px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold;">
+        <i class="fa fa-file-pdf"></i> PDF İNDİR
+    </button>
+</div>
+
+<div class="report-wrapper" id="teskilat-raporu">
+    <div class="report-header">
+        <div class="logo-area">
+            {% if store_logo %} <img src="{{ store_logo }}" style="max-height: 80px;"/> {% else %} <img src="view/image/logo.png" style="max-height: 80px;" /> {% endif %}
+        </div>
+        <div class="signature-box">
+            <h4 style="margin:0 0 5px 0;">Kıymetli Dernek Başkanım;</h4>
+            <p style="margin:0;">Kurumunuzun aylık raporunu zamanında ve eksiksiz doldurduğunuz için teşekkür ederiz.</p>
+            <div style="margin-top:15px; font-size: 0.9rem;">
+                <strong>Abdullah Muhammed İslam</strong> / Genel Başkan
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 30px;">
+            <h2 style="margin:0; color: var(--primary-color);">{{ name }}</h2>
+            <h4 style="margin:5px 0; color: var(--accent-color); ">{{ donemi }} YILI RAPORU</h4>
+        </div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-university"></i> DERNEK GENEL BİLGİLERİ</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>Yönetim Kurulu Üye Sayısı</span><strong>{{ dernek_bilgileri['yonetim_kurulu'] }} Üye</strong></div>
+        <div class="stat-card"><span>Toplantı Periyodu</span><strong>{{ dernek_bilgileri['toplanti_periyodu1'] }}</strong></div>
+        <div class="stat-card"><span>İcra Kurulu Üye Sayısı</span><strong>{{ dernek_bilgileri['icra_kurulu'] }} Üye</strong></div>
+        <div class="stat-card"><span>Toplantı Periyodu</span><strong>{{ dernek_bilgileri['toplanti_periyodu2'] }} Üye</strong></div>
+        <div class="stat-card"><span>Hanımlar Komisyonu</span><strong>{{ dernek_bilgileri['hanimlar_komisyonu'] }}</strong></div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-handshake"></i> DERNEK İMKANLARI</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>Dernek Merkezi Var mı?</span><strong>{{ dernek_imkanlari['dernek_merkezi'] }}</strong></div>
+        <div class="stat-card"><span>Dernek Merkezi Kirası (Mülk İse 0)</span><strong>{{ dernek_imkanlari['dernek_merkezi_kiras'] }}</strong></div>
+        <div class="stat-card"><span>Tam/Yarı Zamanlı Çalışan Sayısı</span><strong>{{ dernek_imkanlari['calisan_sayisi'] }}</strong></div>
+        <div class="stat-card"><span>Dernek Aracı Var mı?</span><strong>{{ dernek_imkanlari['arac'] }}</strong></div>
+        <div class="stat-card"><span>Derneğin Açık Olduğu Gün ve Saatler</span><strong>{{ dernek_imkanlari['saat'] }}</strong></div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-phone"></i> DERNEK İLETİŞİM BİLGİLERİ</div>
+    <div class="stats-grid">
+        <div class="stat-card" style="grid-column: span 2;"><span>Dernek Adresi</span><strong>{{ dernek_iletisim['adres'] }}</strong></div>
+        <div class="stat-card"><span>Kurum Telefonu</span><strong>{{ dernek_iletisim['telefon'] }}</strong></div>
+    </div>
+
+   <div class="section-title"><i class="fa fa-list"></i> MENKUL VE GAYRİMENKULLER</div>
+    <table class="custom-table">
+       <thead>
+                <tr>
+                    <th>Cinsi (Araç-Bina vb)</th>
+                    <th>Kapasitesi</th>
+                    <th>Kaç Yıllık Olduğu</th>
+                    <th>Model Marka(Araç İçin)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in gayri_menkul %}
+                <tr>
+                    <td class="text-center">{{ gayri_menkul_array[value.cins|default(0)] ?? '-' }}</td>
+                    <td class="text-center">{{ value.kapasite }}</td>
+                    <td class="text-center">{{ value.yil }}</td>
+                    <td class="text-center">{{ value.marka }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </table>
+
+    <div class="section-title"><i class="fa fa-list"></i> YÖNETİM KURULU LİSTESİ</div>
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th style="width: 40%;">Ad Soyad</th>
+                <th style="width: 30%;">Telefon No</th>
+                <th style="width: 30%;">Görevi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, value in yonetim_kurulu_array %}
+                {% set veri = yonetim_kurulu[key] ?? {} %}
+                <tr>
+                    <td>{{ veri.adsoyad|default('-') }}</td>
+                    <td class="text-center">{{ veri.telefon|default('-') }}</td>
+                    <td>{{ value|default('-') }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">
+    <i class="fa fa-university"></i> ÖĞRENCİ ÇALIŞMALARI İSTATİSTİKLERİ
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <span>Hedef Öğrenci<br>Sayısı</span>
+        <strong>{{ ogrenci_calisma_istatistik['hedef_ogrenci_sayisi'] }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>İrtibatta Olduğunuz<br>Öğrenci Sayısı</span>
+        <strong>{{ ogrenci_calisma_istatistik['irtibatli_ogrenci_sayisi'] }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>ÖBS’ye Kayıtlı<br>Öğrenci Sayısı</span>
+        <strong>{{ ogrenci_calisma_istatistik['mevcut_ogrenci_sayisi'] }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Ülke Başkanı<br>Sayısı</span>
+        <strong>{{ ogrenci_calisma_istatistik['ulke_baskani_sayisi'] }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>{{ "now"|date("Y") }} Mezun<br>Sayısı</span>
+        <strong>{{ ogrenci_calisma_istatistik['mezun_ogrenci_sayisi'] }}</strong>
+    </div>
+    
+</div>
+
+<div class="stats-grid">
+<div class="stat-card">
+        <span>İrtibatlı Öğrenci<br>Birliği Sayısı</span>
+        <strong>{{ ogrenci_calisma_istatistik['irtibatli_ogrenci_birligi_sayisi'] }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Toplantı Periyodu</span>
+        <strong>{{ ogrenci_calisma_istatistik['toplanti_periyodu'] }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Toplam Toplantı<br>Sayısı</span>
+        <strong>{{ ogrenci_calisma_istatistik['toplam_toplanti_sayisi'] }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Öğrenci Evi<br>Sayısı / Kalan</span>
+        <strong>{{ ogrenci_calisma_istatistik['ogrenci_evi_sayisi'] }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>İrtibatta Olunan<br>Öğrenci Evi Sayısı</span>
+        <strong>{{ ogrenci_calisma_istatistik['irtibat_ogrenci_evi_sayisi'] }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Burs Verilen<br>Öğrenci Sayısı</span>
+        <strong>{{ ogrenci_calisma_istatistik['burs_verilen_ogrenci_sayisi'] }}</strong>
+    </div>
+</div>
+
+    <table class="custom-table">
+        <thead><tr class="sub-header"><th colspan="3">EĞİTİM ÇALIŞMALARI</th></tr></thead>
+        <thead>
+            <tr>
+                <th style="width: 50%;">Faaliyet Adı</th>
+                <th class="text-center">Adet</th>
+                <th class="text-center">Toplam Katılım</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key,value in egitimler_calismalari_array %}
+                {% set veri = egitim_calismalari[key] ?? {} %}
+                <tr>
+                    <td>{{ value }}</td>
+                    <td class="text-center">{{ veri.adet|default('0') }}</td>
+                    <td class="text-center">{{ veri.toplam|default('0') }}</td> 
+                </tr>
+            {% endfor %}
+        </tbody>
+          <thead><tr class="sub-header"><th colspan="3">DERS VE KURSLAR</th></tr></thead>
+            <thead>
+                <tr>
+                    <th>Ders Adı</th>
+                    <th>Kaç Saat Yapıldı?</th>
+                    <th>Toplam Katılım Sayısı</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key,value in egitimler_calismalari_array2 %}
+                {% set veri = egitim_calismalari2[key] ?? {} %}
+                <tr>
+                    <td>{{ value }}</td>
+                    <td class="text-center">{{ veri.adet|default('') }}</td>
+                    <td class="text-center">{{ veri.toplam|default('') }}</td> 
+                </tr>
+                {% endfor %}
+            </tbody>
+    </table>
+
+    <div class="section-title"><i class="fa fa-coins"></i> MALİYE VE KURUMSAL İLİŞKİLER BİRİMİ</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>Bağışçı Sayısı</span><strong>{{ maliye_kurumsal_iliskiler_birimi['bireysel_bagisci_sayisi']|default('0') }}</strong></div>
+        <div class="stat-card"><span>Kumbara Sayısı</span><strong>{{ maliye_kurumsal_iliskiler_birimi['toplam_mevcut_kumbara_sayisi'] }}</strong></div>
+        <div class="stat-card"><span>Aidat Veren</span><strong>{{ maliye_kurumsal_iliskiler_birimi['toplam_aidat_veren_kisi_sayisi'] }}</strong></div>
+        <div class="stat-card"><span>Kurumsal Ziyaret</span><strong>{{ maliye_kurumsal_iliskiler_birimi['gidilen_kurumsal_ziyaret_sayisi'] }}</strong></div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><span>Nakdi Gelir/Gider</span><strong>{{ maliye_kurumsal_iliskiler_birimi['nakdi_gelir'] }} / {{ maliye_kurumsal_iliskiler_birimi['nakdi_gider'] }}</strong></div>
+        <div class="stat-card"><span>Ayni Gelir/Gider</span><strong>{{ maliye_kurumsal_iliskiler_birimi['ayni_gelir'] }} / {{ maliye_kurumsal_iliskiler_birimi['ayni_gider'] }}</strong></div>
+    </div>
+
+    <table class="custom-table">
+        <thead><tr class="sub-header"><th colspan="3">ÖĞRENCİ ÇALIŞMALARI</th></tr></thead>
+        <thead>
+            <tr>
+                <th style="width: 50%;">Faaliyet Adı</th>
+                <th class="text-center">Adet</th>
+                <th class="text-center">Toplam Katılım</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key,value in ogrenci_calismalari_array %}
+                {% set veri = ogrenci_calismalari[key] ?? {} %}
+                <tr>
+                    <td>{{ value }}</td>
+                    <td class="text-center">{{ veri.adet|default('0') }}</td>
+                    <td class="text-center">{{ veri.toplam|default('0') }}</td> 
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="custom-table">
+        <thead><tr class="sub-header"><th colspan="3">ÜÇ AYLARDAKİ ÇALIŞMALAR</th></tr></thead>
+        <thead>
+            <tr>
+                    <th>Çalışma Adı</th>
+                    <th>Kaç Adet Yapıldı?</th>
+                    <th>Toplam Katılım Sayısı</th>
+                </tr>
+        </thead>
+        <tbody>
+                {% for key,value in ramazan_etkinlikleri_array %}
+                {% set veri = ramazan_etkinlikleri[key] ?? {} %}
+                <tr>
+                    <td>{{ value }}</td>
+                    <td class="text-center">{{ veri.adet|default('') }}</td>
+                    <td class="text-center">{{ veri.toplam|default('') }}</td> 
+                </tr>
+                {% endfor %}
+            </tbody>
+    </table>
+
+    <table class="custom-table">
+        <thead><tr class="sub-header"><th colspan="3">SOSYAL ÇALIŞMALAR</th></tr></thead>
+        <thead>
+            <tr>
+                    <th>Çalışma Adı</th>
+                    <th>Kaç Adet Yapıldı?</th>
+                    <th>Toplam Katılım Sayısı</th>
+                </tr>
+        </thead>
+        <tbody>
+                {% for key,value in sosyal_calismalar_array %}
+                {% set veri = sosyal_calismalar[key] ?? {} %}
+                <tr>
+                    <td>{{ value }}</td>
+                    <td class="text-center">{{ veri.adet|default('') }}</td>
+                    <td class="text-center">{{ veri.toplam|default('') }}</td> 
+                </tr>
+                {% endfor %}
+            </tbody>
+    </table>
+
+    <div class="section-title"><i class="fa fa-share-nodes"></i> TANITIM BİRİMİ VE SOSYAL MEDYA</div>
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>Platform</th>
+                <th>Hesap Adı</th>
+                <th class="text-center">Takipçi</th>
+                <th class="text-center">İçerik</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set platforms = ['facebook', 'instagram', 'youtube', 'twitter', 'tiktok'] %}
+            {% for p in platforms %}
+            <tr>
+                <td style="text-transform: capitalize;"><strong>{{ p }}</strong></td>
+                <td>{{ tanitim_birimi[p]['hesap_adi']|default('-') }}</td>
+                <td class="text-center">{{ tanitim_birimi[p]['takipci']|default('0') }}</td>
+                <td class="text-center">{{ tanitim_birimi[p]['icerik']|default('0') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+   <div class="section-title"><i class="fa fa-share-nodes"></i> YAYINLAR (Matbu ve Dijital)</div>
+    <table class="custom-table">
+        
+        <thead>
+                <tr>
+                    <th>Yayın Adı</th>
+                    <th>Periyodu</th>
+                    <th>Kaç Adet Basıldı</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ tanitim_birimi['yayin_adi'] }}</td>
+                    <td class="text-center">{{ tanitim_birimi['periyod'] }}</td>
+                    <td class="text-center">{{ tanitim_birimi['adet'] }}</td>
+                </tr>
+            </tbody>
+    </table>
+
+    <div class="section-title"><i class="fa fa-list"></i> GENEL FAALİYETLER</div>
+    <table class="custom-table">
+        
+        <thead>
+                <tr>
+                    <th>Faaliyet Adı</th>
+                    <th>Yapıldı mı?</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in genel_faaliyetler_array %}
+                {% set veri = genel_faaliyetler[key] ?? {} %}
+                <tr>
+                    <td>{{ value }}</td>
+                    <td class="text-center">{{ veri.secim | default('--') }}</td>
+                    <td>{{ veri.aciklama | default('') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </table>
+
+    <table class="custom-table">
+        <thead><tr class="sub-header"><th>DİĞER FAALİYETLER</th></tr></thead>
+        <tbody>
+                <tr>
+                    <td>{{ diger_faaliyetler.aciklama | nl2br }}</td>
+
+                </tr>
+            </tbody>
+    </table>
+</div>
+
+<script>
+    $('#btnPrint').click(function () {
+        window.print();
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+{{ header }}{{ column_left }}
+<main id="isportali" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-center">       
+          <ul class="list-group list-group-horizontal-md flex-wrap">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Talep Oluşturma
+            <span class="badge bg-secondary"> {{total0}}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Onay Süreci
+            <span class="badge bg-warning"> {{total1}}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Görev
+            <span class="badge bg-info"> {{total2}}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Kapanış
+            <span class="badge bg-primary"> {{total3}}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Tamamlanan
+            <span class="badge bg-success"> {{total4}}</span>
+          </li>
+        </ul>
+
+      </div>
+
+        <div class="ms-auto text-end">
+         <button type="button" id="button-add" data-toggle="tooltip" title="{{ "Görevlendirme Ekle" }}" class="btn btn-primary button-add btn-sm"/><i class="bi bi-plus-lg"></i>{{"Ekle"}}</button>
+         {% if button_excel %}
+        <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success btn-sm" ><i class="bi bi-download" ></i></a>
+         {% endif %}
+         
+         
+         <a href="{{clear}}" id="button-clear" data-toggle="tooltip" title="{{ "Filtreyi Temizle" }}" class="btn btn-light border border-dark shadow-sm btn-sm bg-white" ><i class="bi bi-filter"></i></a>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+
+            <div class="card-header py-1">
+                    <div class="row g-3 ">
+                       <div class="col-lg-3 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_gorev" value="{{filter_gorev}}" placeholder="Görev Konusu" class="form-control auto-filter px-4">
+                            </div>
+                        </div>
+                       <div class="col-lg-2 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_personel" value="{{filter_personel}}" placeholder="Ad Soyad" class="form-control px-4">
+                                <input type="hidden" name="filter_personel_id" value="{{filter_personel_id}}" placeholder="birim id" class="form-control auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 mb-3">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="dateFilterDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <i class="bi bi-calendar me-2"></i> Tarih
+                            </button>
+
+                            <div class="dropdown-menu p-3 shadow" aria-labelledby="dateFilterDropdown" style="min-width: 200px;">
+                          
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="small text-muted fw-bold">Başlangıç:</label>
+                                        <input type="date" name="date_start" value="{{filter_date_start}}" class="form-control">
+                                        <input type="date" name="filter_date_start" value="" class="form-control auto-filter" style="display:none;">
+                                    </div>
+                                    <div class="col-12 mt-2">
+                                        <label class="small text-muted fw-bold">Bitiş:</label>
+                                        <input type="date" name="date_end" value="{{filter_date_end}}" class="form-control" >
+                                        <input type="date" name="filter_date_end" value="" class="form-control auto-filter" style="display:none;">
+                                    </div>
+                                </div>
+                                <div class="mt-3 d-grid">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btn-apply">Uygula</button>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                       <div class="col-lg-1 col-6 mb-2"></div>
+                        <div class="col-lg-1 col-6 mb-2"></div>
+                        
+                       
+                        <div class="col-lg-2 col-6 mb-2">
+                          <select name="filter_status" class="form-select auto-filter">
+                            <option value="" >{{"--Seçim--"}} </option>
+                            {% for key,value in status_array %}                       
+                             <option value="{{key}}" {% if key == filter_status %} selected {% endif %}>{{value}} </option>
+                            {% endfor %}
+                          </select>
+                       </div>
+
+
+                       <div class="col-lg-1 col-6 mb-2">
+                          <select name="limit" class="form-select auto-filter" id="select-limit">
+                          {% for key,value in limits %}
+						               <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+						               {% endfor %}
+                         </select>
+                        </div>
+                    </div>
+                </div>
+                 
+                 
+          <div class="card-body" id="gorev-data"></div>
+          <input type="hidden" id="form-gorev_yonetimi_id" name="gorev_yonetimi_id" value="0"> 
+
+        </div>
+        </div>
+
+
+    </div>
+
+  {{footer}}  
+</main>
+
+{# YENİ TALEP MODAL - SADE VE DARALTILMIŞ VERSİYON #}
+<div class="modal fade" id="modal-gorev" tabindex="-1" aria-labelledby="gorevModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="gorevModalLabel">Görev Ekleme Formu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="form-modal-gorev">
+          <div class="container-fluid">
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="birim-select" class="form-label fw-bold">Birimi:</label>
+                <select name="personel_birim_id" id="birim-select" class="form-select" required>
+                  <option value="">-- Birim Seçin --</option>
+                  {% for kurum in kurumlar %}
+                    <option value="{{kurum.personel_birim_id}}">{{kurum.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="row mb-2">
+              <div class="col-md-12">
+                <label for="konu-input" class="form-label fw-bold">Görev Konusu:</label>
+                <input type="text" name="konu" id="konu-input" placeholder="Yapılacak işin kısa özeti" class="form-control" required>
+              </div>
+            </div>
+
+            <div class="row mb-2">
+              <div class="col-md-12">
+                <label for="aciklama-textarea" class="form-label fw-bold">Görev Amacı/Gerekçesi:</label>
+                <textarea name="description" id="aciklama-textarea" rows="3" placeholder="Gerekçe, amaç veya kapsam özeti nedir?" class="form-control" required></textarea>
+              </div>
+            </div>
+
+            <div class="col-sm-6 mb-2">
+              <label for="input-tutar" class="form-label fw-bold">Avans/Harcama Tutarı:</label>
+              <div class="input-group col-sm-6">
+                <input type="text" name="harcirah_tutari" id="input-tutar" placeholder="Harcama tutarı" data-mask="#.##,00" class="form-control bg-light-success">
+                <span class="input-group-text">₺</span>
+              </div>
+              
+            </div>
+            <small class="text-muted">Not : Küsüratlı rakamları (,) virgül ile ayırınız örn: 5.850,75</small>
+
+            <div class="row mb-2">
+              <div class="col-md-6">
+                <label for="input-date-start" class="form-label fw-bold">Görev Başlangıç Zamanı:</label>
+                <input type="date" name="input_date_start" id="input-date-start" class="form-control"/>
+              </div>
+              <div class="col-md-6">
+                <label for="input-date-end" class="form-label fw-bold">Görev Bitiş Zamanı:</label>
+                <input type="date" name="input_date_end" id="input-date-end" class="form-control"/>
+              </div>
+            </div>
+
+            <div class="row mb-0">
+              <div class="col-md-12">
+                <label for="proje-input " class="form-label fw-bold">Proje/Kampanya</label>
+                <input type="text" name="proje" id="proje-input" data-for="7" placeholder="Proje/Kampanya adı" class="form-control auto-filter">
+                <input type="hidden" name="proje_id" id="proje-input-id" value="" class="input-hidden"/>
+                <small class="text-muted">Harcamalar özel bir proje/kampanya kapsamında değilse Federasyon Harcamalarını seçiniz.</small>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="modal-button-add" class="btn btn-primary">Kaydet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ONAY MESAJI MODALI -->
+<div class="modal fade" id="modal-message" tabindex="-1" aria-labelledby="modalMessageLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:35%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalMessageLabel">Bilgilendirme</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        <h4 class="fs-5">
+          Görevlendirme talebiniz <strong>Talep Oluşturma</strong> aşamasında kaydedilmiştir. 
+          Görevlendirme Sayfasına giderek gerekli kontrolleri yaptıktan, varsa gerekli diğer alanları doldurduktan sonra 
+          <strong>Durum/Aşama bölümünden Onay Sürecine</strong> gönderiniz. 
+          Onay Sürecine gönderildikten sonra Görevlendirme Sayfasında herhangi bir değişiklik yapılamaz.
+        </h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="gorev-detay-html"></div>
+
+<div id="harcamalar-tablosu"></div>
+
+<div id="dokumanlar-listesi"></div>
+
+<script>
+$('.auto-filter').on('change', function(e) {
+  e.preventDefault();
+
+   $('#cover-spin').show(0);
+ 
+  url = 'index.php?route=personeller/gorev_yonetimi/dataGorev&user_token={{ user_token }}';
+
+   if ($('input[name=\'filter_gorev\']').val()) {
+    url += '&filter_gorev=' + encodeURIComponent($('input[name=\'filter_gorev\']').val());
+	}
+
+  if ($('input[name=\'filter_personel_id\']').val()) {
+    url += '&filter_personel=' + encodeURIComponent($('input[name=\'filter_personel\']').val());
+		url += '&filter_personel_id=' + encodeURIComponent($('input[name=\'filter_personel_id\']').val());
+	}
+
+  if ($('input[name=\'filter_date_start\']').val()) {
+    url += '&filter_date_start=' + encodeURIComponent($('input[name=\'filter_date_start\']').val());
+	}
+
+   if ($('input[name=\'filter_date_end\']').val()) {
+    url += '&filter_date_end=' + encodeURIComponent($('input[name=\'filter_date_end\']').val());
+	}
+
+  if ($('select[name=\'filter_status\']').val()) {
+    url += '&filter_status=' + encodeURIComponent($('select[name=\'filter_status\']').val());
+	}
+
+	if ($('select[name^=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name^=\'limit\']').val());
+	}
+	
+	$('#gorev-data').load(url);
+   
+
+});
+
+$( document ).ready(function() {
+ $('#gorev-data').load('index.php?route=personeller/gorev_yonetimi/dataGorev&user_token={{ user_token }}');
+});
+
+</script>
+
+
+<script>
+  //PERSONEL AUTO COMPLETE
+	$('input[name=\'filter_personel\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+         url: 'index.php?route=setting/autocomplete/autocompletePersoneller&user_token={{ user_token }}&filter_personel=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['personel_id']
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+       $('input[name=\'filter_personel\']').val(item['label']);
+       $('input[name=\'filter_personel_id\']').val(item['value']);
+       $('input[name=\'filter_personel_id\']').trigger('change');
+    }
+  });
+
+</script>
+
+<script>
+ $('#button-add').on('click', function() {
+     $('#modal-gorev').modal('show');
+     $('#form-modal-gorev')[0].reset();
+     $('#form-gorev_yonetimi_id').val(0);
+ });
+
+ $('#btn-apply').on('click', function() {
+   var date_start = $('input[name="date_start"]').val();
+   var date_end   = $('input[name="date_end"]').val();
+
+   $('.dropdown-menu').click();
+   $('input[name="filter_date_start"]').val(date_start).trigger('change');
+   $('input[name="filter_date_end"]').val(date_end).trigger('change');
+});
+
+$('#modal-button-add').on('click', function() {
+    $('.text-danger').find('span').remove();
+  
+    var gorev_yonetimi_id = $('#form-gorev_yonetimi_id').val();
+
+    $.ajax({
+      url: 'index.php?route=personeller/gorev_yonetimi/save&user_token={{ user_token }}&gorev_yonetimi_id=' + gorev_yonetimi_id,
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-modal-gorev').serialize(),
+      success: function(json) {
+
+       if (json.error.warning) {
+          alerterror(json.error.warning);
+       }
+
+       if (json.success) {
+         $('#modal-gorev').modal('hide');
+         $('#gorev-data').load('index.php?route=personeller/gorev_yonetimi/dataGorev&user_token={{ user_token }}');
+         $('#modal-message').modal('show');
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ });
+</script>
+
+
+
+
+<script>
+$('.auto-filter').autocomplete({
+    source: function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/gelirgroupautocomplete&user_token={{ user_token }}&bolum=' + $(this).attr('data-for') + '&filter_name=' + encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item.name,
+              value: item.id
+            };
+          }));
+        }
+      });
+    },
+    select: function(item) {
+      $(this).val(item.label);
+      $('#proje-input-id').val(item.value);
+    }
+  });
+
+</script>
+
+<link id="aaa" rel="stylesheet" href="view/stylesheet/gorev_yonetimi.css?v=7885555" />
+

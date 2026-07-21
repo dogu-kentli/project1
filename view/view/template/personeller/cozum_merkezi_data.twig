@@ -1,0 +1,482 @@
+  
+	   <table id="isportali" class="table table-bordered"> 
+        <thead>
+          <tr>
+            <td class="text-left" style="width:20%"><a href="javascript:void(0)"><i class="fa-solid fa-business-time"></i> {{ " Talep Konusu" }}</a>
+            
+            </td>
+		        <td class="text-left"> <a href="javascript:void(0)" id="customer-column">{{ "Öğrenci Adı " }}<i class="fa-solid fa-filter" style="font-size:10px;"></i> </a>
+              <div class="input-group" id="customer-column-input" style="display:none;">
+               <input type="text" name="filter_customer"  class="form-control input-sm" placeholder="Öğrenci ara..">
+             </div>
+
+             <input type="hidden" name="filter_customer_id"  value="{{filter_customer}}" class="form-control auto-filter" >
+            
+            </td>
+             <td class="text-left"><a href="{{sort_tarih}}" class="sort-oncelik">{{ "Talep Tarihi " }} <i class="fa-solid fa-sort" style="font-size:10px;"></i></a></td>
+            
+            
+             <td class="text-left"><a href="javascript:void(0)" id="category-column"> {{ "Kategori " }} <i class="fa-solid fa-filter" style="font-size:10px;"></i></a>
+              <div class="input-group" id="category-column-input" style="display:none;">
+               <input type="text" name="filter_category" class="form-control input-sm" placeholder="Kategori ara..">
+             </div>
+
+             <input type="hidden" name="filter_category_id" id="filter-category-id" value="{{filter_category}}" class="form-control auto-filter" >
+            
+            </td>
+            <td class="text-left"><a href="javascript:void(0)" id="status-column"> {{ "Talep Durumu" }} <i class="fa-solid fa-filter" style="font-size:10px;"></i></a>
+              <div class="input-group" id="status-column-input" style="display:none;">
+               <input type="text" name="filter_status" class="form-control input-sm" placeholder="Talep Durumu...">            
+             </div>
+
+             <input type="hidden" name="filter_status_id" id="filter-birim-id" value="{{filter_status}}" class="form-control auto-filter" >
+            </td>
+
+			      <td class="text-left"><a href="{{sort_oncelik}}" class="sort-oncelik">{{ "Öncelik " }} <i class="fa-solid fa-sort" style="font-size:10px;"></i></a></td>
+           
+            <td colspan="2" class="text-center select-limit" >
+                <select name="limit" class="form-control" id="select-limit auto-filter">
+                  {% for limit in limits %}
+                   <option valu="{{ limit.value }}" {% if limit.value == select_limit %} selected {% endif %}>{{limit.text}}</option>
+                 {% endfor %} 
+                 </select>
+            </td>
+            
+          </tr>
+      </thead>
+     <tbody class="data-list">
+       {% if istakibilist %}
+	     {% set row = 1 %}
+      
+	     {% for istakibi in istakibilist %}
+	  
+      <tr id="data-list{{istakibi.istakibi_cozum_id}}" class="{{istakibi.color}}">
+	    
+      <td id="{{ istakibi.istakibi_cozum_id }}" class="text-left"><span class="isttakibi-span" style="display:block">{{ istakibi.gorev }}</span>
+       <input type="text" name="gorev" value="{{ istakibi.gorev }}" placeholder="Yapılacak görev" id="gorev{{ istakibi.istakibi_cozum_id }}" class="form-control input-portal" onchange="saveToDB('gorev','{{ istakibi.istakibi_cozum_id }}')" style="display:none;"/>
+       
+      </td>
+      <td id="{{ istakibi.istakibi_cozum_id }}" class="text-left item"><span class="isttakibi-span" style="display:block">{{ istakibi.customer }}</span>
+         <input type="text" name="customer" value="" id="customer{{ istakibi.istakibi_cozum_id }}" placeholder="Öğrenci" class="form-control input-portal" style="display:none;" />
+         <input type="hidden" name="customer_id" value="{{ istakibi.customer_id }}" id="customer_id{{ istakibi.istakibi_cozum_id }}" onchange="saveToDB('customer_id','{{ istakibi.istakibi_cozum_id }}')" class="form-control input-portal" style="display:none;" />
+         <input type="hidden" name="adsoyad" value="" id="adsoyad{{ istakibi.istakibi_cozum_id }}" placeholder="" onchange="saveToDB('adsoyad','{{ istakibi.istakibi_cozum_id }}')" class="form-control input-portal" style="display:none;" />
+      </td>
+      <td id="{{ istakibi.istakibi_cozum_id }}" class="text-left item">
+         <span class="text-center isttakibi-span" style="display:block">{{ istakibi.talep_tarihi }}</span>
+         <input type="text" name="talep_tarihi" value="{{istakibi.talep_tarihi}}"  data-date-format="DD/MM/YYYY"  placeholder="Bitiş Tarihi" id="talep_tarihi{{ istakibi.istakibi_cozum_id }}" onchange="saveToDB('talep_tarihi','{{ istakibi.istakibi_cozum_id }}')" class="form-control input-portal" style="display:none;" readonly/>
+      </td>
+		 
+       <td id="{{ istakibi.istakibi_cozum_id }}" class="text-left item"><span class="isttakibi-span" style="display:block">{{ istakibi.category }}</span>
+         <input type="text" name="category" value="{{ istakibi.category }}" id="category{{ istakibi.istakibi_cozum_id }}" placeholder="Kategori" class="form-control input-portal" style="display:none;" />
+         <input type="hidden" name="category_id" value="{{ istakibi.category['personel_category_id'] }}" id="category_id{{ istakibi.istakibi_cozum_id }}" onchange="saveToDB('category_id','{{ istakibi.istakibi_cozum_id }}')" class="form-control input-portal" style="display:none;"/>
+       </td>
+       <td class="text-left item">{{ istakibi.status }}</td>
+	     <td id="{{ istakibi.istakibi_cozum_id }}" class="text-left">
+          <span class="isttakibi-span" style="display:block">{{istakibi.oncelik}}</span>
+        
+          <input type="text" name="oncelik" value="{{istakibi.oncelik}}" placeholder="Öncelik Durumu" id="oncelik{{ istakibi.istakibi_cozum_id }}"  class="form-control input-portal" style="display:none;"/>
+          <input type="hidden" name="oncelik_id" value="{{istakibi.oncelik}}"  id="oncelik_id{{ istakibi.istakibi_cozum_id }}" onchange="saveToDB('oncelik_id','{{ istakibi.istakibi_cozum_id }}')" class="form-control" />
+       </td>
+    
+      <td class="text-center">
+       <input type="hidden" id="data_personel{{ istakibi.istakibi_cozum_id }}" value="{{istakibi.personel_id}}">
+	     <button type="button" id="button-view"  data-toggle="tooltip" title="Görüntüle" onclick="functionView('{{ istakibi.istakibi_cozum_id }}','{{ istakibi.personel_id }}')" class="btn btn-info btn-sm"> <i class="fa fa-eye"></i></button>
+	    </td>
+	     {% if userGroupId == 1 %}
+        <td class="text-center">
+	        <button type="button" id="{{istakibi.istakibi_cozum_id}}" class="btn btn-danger btn-sm button-delete"><i class="fa fa-remove"></i></button>
+	      </td>	  
+       {% endif %}
+	    </tr>
+     
+	   {% set row = row + 1 %}
+     {% endfor %}
+     {% else %}
+        <tr>
+        <td class="text-center" colspan="6">{{"Sonuç bulunamadı"}}</td>
+       </tr>
+      {% endif %}
+      </tbody>
+      <tfoot id="isportali-footer">
+           <tr>
+            
+            <td colspan="9" class="text-right">
+             {% if permission %}
+            <button type="button" id="button-add" data-toggle="tooltip" title="{{ "Ekle" }}" class="btn btn-default button-add"><i class="fa fa-plus"></i>{{" Ekle"}}</button>
+             {% endif %}
+            </td>
+           </tr>
+      </tfoot>
+      </table>         
+
+<div class="row">
+  <div class="col-sm-6 text-left">{{ pagination }}</div>
+  <div class="col-sm-6 text-right">{{ results }}</div>
+</div> 
+
+
+<div id="modal-isportali" class="modal">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+     
+      <div class="pull-right h-25"> 
+		      <button type="button" id="button-close" data-toggle="tooltip" data-dismiss="modal" title="{{ button_close }}" class="btn btn-default btn-sm"><i class="fa fa-close"></i></button>
+      </div>
+      </div>
+       <form id="form-comment">
+      <div class="modal-body">
+        <ul class="list-group">
+          
+          
+        </ul>
+      </div>
+     
+      <div class="modal-footer">
+         
+         <form id="form-comment">
+          
+          <div class="col-sm-12">
+          <div class="text-left"><strong> {{"Faaliyet Kategorisi"}}</strong></div>
+             <select name="category_id" class="form-control faaliyet-category">
+                <option value="">{{"--Kategori Seçin--"}}</option>
+                {% for key,value in categories %}
+                 <option value="{{key}}">{{key}} - {{value}}</option>
+                {% endfor %}
+             </select>
+          </div>
+      
+          <div class="col-sm-12">
+            <input type="hidden" name="istakibi_cozum_id" value="">
+            <div class="text-left"><strong> {{"Açıklama"}}</strong></div>
+            <textarea name="comment1" rows="3" id="comment1" placeholder="{{ "Görev hakkında açıklama yazınız (Maksimum 1000 karakter)" }}" id="input-comment" class="form-control"></textarea>
+            
+          </div>
+
+          <div class="col-sm-12">
+           
+            <div class="text-left"><strong> {{"Sonuç Raporu"}}</strong></div>
+            <textarea name="comment2" rows="3" id="comment2" placeholder="{{ "Sonuç Raporu (Maksimum 1000 karakter)" }}" id="input-comment" class="form-control"></textarea>
+            <br>
+          </div>
+
+  
+          </form>
+           <div class="pull-rigt">
+           
+            <button type="button" id="button-save" class="btn btn-primary btn-save" ><i class="fa-solid fa-floppy-disk"></i> {{ button_save }}</button>
+           </div>
+          
+          </div>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript"><!--
+$('input[name^=\'customer\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/cozum_merkezi/customerautocomplete&user_token={{ user_token }}&filter_customer=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          var adsoyad = json['adsoyad'];
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['customer_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('#customer' + sessionStorage.getItem('id')).val(item['label']);
+      $('#customer_id' + sessionStorage.getItem('id')).val(item['value']);
+      $('#customer_id' + sessionStorage.getItem('id')).trigger('change');
+      if(item['value'] == 'new') {
+        var adsoyad = item['label'].trim().replace(" ismi eklensin mi?","");
+        $('#adsoyad' + sessionStorage.getItem('id')).val(adsoyad);
+        $('#adsoyad' + sessionStorage.getItem('id')).trigger('change');
+      }
+       
+    }
+     
+  });
+
+  
+  $('input[name^=\'oncelik\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/cozum_merkezi/oncelikautocomplete&user_token={{ user_token }}&filter_oncelik=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['text'],
+              value: item['status_id']
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+       $('#oncelik' + sessionStorage.getItem('id')).val(item['label']);
+       $('#oncelik_id' + sessionStorage.getItem('id')).val(item['value']);
+       $('#oncelik_id' + sessionStorage.getItem('id')).trigger('change');
+    }
+  });
+
+
+  $('input[name^=\'category\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/cozum_merkezi/categoryautocomplete&user_token={{ user_token }}&filter_category=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['text'],
+              value: item['category_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('#category' + sessionStorage.getItem('id')).val(item['label']);
+      $('#category_id' + sessionStorage.getItem('id')).val(item['value']);
+      $('#category_id' + sessionStorage.getItem('id')).trigger('change');
+    }
+  });
+
+//--></script>
+
+
+<script type="text/javascript"><!--
+// MODAL GÖRÜNTÜLEME 
+
+function functionView(id,personel_id) {
+    var user_personel_id = '{{user_personel_id}}';
+
+    $('#modal-isportali').modal('show');
+    $('#modal-isportali input[name^=\'istakibi_cozum_id\']').val(id);
+    
+    $.ajax({
+      url: 'index.php?route=personeller/cozum_merkezi/dataView&user_token={{ user_token }}&istakibi_cozum_id='  +id,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+       $('.alert-dismissible').remove();
+       $('.list-group-item').remove();
+       $('.dropdown-menu').find('li').attr('class','');
+        
+      
+        if (json['gorev']) {
+         $('#modal-isportali .list-group').append(json['gorev']);
+         $('#modal-isportali textarea[name^=\'comment1\']').val(json['comment1']);
+         $('#modal-isportali textarea[name^=\'comment2\']').val(json['comment2']);
+         $('#modal-isportali select[name^=\'status\']').val(json['status']);
+         $('#modal-isportali select[name^=\'category_id\']').val(json['category_id']);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+}
+
+
+$('#button-save').on('click', function() {
+   
+    var element = $('#modal-isportali input[name^=\'istakibi_cozum_id\']').val();
+	
+     $.ajax({
+      url: 'index.php?route=personeller/cozum_merkezi/save&user_token={{ user_token }}&istakibi_cozum_id='  + element,
+      type: 'post',
+      dataType: 'json',
+      data : $('#form-comment').serialize(),
+      
+      success: function(json) {
+  
+        if (json.error.warning) {
+	      $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error.warning +'</div>'); 
+         }
+         
+        if (json.success) {
+           $('#modal-isportali').modal('hide');
+           $('#alert').prepend('<div class="alert alert-success alert-dismissible">&#x2714;Kayıt başarıyla gerçekleştirildi.</span>');
+           $('#cozummerkezi-data').load('index.php?route=personeller/cozum_merkezi/dataIsportali&user_token={{ user_token }}');
+          
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+
+ $('.button-delete').on('click', function() {
+    if (confirm('Dikkat : Bu işlem geri alınamaz. Bu görevi silmek istediğinize emin misiniz?') == false) {    
+        exit();
+    }
+   
+    var element = $(this).attr('id');
+	
+     $.ajax({
+      url: 'index.php?route=personeller/cozum_merkezi/deleteData&user_token={{ user_token }}&istakibi_cozum_id='  + element,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+
+         if (json.error.warning) {
+	         $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error.warning +'</div>'); 
+         }
+         
+        if (json.success) {
+          $('#modal-isportali').modal('hide');
+         
+           $('#cozummerkezi-data').load('index.php?route=personeller/cozum_merkezi/dataIsportali&user_token={{ user_token }}');
+           $('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i>' + json.success + '</div>');
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+$('#button-close').on('click', function() {
+    $('#modal-isportali').modal('hide');
+});
+
+//--></script>
+
+<script type="text/javascript"><!--
+$('input[name^=\'talep_tarihi\']').datetimepicker({
+	language: '{{ datepicker }}',
+	pickTime: false
+});
+
+//--></script>
+
+<script>
+$('#customer-column').on('click', function() {
+  $('#customer-column-input').toggle();
+  $('input[name^=\'filter_customer\']').focus();
+});
+
+$('#category-column').on('click', function() {
+  $('#category-column-input').toggle();
+  $('input[name^=\'filter_category\']').focus();
+});
+
+$('#status-column').on('click', function() {
+  $('#status-column-input').toggle();
+  $('input[name^=\'filter_status\']').focus();
+});
+
+
+$('input[name^=\'filter_customer\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/cozum_merkezi/customerautocomplete&user_token={{ user_token }}&filter_customer=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          json.unshift({
+             name: '-- Tümünü Seç --',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['customer_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_customer\']').val(item['label']);
+      $('input[name^=\'filter_customer_id\']').val(item['value']);
+      $('input[name^=\'filter_customer_id\']').trigger('change');
+      
+    }
+  });
+
+
+  $('input[name^=\'filter_category\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/cozum_merkezi/categoryautocomplete&user_token={{ user_token }}&filter_category=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          json.unshift({
+             text: '-- Tümünü Seç --',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['text'],
+              value: item['category_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_category\']').val(item['label']);
+      $('input[name^=\'filter_category_id\']').val(item['value']);
+      $('input[name^=\'filter_category_id\']').trigger('change');
+    }
+  });
+
+
+
+    $('input[name^=\'filter_status\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/cozum_merkezi/statusautocomplete&user_token={{ user_token }}&filter_status=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          json.unshift({
+             text: '-- Tümünü Seç --',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['text'],
+              value: item['status_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_status\']').val(item['label']);
+      $('input[name^=\'filter_status_id\']').val(item['value']);
+      $('input[name^=\'filter_category_id\']').trigger('change');
+    }
+  });
+  $('#cover-spin').hide(0);
+</script>
+
+
+
+
+
+
+

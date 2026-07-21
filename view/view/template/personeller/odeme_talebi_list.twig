@@ -1,0 +1,676 @@
+{{ header }}{{ column_left }}
+<main id="isportali" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-center">
+            <ul class="list-group list-group-horizontal-md flex-wrap">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    İşlem Bekleyen
+                    <span class="badge bg-warning"> {{total0}}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    İşleme Alınan
+                    <span class="badge bg-info"> {{total1}}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Güncelleme Talebi
+                    <span class="badge bg-primary"> {{total2}}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Tamamlanan
+                    <span class="badge bg-success"> {{total3}}</span>
+                </li>
+            </ul>
+
+        </div>
+
+        <div class="ms-auto text-end">
+            <button type="button" id="button-add" data-toggle="tooltip" title="{{ "Talep Ekle" }}" class="btn btn-primary btn-sm button-add" /><i class="bi bi-plus-lg"></i>{{" Talep Ekle"}}</button>
+            {% if button_excel %}
+            <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success btn-sm"><i class="bi bi-download"></i></a>
+            {% endif %}
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+
+                <div class="card-header py-3">
+                    <div class="row g-1 ">
+                        <div class="col-lg-2 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_personel" value="{{filter_personel}}" placeholder="Ad Soyad" class="form-control px-4">
+                                <input type="hidden" name="filter_personel_id" value="{{filter_personel_id}}" placeholder="personel id" class="form-control auto-filter">
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_birim" value="{{filter_birim}}" placeholder="Kurum/Birim" class="form-control px-4">
+                                <input type="hidden" name="filter_birim_id" value="{{filter_birim_id}}" placeholder="birim id" class="form-control auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_firma" value="{{filter_firma}}" placeholder="Şirket adı" class="form-control auto-filter px-4">
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-6 mb-2">
+                            <select name="filter_odeme" class="form-select auto-filter">
+                                <option value="">{{"--Seçim--"}}</option>
+                                <option value="1" {% if filter_odeme == 1 %} selected='selected' {% endif %}>{{"Nakit"}}</option>
+                                <option value="2" {% if filter_odeme == 2 %} selected='selected' {% endif %}>{{"Havale/Eft"}}</option>
+                                <option value="3" {% if filter_odeme == 3 %} selected='selected' {% endif %}>{{"Kredi Kartı"}}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-1 col-6 mb-2">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_tutar" value="{{filter_tutar}}" placeholder="Tutar" class="form-control auto-filter px-4">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-1 col-6 mb-2">
+                            <select name="filter_fatura" class="form-select auto-filter">
+                                <option value="">{{"-Seçim Yapın--"}}</option>
+                                <option value="1" {% if filter_fatura == 1 %} selected='selected' {% endif %}>{{"Faturalı"}}</option>
+                                <option value="2" {% if filter_fatura == 2 %} selected='selected' {% endif %}>{{"Faturasız"}}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-1 col-6 mb-2">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="dateFilterDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                    <i class="fas fa-calendar-alt me-2"></i> Tarih
+                                </button>
+
+                                <div class="dropdown-menu p-3 shadow" aria-labelledby="dateFilterDropdown" style="min-width: 200px;">
+                                    <h6 class="dropdown-header px-0">Tarih Aralığı Seçin</h6>
+                                    <div class="row g-2">
+                                        <div class="col-12">
+                                            <label class="small text-muted">Başlangıç:</label>
+                                            <input type="date" name="date_start" value="{{filter_date_start}}" class="form-control">
+                                            <input type="date" name="filter_date_start" value="" class="form-control auto-filter" style="display:none;">
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <label class="small text-muted">Bitiş:</label>
+                                            <input type="date" name="date_end" value="{{filter_date_end}}" class="form-control">
+                                            <input type="date" name="filter_date_end" value="" class="form-control auto-filter" style="display:none;">
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 d-grid">
+                                        <button type="button" class="btn btn-primary btn-sm" id="btn-apply">Uygula</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-1 col-6 mb-2">
+                            <select name="filter_status" class="form-select auto-filter">
+                                <option value="" {% if filter_status is same as("") or filter_status is null %} selected='selected' {% endif %}>--Seçim Yapın--</option>
+                                <option value="0" {% if filter_status is same as(0) or filter_status is same as("0") %} selected='selected' {% endif %}>İşlem Bekleyen</option>
+                                <option value="1" {% if filter_status == 1 %} selected='selected' {% endif %}>İşleme Alınan</option>
+                                <option value="2" {% if filter_status == 2 %} selected='selected' {% endif %}>Güncelleme Talebi</option>
+                                <option value="3" {% if filter_status == 3 %} selected='selected' {% endif %}>Tamamlanan</option>
+                            </select>
+                        </div>
+
+
+                        <div class="col-lg-1 col-6 mb-2">
+                            <select name="limit" class="form-select auto-filter" id="select-limit">
+                                {% for key,value in limits %}
+                                <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card-body" id="odeme-data"></div>
+                <input type="hidden" id="form-odeme-talebi-id" name="odeme_talebi_id" value="0">
+            </div>
+        </div>
+
+
+    </div>
+
+    {{footer}}
+</main>
+{# YENİ TALEP MODAL #}
+<div class="modal fade" id="modal-talep" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg custom-modal" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ödeme Talep Formu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="form-modal-talep">
+                    <div id="last-history" class="alert alert-warning" style="display:none;"></div>
+
+                    <div class="mb-3"> <label for="personel_birim_id" class="form-label fw-bold">Kurum/Birim Seçiniz:</label>
+                        <select name="personel_birim_id" id="personel_birim_id" class="form-select">
+                            <option value="">--Kurum / Birim Seçin--</option>
+                            {% for kurum in kurumlar %}
+                            <option value="{{kurum.personel_birim_id}}">{{kurum.name}}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="odeme_talebi_id" value="0">
+                    </div>
+
+                    <div class="mb-3 p-2 border-elegant" id="odeme-yontemi">
+                        <label class="form-label d-block fw-bold">Ödeme Yöntemi:</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="odeme_yontemi" value="1" id="odeme-yontemi-1" checked>
+                            <label class="form-check-label" for="odeme-yontemi-1">Nakit</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="odeme_yontemi" value="2" id="odeme-yontemi-2">
+                            <label class="form-check-label" for="odeme-yontemi-2">Havale-EFT</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="odeme_yontemi" value="3" id="odeme-yontemi-3">
+                            <label class="form-check-label" for="odeme-yontemi-3">Kredi Kartı</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-bold">Açıklama:</label>
+                        <textarea name="description" id="description" placeholder="Ödeme kapsamını ve nedenini resmi bir dil ile açıklayınız." class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="input-tutar" class="form-label fw-bold">Ödeme Tutarı:</label>
+                        <div class="input-group mb-1" style="max-width: 200px;">
+                            <input type="text" name="tutar" id="input-tutar" placeholder="0.000,00" data-mask="#.##,00" class="form-control border-info">
+                            <span class="input-group-text bg-secondary text-white">₺</span>
+                        </div>
+                        <div class="form-text text-muted">Not: Küsüratlı rakamları virgül (,) ile ayırınız. Örn: 5.850,75</div>
+                    </div>
+
+                    <div id="banka-bilgileri" class="mb-3 p-2 border-elegant">
+                        <label class="form-label w-100" style="cursor:pointer;" onclick="toggleBankElement(this)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">Ödeme Yapılacak Banka Bilgileri</span>
+                                <span class="toggle-icon-bank small">&#9660;</span>
+                            </div>
+                        </label>
+
+                        <div id="bank-element" style="display:none;" class="mt-2">
+                            <select name="bank_account[banka]" class="form-select mb-2">
+                                <option value="">--Banka Seçin--</option>
+                                {% for key,value in bankalar %}
+                                <option value="{{key}}"> {{value}}</option>
+                                {% endfor %}
+                            </select>
+                            <input class="form-control mb-2" name="bank_account[name]" type="text" placeholder="Hesap Sahibi Ad Soyad">
+                            <input class="form-control" name="bank_account[iban]" type="text" placeholder="TR00 0000...">
+                        </div>
+                    </div>
+
+                    <div class="mb-3 fatura-content">
+                        <button type="button" id="button-upload" class="btn btn-outline-primary btn-sm">
+                            <i class="fa fa-upload"></i> Fatura Ekle
+                        </button>
+                        <div class="form-text text-muted small">Maksimum 50 MB (pdf, jpeg, jpg, png)</div>
+                    </div>
+
+                    <div id="file-content" class="fatura-content mb-3"></div>
+
+                    <div class=" p-2 border-elegant">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" name="fatura" onclick="$('.fatura-content').toggle();" type="checkbox" value="" id="flexCheckChecked">
+                            <label class="form-check-label fw-bold" for="flexCheckChecked">Fatura Sonradan Eklenecek</label>
+                            <div class="form-text mt-1">Online satın alımlar gibi faturanın sonradan iletileceği durumlarda işaretleyiniz.</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modal-button-add" class="btn btn-primary px-4">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-message" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" style="max-width:35%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4>
+                    Ödeme talebiniz alınmıştır. Talep onaylandıktan sonra verdiğiniz
+                    <strong>Banka / Hesap bilgilerine</strong> ödeme yapılacaktır.
+                    Ayrıntıları buradan takip edebilirsiniz.
+                </h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tamam</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#odeme-data').delegate('.sort-oncelik', 'click', function(e) {
+        e.preventDefault();
+
+        $('#odeme-data').load(this.href);
+    });
+
+    $('#odeme-data').delegate('.pagination a', 'click', function(e) {
+        e.preventDefault();
+        $('#odeme-data').load(this.href);
+    });
+
+    $('.auto-filter').on('change', function(e) {
+        e.preventDefault();
+
+        $('#cover-spin').show(0);
+
+        url = 'index.php?route=personeller/odeme_talebi/dataodemeTalebi&user_token={{ user_token }}';
+
+        if ($('input[name=\'filter_birim_id\']').val()) {
+            url += '&filter_birim=' + encodeURIComponent($('input[name=\'filter_birim\']').val());
+            url += '&filter_birim_id=' + encodeURIComponent($('input[name=\'filter_birim_id\']').val());
+        }
+
+        if ($('input[name=\'filter_personel_id\']').val()) {
+            url += '&filter_personel=' + encodeURIComponent($('input[name=\'filter_personel\']').val());
+            url += '&filter_personel_id=' + encodeURIComponent($('input[name=\'filter_personel_id\']').val());
+        }
+
+        if ($('input[name=\'filter_firma\']').val()) {
+            url += '&filter_firma=' + encodeURIComponent($('input[name=\'filter_firma\']').val());
+        }
+
+        if ($('select[name=\'filter_odeme\']').val()) {
+            url += '&filter_odeme=' + encodeURIComponent($('select[name=\'filter_odeme\']').val());
+        }
+
+        if ($('input[name=\'filter_tutar\']').val()) {
+            url += '&filter_tutar=' + encodeURIComponent($('input[name=\'filter_tutar\']').val());
+        }
+
+        if ($('select[name=\'filter_fatura\']').val()) {
+            url += '&filter_fatura=' + encodeURIComponent($('select[name=\'filter_fatura\']').val());
+        }
+
+        if ($('input[name=\'filter_date_start\']').val()) {
+            url += '&filter_date_start=' + encodeURIComponent($('input[name=\'filter_date_start\']').val());
+        }
+
+        if ($('input[name=\'filter_date_end\']').val()) {
+            url += '&filter_date_end=' + encodeURIComponent($('input[name=\'filter_date_end\']').val());
+        }
+
+        if ($('select[name=\'filter_status\']').val()) {
+            url += '&filter_status=' + encodeURIComponent($('select[name=\'filter_status\']').val());
+        }
+
+        if ($('select[name^=\'limit\']').val()) {
+            url += '&limit=' + encodeURIComponent($('select[name^=\'limit\']').val());
+        }
+
+        $('#odeme-data').load(url);
+
+
+    });
+
+    $('#odeme-data').on('blur', 'input[name=\'filter_date\']', function(e) {
+        e.preventDefault();
+
+        $('#cover-spin').show(0);
+
+        url = 'index.php?route=personeller/odeme_talebi/dataodemeTalebi&user_token={{ user_token }}';
+
+        if ($('input[name=\'filter_date\']').val()) {
+            url += '&filter_date=' + encodeURIComponent($('input[name=\'filter_date\']').val());
+        }
+
+        $('#odeme-data').load(url);
+
+    });
+
+    $('#odeme-data').load('index.php?route=personeller/odeme_talebi/dataodemeTalebi&user_token={{ user_token }}');
+</script>
+
+<script>
+    $('#button-add').on('click', function() {
+        $('#modal-talep').modal('show');
+        $('#form-modal-talep')[0].reset();
+        $('#form-odeme-talebi-id').val(0);
+    });
+
+    $('#modal-button-add').on('click', function() {
+        $('.text-danger').find('span').remove();
+        $('.border-warning').removeClass('border-warning');
+
+        var odeme_talebi_id = $('#form-odeme-talebi-id').val();
+
+        if (!$('input[name="fatura"]').is(':checked') && !$('#file-content .row').length) {
+           alerterror('Lütfen fatura belgesini yükleyiniz');
+           return false;
+        }
+
+        var valid = true;
+
+        $('.fatura-no').each(function() {
+            if ($(this).val().trim() === "") {
+                valid = false;
+                $(this).addClass('is-invalid'); // Bootstrap için kırmızı çerçeve
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        if (!valid) {
+            $('#alert').prepend(
+                '<div class="alert alert-danger alert-dismissible">' +
+                '<i class="fa fa-exclamation-circle"></i> Lütfen tüm belgeler için Fatura numarası giriniz..' +
+                '</div>'
+            );
+            return false;
+        }
+
+        $.ajax({
+            url: 'index.php?route=personeller/odeme_talebi/save&user_token={{ user_token }}&odeme_talebi_id=' + odeme_talebi_id,
+            type: 'post',
+            dataType: 'json',
+            data: $('#form-modal-talep').serialize(),
+            success: function(json) {
+                if (json.error.warning) {
+                    alerterror(json.error.warning);
+                }
+
+                if (json.error) {
+                    if (json.error.birim) {
+                        alerterror(json.error.birim);
+                    } else if (json.error.description) {
+                        alerterror(json.error.description);
+                    } else if (json.error.tutar) {
+                        alerterror(json.error.tutar);
+                    } else if (json.error.bank_account) {
+                        alerterror(json.error.bank_account);
+                        $('#banka-bilgileri').addClass('border-warning');
+                    } else if (json.error.code) {
+                        alerterror(json.error.code);
+                    }
+                }
+
+                if (json.success) {
+                    $('#modal-talep').modal('hide');
+                    $('#odeme-data').load('index.php?route=personeller/odeme_talebi/dataodemeTalebi&user_token={{ user_token }}');
+                    $('#modal-message').modal('show');
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    });
+</script>
+<script>
+    function toggleBankElement(el) {
+        const content = document.getElementById('bank-element');
+        const icon = el.querySelector('.toggle-icon-bank');
+        const isVisible = content.style.display === 'block';
+        content.style.display = isVisible ? 'none' : 'block';
+        icon.classList.toggle('rotate', !isVisible);
+    }
+</script>
+
+
+<script type="text/javascript">
+    <!--
+    $('#button-upload').on('click', function() {
+        $('#form-upload').remove();
+        $('.alert-dismissible').remove();
+        $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+        $('#form-upload input[name=\'file\']').trigger('click');
+
+        if (typeof timer != 'undefined') {
+            clearInterval(timer);
+        }
+
+        timer = setInterval(function() {
+            if ($('#form-upload input[name=\'file\']').val() != '') {
+                clearInterval(timer);
+
+                $.ajax({
+                    url: 'index.php?route=personeller/odeme_talebi/upload&user_token={{ user_token }}',
+                    type: 'post',
+                    dataType: 'json',
+                    data: new FormData($('#form-upload')[0]),
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function() {
+                        $('#button-upload').button('loading');
+                    },
+                    complete: function() {
+                        $('#button-upload').button('reset');
+                    },
+                    success: function(json) {
+                        if (json.error) {
+                            alerterror(json.error);
+                        }
+
+                        if (json.success) {
+                            alertsuccess(json.success);
+                             $('#file-content').append(
+                                '<div class="form-group row mb-2">' +
+                                    '<div class="col-6">' +
+                                    '<label for="fatura-no" class="form-label">Fatura No:</label>' +
+                                    '<input type="number" name="fatura-no" id="fatura-no" class="form-control fatura-no" placeholder="Fatura No">' +
+                                    '</div>' +
+                                    '<div class="col-6">' +
+                                    '<label for="input-code" class="form-label">Fatura Belgesi:</label>' +
+                                    '<input type="text" name="code[]" id="input-code" value="' + json['code'] + '" class="form-control input-code" readonly>' +
+                                    '</div>' +
+                                '</div>'
+                              );
+                        }
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                    }
+                });
+            }
+        }, 500);
+    });
+    //
+    -->
+</script>
+
+<script>
+    $('#btn-help').on('click', function() {
+        $('#modal-talep .note').toggle();
+    });
+
+    $('#btn-apply').on('click', function() {
+        var date_start = $('input[name="date_start"]').val();
+        var date_end = $('input[name="date_end"]').val();
+
+        $('.dropdown-menu').click();
+        $('input[name="filter_date_start"]').val(date_start).trigger('change');
+        $('input[name="filter_date_end"]').val(date_end).trigger('change');
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.addEventListener('click', function(e) {
+            if (e.target.classList.contains('file-delete')) {
+                const row = e.target.closest('.row');
+                if (row) row.remove();
+            }
+        });
+    });
+</script>
+
+<script>
+    //PERSONEL AUTO COMPLETE
+    $('input[name=\'filter_personel\']').autocomplete({
+        'source': function(request, response) {
+            $.ajax({
+                url: 'index.php?route=setting/autocomplete/autocompletePersoneller&user_token={{ user_token }}&filter_personel=' + encodeURIComponent(request),
+                dataType: 'json',
+                success: function(json) {
+                    response($.map(json, function(item) {
+                        return {
+                            label: item['name'],
+                            value: item['personel_id']
+                        }
+                    }));
+                }
+            });
+        },
+
+        'select': function(item) {
+            $('input[name=\'filter_personel\']').val(item['label']);
+            $('input[name=\'filter_personel_id\']').val(item['value']);
+            $('input[name=\'filter_personel_id\']').trigger('change');
+        }
+    });
+
+    $('input[name=\'filter_birim\']').autocomplete({
+        'source': function(request, response) {
+            $.ajax({
+                url: 'index.php?route=setting/autocomplete/birimautocomplete&user_token={{ user_token }}&filter_birim=' + encodeURIComponent(request),
+                dataType: 'json',
+                success: function(json) {
+                    response($.map(json, function(item) {
+                        return {
+                            label: item['name'],
+                            value: item['id']
+                        }
+                    }));
+                }
+            });
+        },
+
+        'select': function(item) {
+            $('input[name=\'filter_birim\']').val(item['label']);
+            $('input[name=\'filter_birim_id\']').val(item['value']);
+            $('input[name=\'filter_birim_id\']').trigger('change');
+        }
+    });
+</script>
+
+<style>
+    .border-elegant {
+        border: 1px solid rgba(166, 181, 228, 0.1);
+        /* Hafif gri çerçeve */
+        border-left: 2px solid #85dcf1ff;
+        /* Bootstrap success yeşili */
+        background: #f8f9faff;
+        /* Soft arka plan */
+        padding: 0.50rem 1rem;
+        border-radius: 0.375rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .toggle-icon-bank {
+        display: inline-block;
+        margin-left: 8px;
+        transition: transform 0.3s ease;
+    }
+
+    .toggle-icon-bank.rotate {
+        transform: rotate(180deg);
+    }
+
+    .border-warning {
+        border: 1px solid #eb4034;
+    }
+
+    .category-badge {
+        display: inline-block;
+        padding: 3px 7px;
+        border: 1px solid;
+        border-radius: 3px;
+        font-weight: 500;
+        font-size: 1em;
+    }
+
+    /* Hafif yeşil ton */
+    .category-badge.success {
+        background-color: #6dd886ff;
+        border-color: #c3e6cb;
+        color: #121312ff;
+    }
+
+    /* Hafif mavi ton */
+    .category-badge.info {
+        background-color: #fff3cd;
+        border-color: #ffeeba;
+        color: #856404;
+    }
+
+    /* Hafif morumsu mavi ton (primary) */
+    .category-badge.primary {
+        background-color: #cce5ff;
+        border-color: #b8daff;
+        color: #004085;
+    }
+
+    /* Hafif gri ton */
+    .category-badge.light {
+        background-color: #f8f9fa;
+        border-color: #dae0e5;
+        color: #6c757d;
+    }
+
+    tr.completed {
+        border-left: 6px solid #96e6a1;
+        background: linear-gradient(#f6fff6, #f6fff6);
+        /* Gradient havası ama tek renk */
+    }
+
+    .tooltip-inner {
+        max-width: 400px;
+        padding: 3px 8px;
+        font-size: 14px;
+        color: #000000;
+        text-align: left;
+        opacity: 1;
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    .custom-modal {
+        width: 33%;
+        max-width: 600px;
+    }
+
+    @media (max-width: 768px) {
+        .custom-modal {
+            width: 95%;
+            /* Mobilde neredeyse tam genişlik */
+        }
+    }
+</style>

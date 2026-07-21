@@ -1,0 +1,14 @@
+
+<div id="basvuru-data"></div>
+    
+<script>
+$('#basvuru-data').delegate('.sort', 'click', function(e) {
+  $('#cover-spin').show(0);
+ e.preventDefault();
+	
+$('#basvuru-data').load(this.href);
+});
+
+$('#basvuru-data').load('index.php?route=extension/dashboard/basvuru/databasvuru&user_token={{ user_token }}');
+
+</script>

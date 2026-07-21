@@ -1,0 +1,176 @@
+<div id="modal-dokuman" class="modal fade" tabindex="-1" aria-labelledby="modalDokumanLabel" aria-hidden="true">
+  <div id="filemanager" class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDokumanLabel">{{ "Dökümanlar" }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3 mb-3 align-items-center">
+          <div class="col-md-6">
+            <div class="btn-group" role="group">
+              <button type="button" data-bs-toggle="tooltip" title="{{ button_upload }}" id="button-upload" class="btn btn-primary">
+                <i class="bi bi-upload"></i> {{ " Yükle" }}
+              </button>
+              <button type="button" data-bs-toggle="tooltip" title="{{ "Belgeyi İndir" }}" id="button-download" class="btn btn-warning text-dark">
+                <i class="bi bi-download"></i> {{ " İndir" }}
+              </button>
+              <button type="button" data-bs-toggle="tooltip" title="{{ button_delete }}" id="button-delete" class="btn btn-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="input-group">
+              <input type="text" name="search" value="{{ filter_name }}" placeholder="{{ entry_search }}" class="form-control">
+              <button type="button" data-bs-toggle="tooltip" title="{{ button_search }}" id="button-search" class="btn btn-outline-primary">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4"/>
+
+        {% for row in dokumanlar|batch(4) %}
+          <div class="row g-3">
+            {% for dokuman in row %}
+              <div class="col-sm-3 col-6 text-center">
+                {% set path = upload_url ~ dokuman.path %}
+                {% set name = dokuman.name %}
+                {% set type = dokuman.type %}
+
+                <div class="card h-100 border-0">
+                  <div class="d-flex align-items-center justify-content-center p-2" style="height: 100px;">
+                    {% if 'image' in type %}
+                      <a href="{{ path }}" target="_blank" class="d-block w-100 h-100">
+                        <img src="{{ path }}" alt="{{ name }}" class="img-thumbnail w-100 h-100 object-fit-contain">
+                      </a>
+                    {% elseif 'pdf' in type or name ends with '.pdf' %}
+                      <a href="{{ path }}" target="_blank" class="text-danger">
+                        <i class="bi bi-file-earmark-pdf" style="font-size: 3rem;"></i>
+                      </a>
+                    {% else %}
+                      <a href="{{ path }}" target="_blank" class="text-secondary">
+                        <i class="bi bi-file-earmark" style="font-size: 3rem;"></i>
+                      </a>
+                    {% endif %}
+                  </div>
+                  
+                  <div class="card-footer bg-transparent border-0 pt-0">
+                    <div class="form-check d-inline-block">
+                      <input class="form-check-input" type="checkbox" name="path[]" value="{{ dokuman.path }}" id="check-{{ loop.index }}">
+                      <label class="form-check-label d-block text-truncate" for="check-{{ loop.index }}" style="font-size: 11px; max-width: 120px;">
+                        {{ name }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="mb-4"></div>
+        {% endfor %}
+      </div>
+
+      <div class="modal-footer justify-content-center">
+        {{ pagination }}
+      </div>
+      
+    </div>
+  </div>
+</div>
+<script>
+    $('#modal-dokuman').on('click', '.pagination a', function(e) {
+        e.preventDefault();
+        
+        dokumanDosya(this.href);
+    });
+
+</script>
+
+<script type="text/javascript"><!--
+$('#button-upload').on('click', function() {
+	$('#form-upload').remove();
+   $('.alert-dismissible').remove();
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+
+			$.ajax({
+				url: 'index.php?route=personeller/gorev_yonetimi/upload&user_token={{ user_token }}&gorev_yonetimi_id=' + $('#form-gorev_yonetimi_id').val(),
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				beforeSend: function() {
+					$('#button-upload').button('loading');
+				},
+				complete: function() {
+					$('#button-upload').button('reset');
+				},
+				success: function(json) {
+					if (json.error) {
+              $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error +'</div>'); 
+					}
+
+					if (json.success) {
+						$('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i>' + json.success + '</div>');
+             dokumanDosya();
+            
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+</script>
+
+<script type="text/javascript"><!--
+$('#modal-dokuman #button-delete').on('click', function(e) {
+	if (confirm('{{ text_confirm }}')) {
+		$.ajax({
+			url: 'index.php?route=personeller/gorev_yonetimi/deleteUpload&user_token={{ user_token }}&gorev_yonetimi_id=' + $('#form-gorev_yonetimi_id').val(),
+			type: 'post',
+			dataType: 'json',
+			data: $('input[name^=\'path\']:checked'),
+			beforeSend: function() {
+				$('#button-delete').prop('disabled', true);
+			},
+			complete: function() {
+				$('#button-delete').prop('disabled', false);
+			},
+			success: function(json) {
+				if (json.error) {
+					 $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error +'</div>');
+				}
+
+				if (json.success) {
+					$('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i>' + json.success + '</div>');
+
+          dokumanDosya();
+				}
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+			}
+		});
+	}
+});
+//--></script>

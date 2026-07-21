@@ -1,0 +1,172 @@
+{{ header }}{{ column_left }}
+<div id="content" style="font-size:14px;">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+      {% if permission %}
+         <button type="button" id="button-add" data-toggle="tooltip" title="{{ "Ekle" }}" class="btn btn-info button-add"><i class="fa fa-plus"></i>{{" Yeni İş Ekle"}}</button>
+         <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success"><i class="fa fa-download"></i></a>
+      {% endif %}
+	    </div>
+    </div><br>
+  </div>
+  <div class="container-fluid">
+    
+    <div class="panel panel-default">
+      
+
+      <div class="panel-body">
+       <div class="alert alert-info">Talep Listesi (<i class="fa fa-exclamation-circle"></i> {{"<strong>Not</strong> : Verileri güncellemek için ilgili alana çift tıklayınız"}})
+       
+        <div class="pull-right" style="display:none;">
+          <select name="filter_list" class="form-control select-filter-list"> 
+            <option value="1" selected="selected" >{{"Tüm işleri Göster"}}</option>
+            <option value="2">{{"Sadece Kendi İşlerimi Göster"}}</option>
+          </select>
+        </div>
+       </div>
+       
+        <div id="cozummerkezi-data"></div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+$('#cozummerkezi-data').delegate('.sort-oncelik', 'click', function(e) {
+ e.preventDefault();
+	
+$('#cozummerkezi-data').load(this.href);
+});
+
+$('#cozummerkezi-data').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+	$('#cozummerkezi-data').load(this.href);
+});
+
+$('#cozummerkezi-data').delegate('.auto-filter', 'change', function(e) {
+  e.preventDefault();
+
+  url = 'index.php?route=personeller/cozum_merkezi/dataIsportali&user_token={{ user_token }}';
+
+	if ($('input[name=\'filter_customer_id\']').val()) {
+		url += '&filter_customer=' + encodeURIComponent($('input[name=\'filter_customer_id\']').val());
+	}
+
+	if ($('input[name=\'filter_category_id\']').val()) {
+		url += '&filter_category=' + encodeURIComponent($('input[name=\'filter_category_id\']').val());
+	}
+
+  if ($('input[name=\'filter_status_id\']').val()) {
+		url += '&filter_status=' + encodeURIComponent($('input[name=\'filter_status_id\']').val());
+	}
+
+	if ($('select[name^=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name^=\'limit\']').val());
+	}
+	
+  $('#cover-spin').show(0);
+	
+	$('#cozummerkezi-data').load(url);
+});
+
+$('.select-filter-list').on('change', function() {
+ 
+  var filter_list =  $('select[name^=\'filter_list\']').val();
+  
+  var url = 'index.php?route=personeller/cozum_merkezi/dataIsportali&user_token={{ user_token }}&filter_list=' + filter_list;	
+  
+  $('#cozummerkezi-data').load(url);
+});
+
+$('#cozummerkezi-data').load('index.php?route=personeller/cozum_merkezi/dataIsportali&user_token={{ user_token }}');
+
+$('#cozummerkezi-data').on('dblclick','td', function() {
+    var permission = '{{permission}}';
+     
+    if(permission == false){
+      exit();
+    }
+    
+    $(this).find('.isttakibi-span').toggle();
+    $(this).find('input').toggle();
+    $(this).find('input').focus();
+    sessionStorage.setItem('id', $(this).attr('id'));
+});
+
+</script>
+
+<script>
+  $('.container-fluid').on('click', '.button-add', function(e) {
+   e.preventDefault();
+    var action = 'add';
+    $.ajax({
+      url: 'index.php?route=personeller/cozum_merkezi/addData&user_token={{ user_token }}&formaction=' + action,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        if (json.error.warning) {
+	       $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error.warning +'</div>'); 
+         }
+        
+        if (json.success) {
+          $('#cozummerkezi-data').load('index.php?route=personeller/cozum_merkezi/dataIsportali&user_token={{ user_token }}');
+           $('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json.success + '</div>');
+           
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ });
+</script>
+
+<script>
+
+  function saveToDB(column,id) {
+    var action = 'edit';
+    var page = $('.pagination').find(".active").text();
+    
+    $.ajax({
+      url: 'index.php?route=personeller/cozum_merkezi/addData&user_token={{ user_token }}&formaction=' + action + '&id=' + id,
+      type: 'post',
+      dataType: 'json',
+      data: '&' + column + '=' + $('#' + column + id).val(),
+      
+      success: function(json) {
+        
+        if (json.error.warning) {
+	       $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error.warning +'</div>'); 
+         }
+
+        if (json.success) {
+          $('#cozummerkezi-data').load('index.php?route=personeller/cozum_merkezi/dataIsportali&user_token={{ user_token }}&page=' + page);
+           $('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i>' + json.success + '</div>');
+        }
+      },
+      
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  }
+  
+ </script>
+
+ <script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+       $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + error_warning +'</div>');
+     }
+
+      if(success) {
+       $('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + success +'</div>');
+     } 
+});
+</script>
+{{ footer }}

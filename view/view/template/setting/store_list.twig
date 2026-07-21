@@ -1,0 +1,252 @@
+{{ header }}{{ column_left }}
+<main id="dernekler" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+         
+         <a href="{{ add }}" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Ekle</a>
+         <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm" onclick="confirm('{{ text_confirm }}') ? $('#form-information').submit() : false;"><i class="bi bi-trash"></i> Sil</button>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-12 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name"  valu="" placeholder="Bir isim yazınız.."  class="form-control form-control-lg ps-4">
+                               <input type="hidden" name="filter_store_id" value="" id="input-store_id" class="form-control auto-filter" />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-information">
+                    <div class="card-body">
+
+                        <div class="table-responsive-sm">
+                            <table class="table table-striped table-bordered table-hover align-middle mb-0">
+                                   <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                     <tr>
+                                      <th></th>
+                                       <th>{{ column_name }}</th>
+                                       <th>{{ column_baskan }}</th>
+                                       <th>{{ column_telephone }}</th>
+                                       <th>{{ "İl" }}</th>
+                                       <th>{{ "E-Posta" }}</th>
+                                       <th>{{ "Durumu" }}</th>
+                                       <th>{{ "Eylem" }}</th>
+                                     </tr>
+                                   </thead>
+                                   <tbody>
+                                     {% for store in dernekler %}
+                                     <tr>
+                                      <td><input class="form-check-input" type="checkbox" name="selected[]" value="{{ store.store_id }}"></td>
+                                       <td>
+                                         <div class="orderlist">
+                                          <a class="d-flex align-items-center gap-2" href="javascript:;">
+                                            <div class="product-box">
+                                                <img src="{{ store.image }}" alt="">
+                                            </div>
+                                            <div>
+                                                <p class="mb-0 product-title">{{ store.name }}</p>
+                                            </div>
+                                           </a>
+                                         </div>
+                                       </td>
+                                       <td>{{ store.baskan }}</td>
+                                       <td>{{ store.telephone }}</td>
+                                       <td>{{ store.sehir['name'] }}</td>
+                                       <td>{{ store.email }}</td>
+                                       <td>
+                                       {% if store.status == 1 %}
+                                        <span class="badge bg-success">{{"Aktif"}}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{"Pasif"}}</span>
+                                        {% endif %}
+                                        </td>
+                                        <td>
+                                          <div class="d-flex justify-content-end gap-3 fs-5">
+                                            <a href="{{ store.edit }}" class="btn btn-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Düzenle" data-bs-original-title="Edit info" aria-label="Edit">
+                                            <i class="bi bi-pencil-fill"></i>
+                                            </a>
+                                           
+                                             {% if level %}
+                                            <a href="{{ store.login }}" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ "Oturum Aç" }}" data-bs-original-title="Login" aria-label="Login">
+                                            <i class="bi bi-lock-fill"></i>
+                                            </a>
+                                             {% endif %}
+                                           
+                                          </div>
+                                        </td>
+                                     </tr>
+                                      {% endfor %}
+                                   </tbody>
+                                 </table>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12 col-md-5">
+                                <div class="dataTables_info">{{results}}</div>
+                            </div>
+                            <div class="col-sm-12 col-md-7">
+                                <div class="float-end" id="example2_paginate">
+                                    {{pagination}}
+                                </div>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div id="modal-report-setting" class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:480px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fa fa-cog"></i> Sosyal medya Etkinlik Görsel hazırlama ekranı
+        </h5>
+        <button type="button" id="button-close" class="btn-close" data-bs-toggle="tooltip" 
+                data-bs-dismiss="modal" title="{{ button_close }}"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-rapor" class="row g-3">
+          <input type="hidden" name="id" value="">
+
+          <div class="text-center mb-3">
+            <h3>
+              <span class="badge bg-light-primary text-dark">{{ "Rapor Formatını Seçiniz" }}</span>
+            </h3>
+          </div>
+
+          <div class="text-center mb-3">
+            <div class="ms-auto">
+              <button type="button" id="button-months" name="1" class="btn btn-info">
+                Aylık Rapor Oluştur
+              </button>
+              <button type="button" id="button-years" name="2" class="btn btn-primary">
+                Yıllık Rapor Oluştur
+              </button>
+            </div>
+          </div>
+
+          <div class="row mb-3" id="donem" style="display:none;">
+            <div class="col-sm-6 mb-3">
+              <select name="months" id="months" class="form-select">
+                {% for key, value in months %}
+                  <option value="{{key}}">{{value}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-sm-6 mb-3">
+              <select name="years" id="years" class="form-select">
+                {% for year in years %}
+                  <option value="{{year.text}}">{{year.text}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3 text-center" id="image" style="display:none;">
+            <a href="javascript:void(0)">
+              <img src="" id="report-image" class="img-fluid" style="max-height:450px;" />
+            </a>
+          </div>
+
+         
+
+          <div class="text-center">
+            <button type="button" id="button-save" data-loading-text="{{ text_loading }}" class="btn btn-success" disabled>
+               <span class="spinner-border spinner-border-sm loading visually-hidden" role="status" aria-hidden="true"></span>
+               <span class="reset"><i class="bi bi-gear"></i> Raporu Oluştur</span>
+            </button>
+            <a href="javascript:void(0);" id="button-download" class="btn btn-outline-warning" style="display:none;" download>
+              <i class="bi bi-download"></i>
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+    {{footer}}
+</main>
+{% if store_id == 0 %}
+<script type="text/javascript"><!--
+$('#dernekler .auto-filter').on('change', function() {
+  $('#cover-spin').show(0);
+  
+  url = 'index.php?route=setting/store&user_token={{ user_token }}';
+  var filter_store_id = $('input[name=\'filter_store_id\']').val();
+   
+  if (filter_store_id) {
+     url += '&filter_store_id=' + encodeURIComponent(filter_store_id);
+  }
+   
+	 location = url;
+});
+
+//--></script>
+
+<script>
+  $('input[name=\'filter_name\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/store/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          json.unshift({
+             name: '--Tümünü Seç--',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['store_id']
+            }
+          }));
+        }
+      });
+    },
+    'select': function(item) {
+    $('input[name=\'filter_name\']').val(item['label']);
+	  $('input[name=\'filter_store_id\']').val(item['value']);
+	  $('input[name=\'filter_store_id\']').trigger('change');
+    }
+	
+  });
+  
+  </script>
+  {% endif %}
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

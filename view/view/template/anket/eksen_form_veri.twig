@@ -1,0 +1,226 @@
+{{ header }}{{ column_left }}
+<main id="anketler" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+          <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success btn-sm"><i class="bi bi-download"></i></a>
+           <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light btn-sm border border-dark shadow-sm bg-white">
+                <i class="bi bi-arrow-counterclockwise"></i>
+          </a>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-12 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="{{ "Dernek ismini yazınız." }}" id="input-name" class="form-control auto-filter form-control-lg ps-4">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-information">
+                    <div class="card-body">
+
+                <div class="table-responsive-sm">
+                <table class="table table-bordered align-middle mb-0">
+                <thead class="bg bg-light-info">
+                <tr>
+                  <th style="width: 1px;" class="text-center">S.N</th>
+                  <th class="text-start">{{ "Derneği" }}</th>
+                  <th class="text-left">{{ "Yanıtlar" }}</th>
+                  <th class="text-left">{{ "Yanıt Sayısı" }}</th>
+				  <th class="text-start">{{ "Kayıt Tarihi" }}</th>
+                  <th colspan="2" class="text-center" style="width:1%;">{{ "Eylem" }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if customers %}
+                {% for customer in customers %}
+                 {% if customer.store_id == 0 %}
+                <tr>
+                  <td class="text-center">{{customer.row}} </td>
+                  <td class="text-start">{{ customer.store['name']}}</td>
+                  <td class="text-start">
+                        <div class="qa-wrapper">
+                           {% for soru in customer.sorular[0].sorular|slice(0,2) %}
+                            <div class="qa-item">
+                                <span class="qa-question">{{ loop.index }}. {{ soru.soru }} : </span>
+                                <span class="qa-answer">
+                                    {% set cevap = customer.cevap[0][loop.index0] %}
+                                    {% if cevap is iterable %}
+                                        {# Eğer array ise, virgülle birleştir #}
+                                        {{ cevap|join(', ') }}
+                                    {% else %}
+                                        {{ cevap }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% endfor %}
+
+                        </div>
+                      </td>
+
+                      <td class="text-left">{{ customer.stotal }}</td>
+                  <td class="text-left">{{ customer.date_added}}</td>
+                  <td class="text-center" >
+				          <a href="{{customer.pdf}}" data-toggle="tooltip"  target="_blank" title="{{ "Pdf olarak görüntüle" }}" class="btn btn-warning btn-sm"><i class="bi bi-file-earmark-pdf"></i></a>
+                  </td>
+                  <td class="text-center" >
+				          <a href="{{customer.delete}}" data-toggle="tooltip"  title="{{ "sil" }}" class="btn btn-danger btn-sm"><i class="bi bi-file-earmark-pdf"></i></a>
+                  </td>
+                  
+                  
+                </tr>
+                 {% endif %}
+                {% endfor %}
+               
+                {% else %}
+                <tr>
+                  <td class="text-center" colspan="4">{{ text_no_results }}</td>
+                </tr>
+                {% endif %}
+              </tbody>
+                                 </table>
+                        </div>
+
+                        <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+    {{footer}}
+</main>
+<script>
+  $('input[name=\'filter_name\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/store/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          json.unshift({
+             name: '--Tümünü Seç--',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['store_id']
+            }
+          }));
+        }
+      });
+    },
+    'select': function(item) {
+    $('input[name=\'filter_name\']').val(item['label']);
+	  $('input[name=\'filter_store_id\']').val(item['value']);
+	  $('input[name=\'filter_store_id\']').trigger('change');
+    }
+	
+  });
+  
+  </script>
+<script>
+$('.auto-filter').on('change', function() {  
+    var url = 'index.php?route=anket/anket&user_token={{ user_token }}';
+    
+    if ($('input[name="filter_name"]').val()) {
+        url += '&filter_name=' + encodeURIComponent($('input[name="filter_name"]').val());
+    }
+
+    location = url;
+});
+</script>
+
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+  if(error_warning) {
+    $('#alert').prepend(
+      '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+        '<div class="d-flex align-items-center">' +
+          '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+          '<div class="ms-3"><div class="text-dynamic">' + error_warning + '</div></div>' +
+        '</div>' +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+      '</div>'
+    );
+  }
+
+  if (success) {
+    $('#alert').append(
+        '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+          '<div class="d-flex align-items-center">' +
+            '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+            '<div class="ms-3"><div class="text-dynamic">' + success + '</div></div>' +
+          '</div>' +
+          '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        '</div>'
+      );  
+  }
+});
+</script>
+<style>
+  #destek-secenekleri .form-check {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+.qa-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* sorular arasında boşluk */
+}
+
+.qa-item {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.qa-question {
+    font-weight: 500;
+    color: #333333;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.qa-answer {
+    color: #555;
+    display: block;
+}
+
+</style>

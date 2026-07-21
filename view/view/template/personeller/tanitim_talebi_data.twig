@@ -1,0 +1,454 @@
+ <div class="table-responsive-sm">
+    <table class="table table-striped align-middle mb-0 table-sm">
+        <thead class="table-light">
+            <tr>
+                <th class="text-start" style="width:20%">{{ " Kurum/Birim" }}</th>
+                <th class="text-start">{{ "Tasarım Tipi" }}</th>
+                <th class="text-start">{{ "Kullanım Alanı" }}</th>
+                <th class="text-start">{{ "Talep Tarihi " }}</th>
+                <th class="text-start">{{ "Durumu" }}</th>
+                <th class="text-center" style="width:8%;">{{ "Dosya" }}</th>
+                <th colspan="3" class="text-center select-limit" style="width:1%;"> {{"Eylem"}}  </th>
+            </tr>
+        </thead>
+        <tbody class="data-list">
+            {% if datatanitim %}
+            {% set row = 1 %}
+            {% for isler in datatanitim %}
+            <tr id="data-list{{isler.tanitim_talebi_id}}" >
+                <td id="{{ isler.tanitim_talebi_id }}" class="text-start">{{ isler.name }}</td>
+                <td id="{{ isler.tanitim_talebi_id }}" class="text-start item">{{ isler.tasarim_tipi }}</td>
+                <td id="{{ isler.tanitim_talebi_id }}" class="text-start item">{{ isler.tasarim_amaci }}</td>
+                <td id="{{ isler.tanitim_talebi_id }}" class="text-start item">{{ isler.date_added }}</td>
+                <td class="text-start"><span class="badge {{isler.status_bg}}">{{ isler.status }}</span></td>
+                <td class="text-center">
+               
+                {% if isler.download %}
+                <a href="{{isler.download}}" data-toggle="tooltip" title="Tasarım dosyasını indir" class="btn btn-link btn-lg text-info">
+                    <i class="bi bi-file-pdf"></i>
+                </a>
+                {% else %}
+                        <i class="bi bi-dash"></i>
+                {% endif %}
+
+                </td>
+                <td class="text-center" {{button_revizyon_display}}>
+                    <button type="button" id="button-revizyon" name="{{ isler.tanitim_talebi_id }}" data-toggle="tooltip" title="Revizyon Talebi" class="btn btn-warning btn-xs" {{isler.disabled}}>
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                </td>
+
+                <td class="text-center">
+                    <button type="button" id="button-view" data-toggle="tooltip" title="Görüntüle" onclick="functionView('{{ isler.tanitim_talebi_id }}','{{ isler.personel_id }}')" class="btn btn-info btn-xs">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </td>
+
+                <td class="text-center" {{button_delete_display}}>
+                    <button type="button" id="{{isler.tanitim_talebi_id}}" class="btn btn-danger btn-xs button-delete">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </td>
+            </tr>
+
+            {% set row = row + 1 %}
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td class="text-center" colspan="6">{{"Sonuç bulunamadı"}}</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+ <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+
+{# GÖRÜNTÜLEME MODAL - SADE TASARIM #}
+<div id="modal-tanitim" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+    <div class="modal-content border-0 shadow">
+      
+      <div class="modal-header border-bottom-0 pb-0">
+        <h6 class="modal-title fw-bold text-secondary">Talep Detayları</h6>
+        <button type="button" class="btn-close small" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      
+      <form id="form-tanitim-edit">
+        <input type="hidden" name="tanitim_talebi_id" value="">
+        
+        <div class="modal-body">
+          <ul class="nav nav-tabs border-bottom mb-3" id="tanitimTab" role="tablist" style="font-size: 0.9rem;">
+            <li class="nav-item">
+              <button class="nav-link active border-0 bg-transparent text-primary fw-bold" id="modal-tab-1" data-bs-toggle="tab" data-bs-target="#tab-1" type="button">Genel Bilgiler</button>
+            </li>
+            {% if store_id == 0 %}
+            <li class="nav-item">
+              <button class="nav-link border-0 bg-transparent text-muted" id="modal-tab-2" data-bs-toggle="tab" data-bs-target="#tab-2" type="button">İşlem Geçmişi</button>
+            </li>
+            {% endif %}
+          </ul>
+
+          <div class="tab-content" id="tanitimTabContent">
+            
+            <div class="tab-pane fade show active" id="tab-1" role="tabpanel">
+              <div class="small text-muted mb-3">
+                <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                  </div>
+              </div>
+              
+              <div class="description p-2 bg-light rounded small mb-4 border-start border-3 border-primary">
+                </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-uppercase text-muted">Durum Güncelle</label>
+                <select name="status" class="form-select">
+                  <option value="0">Onay Bekliyor</option>
+                  <option value="2">İşleme Alındı</option>
+                  <option value="3">Eksik Bilgi</option>
+                  <option value="4">Revizyon Talebi</option>
+                  <option value="5">İptal</option>
+                  <option value="1">Tamamlandı</option>
+                </select>
+              </div>
+
+              <div class="mb-3" id="text" style="display:none;">
+                <textarea name="text" rows="3" placeholder="İşlem notu ekleyin..." class="form-control form-control-sm"></textarea>
+              </div>
+
+              <div id="dokuman" style="display:none;" class="mb-3">
+                <label class="form-label small fw-bold text-muted">Dosya Yükle (.zip)</label>
+                <div class="input-group input-group-sm">
+                  <input type="text" id="input-filename" class="form-control" placeholder="Seçilmedi" readonly>
+                  <button type="button" id="button-upload-tasarim" class="btn btn-outline-primary">Dosya Seç</button>
+                </div>
+                <input type="hidden" name="code2" id="input-code" />
+                
+                <div id="note" class="mt-2" style="display:none;">
+                  <span class="badge bg-warning text-dark fw-normal w-100 p-2" style="white-space: normal;">Maksimum 50 MB, .zip formatı gereklidir.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-2" role="tabpanel">
+              <div class="timeline p-2 small text-muted">
+                Kayıtlar inceleniyor...
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer border-top-0 pt-0">
+          
+          <button type="button" id="modal-button-update" class="btn btn-primary">Güncelle</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+{# REVİZYON MODAL #}
+<div id="modal-revizyon" class="modal fade" tabindex="-1" aria-labelledby="revizyonModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="min-width: 400px; max-width: 35%;">
+    <div class="modal-content shadow-lg">
+      
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold" id="revizyonModalLabel">
+          <i class="bi bi-pencil-square me-2 text-primary"></i>Revizyon Talebi
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      
+      <form id="form-tanitim-revizyon">
+        <input type="hidden" name="tanitim_talebi_id" value="">
+        
+        <div class="modal-body pb-4">
+          <div class="alert alert-info small mb-3">
+            Lütfen tasarım üzerinde yapılmasını istediğiniz değişiklikleri (renk, metin, konumlandırma vb.) detaylıca belirtiniz.
+          </div>
+
+          <div class="form-group">
+            <label class="form-label fw-bold">Revizyon Açıklaması</label>
+            <textarea 
+              name="text" 
+              rows="5" 
+              placeholder="Örn: Logonun boyutu biraz daha büyütülebilir ve alt kısımdaki tarih bilgisi güncellenebilir." 
+              class="form-control border-primary-subtle"
+            ></textarea>
+            <div id="error-revizyon" class="text-danger small mt-1"></div>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+          <button type="button" class="btn btn-primary btn-save px-4">
+            <i class="fa-solid fa-floppy-disk me-1"></i> {{ button_save|default('Revizyonu Gönder') }}
+          </button>
+        </div>
+      </form>
+        
+    </div>
+  </div>
+</div>
+
+
+
+
+<script type="text/javascript"><!--
+// MODAL GÖRÜNTÜLEME 
+
+function functionView(id,personel_id) {
+    $('.table tr').removeClass('bg bg-info');
+    $('#tab-2').find('.alert-info').remove();
+    var user_personel_id = '{{user_personel_id}}';
+    $('#data-list' + id).addClass('bg bg-info');
+    
+    $('#modal-tanitim').modal('show');
+    $('#modal-tab-1').click();
+    $('#modal-tanitim input[name^=\'tanitim_talebi_id\']').val(id);
+    
+    $('#modal-tanitim .label-status').hide();
+    $('#modal-tanitim select[name^=\'status\']').hide();
+    $('#modal-tanitim select[name^=\'status\']').prop('disabled',false);
+    $('#modal-tanitim .btn-primary').hide();
+    
+    $.ajax({
+      url: 'index.php?route=personeller/tanitim_talebi/dataView&user_token={{ user_token }}&tanitim_talebi_id=' + id,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+       $('.alert-dismissible').remove();
+       $('.list-group-item').remove();
+       $('.description').find('p').remove();
+       $('.dropdown-menu').find('li').attr('class','');
+        
+       if (json['html']) {
+         $('#modal-tanitim .list-group').append(json['html']);
+         $('#modal-tanitim .description').append(json['description']);
+         $('#modal-tanitim select[name^=\'status\']').val(json['status']);
+         $('#modal-tanitim input[name^=\'tanitim_talebi_id\']').val(json['tanitim_talebi_id']);
+        }
+
+        if (json['display']) {
+         $('#modal-tanitim .label-status').show();
+         $('#modal-tanitim select[name^=\'status\']').show();
+         $('#modal-tanitim .btn-primary').show();
+        }
+
+        if (json['status'] == 1) {
+           $('#modal-tanitim select[name^=\'status\']').prop('disabled',true);
+           $('#modal-tanitim .btn-primary').prop('disabled',true);
+        }
+
+        if (json['html_history']) {
+         $('#tab-2').find('.alert-info').remove();
+         $('#tab-2').append(json['html_history']);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+}
+
+
+$('#modal-button-update').on('click', function() {
+    var element = $('#modal-tanitim input[name^=\'tanitim_talebi_id\']').val();
+
+     $.ajax({
+      url: 'index.php?route=personeller/tanitim_talebi/save&user_token={{ user_token }}&form=edit' + '&tanitim_talebi_id='  + element,
+      type: 'post',
+      dataType: 'json',
+      data : $('#form-tanitim-edit').serialize(),
+      
+      success: function(json) {
+        $('.alert-dismissible').remove();
+
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+
+  
+        if (json.success) {
+         $('#modal-tanitim').modal('hide');
+          $('#tanitim-data').load('index.php?route=personeller/tanitim_talebi/dataTanitim&user_token={{ user_token }}');
+          alertsuccess(json.success);
+          
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+
+ $('select[name^=\'status\']').on('change', function() {
+    $('#dokuman,#text').hide();
+    
+    if($(this).val() == 1) {
+      $('#dokuman').show();
+      $('#text').show();
+    }
+
+    if($(this).val() == 3) {
+      $('#text').show();
+    }
+ });
+
+  $('#btn-help').on('click', function() {
+     $('#note').toggle(); 
+ });
+ </script> 
+<script>
+ $('.button-delete').on('click', function() {
+    if (confirm('Dikkat : Bu işlem geri alınamaz. Bu görevi silmek istediğinize emin misiniz?') == false) {    
+        exit();
+    }
+   
+    var element = $(this).attr('id');
+	
+     $.ajax({
+      url: 'index.php?route=personeller/tanitim_talebi/deleteData&user_token={{ user_token }}&tanitim_talebi_id='  + element,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        $('.alert-dismissible').remove();
+
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+                
+        if (json.success) {
+          $('#modal-tanitim').modal('hide');
+          $('#tanitim-data').load('index.php?route=personeller/tanitim_talebi/dataTanitim&user_token={{ user_token }}'); 
+          alertsuccess(json.success);
+                  
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+$('#button-close').on('click', function() {
+    $('#modal-tanitim').modal('hide');
+});
+
+//--></script>
+
+{# REVİZYON İŞLEMLERİ JQUERY #}
+<script type="text/javascript"><!--
+$('button[id^=\'button-revizyon\']').on('click', function() {
+    $('#modal-revizyon input[name^=\'tanitim_talebi_id\']').val($(this).attr('name'));
+    $('#modal-revizyon').modal('show');
+});
+
+$('#modal-revizyon .btn-save').on('click', function() {
+    var element = $('#modal-revizyon input[name^=\'tanitim_talebi_id\']').val();
+    $.ajax({
+      url: 'index.php?route=personeller/tanitim_talebi/revizyon&user_token={{ user_token }}&tanitim_talebi_id='  + element,
+      type: 'post',
+      dataType: 'json',
+      data : '&text=' +  $('#modal-revizyon textarea[name^=\'text\']').val(),
+      
+      success: function(json) {   
+
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+
+        
+        if (json.success) {
+           $('#modal-revizyon').modal('hide');
+           $('#tanitim-data').load('index.php?route=personeller/tanitim_talebi/dataTanitim&user_token={{ user_token }}');
+           alertsuccess(json.success);
+          
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+});
+//--></script>
+
+<script type="text/javascript"><!--
+$('#button-upload-tasarim').on('click', function() {
+	$('#form-upload').remove();
+   $('.alert-dismissible').remove();
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+
+			$.ajax({
+				url: 'index.php?route=catalog/download/upload&user_token={{ user_token }}&bolum=tanitim',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				beforeSend: function() {
+					$('#button-upload-tasarim').buttonanimate('loading');
+				},
+				complete: function() {
+					$('#button-upload-tasarim').buttonanimate('reset');
+				},
+				success: function(json) {
+					if (json.error) {
+                      alerterror(json.error);
+					}
+
+					if (json.success) {
+						alertsuccess(json.success);
+
+						$('input[name=\'filename2\']').val(json['filename']);
+                        $('input[name=\'code2\']').val(json['code']);
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+//--></script>
+
+
+
+<style>
+.btn-xs {
+  padding: 0.20rem 0.5rem;
+  font-size: 0.75rem;
+}
+</style>
+
+
+
+
+

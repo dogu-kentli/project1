@@ -1,0 +1,517 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+    <div class="row" id="step-1">
+        <div class="col-lg-12 mx-auto">
+            <div class="card">
+                <div class="card-header py-3 bg-transparent">
+                    <div class="d-sm-flex align-items-center">
+                        <h5 class="mb-2 mb-sm-0">{{ text_form }}</h5>
+                        <div class="ms-auto">
+                            <button id="button-save" data-toggle="tooltip" title="{{ "Kaydet" }}" class="btn btn-primary btn-sm"><i class="bi bi-save"></i></button>
+                            <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="geri Dön" class="btn btn-light border border-dark shadow-sm btn-sm bg-white"><i class="bi bi-arrow-counterclockwise"></i></a>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <form id="form-toplanti" class="row g-2">
+                       <div class="row mb-3">
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label fw-bold" for="input-sehir">Toplantı Zamanı</label>
+                                <select name="toplanti_turu" id="toplanti-turu" class="form-select bg bg-light-info">
+                                    <option value="1">{{ "Hemen Yapılacak" }}</option>
+                                    <option value="2">{{ "İleri Tarihe Planla" }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label fw-bold" for="input-sehir">Kategoris</label>
+                                <select name="toplanti_category_id" id="toplanti_category_id" class="form-select bg bg-light-info">
+                                    <option value="">{{ "--Toplantı Kategorisini Seçiniz--" }}</option>
+                                    {% for key,value in category_array %}
+                                    <option value="{{key}}">{{ value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" id="select-history" style="display:none;">
+                        <div class="col-12 col-lg-6">
+                            <label class="form-label fw-bold">Devam Eden Toplantılar</label>
+                            
+                            <div class="dropdown">
+                            <button class="btn btn-light border dropdown-toggle w-100 text-start" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                --Seçim Yapınız--
+                            </button>
+                            <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
+                                {% for history in category_history %}
+                                <li>
+                                    <a class="dropdown-item" href="javascript:void(0)" onclick="toplanti({{ history.toplanti_id }});">
+                                        <i class="bi bi-arrow-right-circle text-warning me-1"></i>
+                                         {{ category_array[history.id] }} (No :{{ history.no }})
+                                    </a>
+
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- Konu -->
+                        <div class="row mb-3">
+                            <div class="col-12 col-lg-2">
+                                <label class="form-label fw-bold" for="input-subject">{{ "Toplantı No" }}</label>
+                                <input type="text" name="toplanti_no" value="" placeholder="{{ "Toplantı Numarası" }}" id="inputtoplanti-no" class="form-control bg bg-light-info" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" id="toplanti-baslik" style="display:none;">
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label fw-bold" for="input-subject">{{ "Konusu" }}</label>
+                                <input type="text" name="toplanti_konusu" value="" placeholder="{{ "Toplantı Konusu" }}" id="input-konusu" class="form-control bg bg-light-info" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label fw-bold" for="input-subject">{{ "Tarihi"}}</label>
+                                <input type="date" name="toplanti_tarihi" value="{{bugun}}" placeholder="{{ "Toplantı Tarih" }}" id="input-toplanti-tarihi" class="form-control bg bg-light-info" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label class="form-label fw-bold" for="input-subject">Toplantı Gündemi</label>
+                            <div class="col-12 col-lg-6">
+                                <div class="input-group">
+                                    <input type="text" name="toplanti_gundemi" value="{{ toplanti_gundemi }}" placeholder="Toplantı Gündemi" id="input-gundem" class="form-control bg bg-light-info" />
+                                    <button class="btn btn-outline-secondary button-gundem-add" type="button">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                                <div class="border rounded p-2 mt-2" id="toplanti-gundem-well" style="height: 150px; overflow: auto;">
+                                    <table id="gundem-filter" class="table table-striped table-sm mb-0">
+                                        <tbody>
+                                            {% for key,value in gundem_array %}
+                                            <tr id="gundem-filter-{{ value }}" class="list{{key}}">
+                                                <td>
+                                                    {{value}}
+                                                    <input type="hidden" name="gundem_array[]" id="gundem-input-array" value="{{value}}" />
+                                                </td>
+                                                <td class="text-end" style="width:1%;">
+                                                    <button type="button" class="btn btn-danger btn-sm-new"><i class="bi bi-dash-circle"></i></button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label fw-bold" for="input-subject">{{ "Toplantı Yeri" }}</label>
+                                <input type="text" name="toplanti_yeri" value="" placeholder="{{ "Toplantı Yeri" }}" id="input-yer" class="form-control bg bg-light-info" />
+                            </div>
+                        </div>
+
+                    </form>
+
+                    <div class="text-start mt-3 pt-2 border-top">
+                        <button type="button" id="button-toplanti-generate" class="btn btn-info"><i class="bi bi-save"></i> DEVAM ET</button>
+                        <span class="spinner-border spinner-border-sm loading visually-hidden" role="status" aria-hidden="true"></span>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div id="step-2" class="row" style="display:none;">
+        <div class="col-lg-12 mx-auto">
+            <div class="card">
+                <div id="form-toplanti-data" class="card-body">
+                    <div class="text-start mt-3 pt-2 border-top">
+                        <button type="button" id="button-toplanti-generate" class="btn btn-info"><i class="bi bi-save"></i> TOPLANTIYI KAYDET</button>
+                        <span class="spinner-border spinner-border-sm loading visually-hidden" role="status" aria-hidden="true"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ footer }}
+</main>
+<script>
+    function toplanti(toplanti_history_id) {
+        
+        if (toplanti_history_id) {
+            $('#form-toplanti-data').load('index.php?route=toplanti/toplanti/dataToplanti&user_token={{ user_token }}&toplanti_history_id=' + toplanti_history_id);
+            $('#step-1').hide();
+            $('input[name=\'toplanti_id\']').val(toplanti_history_id);
+            $('#step-2').show();
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    <!--
+    //FORMDAN TEK TEK EKLENEN GÜNDEM LİSTESİ
+    $('.button-gundem-add').on('click', function() {
+        var value = $('input[name=\'toplanti_gundemi\']').val();
+
+        if (value) {
+            html = '<tr id="gundem-filter-' + value + '">';
+            html += '  <td>' + value + '<input type="hidden" name="gundem_array[]" id="gundem-input-array" value="' + value + '"/></td>';
+            html += '  <td class="text-right" style="width:1%;"><button type="button" class="btn btn-danger btn-sm-new" ><i class="bi bi-dash-circle"></i></button></td>';
+            html += '</tr>';
+            $('#gundem-filter tbody').find('.list100').before(html);
+        }
+
+        $('input[name=\'toplanti_gundemi\']').val('');
+    });
+
+    $('#gundem-filter').on('click', '.btn', function() {
+        $(this).parent().parent().remove();
+    });
+
+    //
+    -->
+</script>
+
+<script type="text/javascript">
+    <!--
+    $('select[name=\'toplanti_category_id\']').on('change', function() {
+        $('#toplanti-baslik').hide();
+
+        var toplanti_category_id = $(this).val();
+
+        if (toplanti_category_id == 6 || toplanti_category_id == 7) {
+            $('#toplanti-baslik').show();
+        }
+
+        if (toplanti_category_id == 8) {
+            $('#input-konusu').val('İSTANBUL KOORDİNASYON');
+            $('#toplanti-baslik').show();
+        }
+
+        $.ajax({
+            url: 'index.php?route=toplanti/toplanti/category&user_token={{ user_token }}&category_id=' + $('select[name=\'toplanti_category_id\']').val(),
+            type: 'post',
+            dataType: 'json',
+            success: function(json) {
+                $('input[name=\'toplanti_no\']').val(json['toplanti_no']);
+
+                if (json['description']) {
+                    $('#temenni-rows').append(json['description']);
+                }
+
+                if (json['personel']) {
+                    addPersonel(json['personel']);
+                }
+            },
+
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    });
+
+    $('select[name=\'toplanti_category_id\']').trigger('change'); 
+    </script>
+
+    
+     <script>
+        $(document).on('click', '.button-plus', function() {
+            let id = Number($(this).attr('name'));
+            let value = Number($('#status' + id).val());
+
+            // 0→1→2→0 döngüsü
+            let new_id = (value + 1) % 3;
+
+            $('#status' + id).val(new_id).trigger('change');
+        }); 
+    </script>
+    <script type = "text/javascript"> <!--
+    $('select[name=\'toplanti_category_id\']').on('change', function() {
+        $('.option').hide();
+        $('#select-history').hide();
+        $('#button-toplanti-generate').prop('disabled',false);
+        var toplanti_category_id = $(this).val();
+
+        if (toplanti_category_id == 6 || toplanti_category_id == 7) {
+            $('#toplanti-baslik').show();
+        }
+
+        if (toplanti_category_id == 8) {
+            $('#input-konusu').val('İSTANBUL KOORDİNASYON');
+            $('#toplanti-baslik').show();
+
+        }
+
+        if (toplanti_category_id == 'history') {
+            $('#select-history').show();
+            $('#button-toplanti-generate').prop('disabled',true);
+        }
+
+    });
+
+    //
+    -->
+</script>
+
+<script>
+    function addRows(element) {
+        var bolum = element;
+        $.ajax({
+            url: 'index.php?route=toplanti/toplanti/updatePersonel&user_token={{ user_token }}&bolum=' + bolum + '&toplanti_id=' + $('input[name="toplanti_id"]').val(),
+            type: 'post',
+            dataType: 'json', // JSON parse için önemli
+            success: function(json) {
+                $('.alert-dismissible').remove();
+                if (json.success) {
+                    $('#form-toplanti-data').load(
+                        'index.php?route=toplanti/toplanti/dataToplanti&user_token={{ user_token }}&toplanti_history_id=' + json.toplanti_id
+                    );
+                    $('#alert').empty().append(
+                        '<div class="alert border-0 border-success border-start border-2 bg-light-success alert-dismissible fade show py-1">' +
+                        '<div class="d-flex align-items-center">' +
+                        '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+                        '<div class="ms-3"><div class="text-dynamic">' + $('<div>').text(json.success).html() + '</div></div>' +
+                        '</div>' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                        '</div>'
+                    );
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+
+    function autoSave(element, element_bolum, element_kolon, element_id) {
+        let form;
+
+        if (element_bolum === 'temenni') {
+            form = $('#form-temenni').serialize();
+        } else {
+            form = {
+                toplanti_id: $('input[name="toplanti_id"]').val(),
+                id: element_id,
+                kolon: element_kolon,
+                veri: $(element).val()
+            };
+        }
+
+        $.ajax({
+            url: 'index.php?route=toplanti/toplanti/autosave&user_token={{ user_token }}&bolum=' + element_bolum,
+            type: 'post',
+            dataType: 'json',
+            data: form,
+            beforeSend: function() {
+                $('#cover-spin').show(0);
+            },
+            complete: function() {
+                $('#cover-spin').hide(0);
+            },
+            success: function(json) {
+                $('.alert-dismissible').remove();
+                if (json.success) {
+                    $('#form-toplanti-data').load('index.php?route=toplanti/toplanti/dataToplanti&user_token={{ user_token }}&toplanti_history_id=' + json.toplanti_id);
+                    //alertsuccess(json.success);
+                }
+
+                if (json['form']) {
+                    location = json['form'];
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+
+
+    function deleteRows(element, element_id) {
+        if (confirm('Dikkat : Bu işlem geri alınamaz. Bu veriyi silmek istediğinize emin misiniz?') == false) {
+            exit();
+        }
+
+        var bolum = element;
+        var id = element_id;
+        $.ajax({
+            url: 'index.php?route=toplanti/toplanti/deleteRow&user_token={{ user_token }}&bolum=' + bolum + '&id=' + id + '&toplanti_id=' + $('input[name="toplanti_id"]').val(),
+            type: 'post',
+            dataType: 'json', // JSON parse için önemli
+            success: function(json) {
+                if (json.success) {
+                    $('#form-toplanti-data').load(
+                        'index.php?route=toplanti/toplanti/dataToplanti&user_token={{ user_token }}&toplanti_history_id=' + json.toplanti_id
+                    );
+                    alertsuccess(json.success);
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+<script>
+    $('#button-export').on('click', function() {
+
+        $('.tfooty-button').hide();
+        $('#kararlar-row .TK').hide();
+        $('#description').find('button').hide();
+        $('#cover-spin').fadeIn(200);
+        var name = 'toplanti-' + $('.toplanti-no').html() + '.pdf';
+        var table = document.querySelector('#toplanti-dokuman');
+        var clone = table.cloneNode(true); // Tabloyu kopyala
+
+        html2pdf(clone, {
+            margin: [2, 2],
+            filename: name,
+            image: {
+                type: 'png',
+                quality: 1.0
+            },
+            html2canvas: {
+                dpi: 600,
+                letterRendering: true
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            }
+        });
+
+        $('.tfooty-button').show();
+
+        setTimeout(function() {
+            $('#cover-spin').fadeOut(200); // 2 saniye sonra spinner'ı gizle
+
+            $('#kararlar-row .TK').show();
+            $('#button-save').click();
+        }, 2500);
+
+
+
+    });
+</script>
+<script>
+    function autoTextHeight(el) {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+    }
+
+    $('#kararlar-row').on('click', 'td', function() {
+        var value = $(this).find('span').html();
+        $(this).find('span').hide();
+        $(this).find('textarea').show();
+        $(this).find('textarea').trigger('keyup');
+
+    });
+</script>
+
+<script>
+    $('#button-toplanti-generate').on('click', function() {
+        var $btn = $(this);
+        $.ajax({
+            url: 'index.php?route=toplanti/toplanti/save&user_token={{ user_token }}&toplanti_no=' + $('input[name=\'toplanti_no\']').val(),
+            type: 'post',
+            dataType: 'json',
+            data: $('#form-toplanti').serialize(),
+            beforeSend: function() {
+                $('#button-toplanti-generate').buttonanimate('loading');
+                $btn.find(".loading").removeClass("visually-hidden");
+                $btn.find(".reset").addClass("visually-hidden");
+            },
+            complete: function() {
+                $('#button-toplanti-generate').buttonanimate('reset');
+            },
+            success: function(json) {
+                if (json.error.warning) {
+                    $('#alert').prepend(
+                        '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                        '<div class="d-flex align-items-center">' +
+                        '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                        '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                        '</div>' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                        '</div>'
+                    );
+                }
+
+                if (json.success) {
+                    $('#step-1').hide();
+                    $('#form-toplanti-data').load('index.php?route=toplanti/toplanti/dataToplanti&user_token={{ user_token }}' + '&toplanti_history_id=' + json['toplanti_history_id']);
+                    $('#step-2').show();
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    });
+</script>
+
+<style>
+    .table {
+        font-size: 14px;
+    }
+
+    .table2 {
+        font-size: 12px;
+    }
+
+    .input-border-none {
+        width: 100%;
+        height: 28px;
+        border: none;
+        outline: none;
+        /* Opsiyonel: focus durumundaki çerçeveyi kaldırmak için */
+        resize: none;
+        /* Yeniden boyutlamayı kapatır */
+        overflow: hidden;
+
+    }
+
+    .input-border-none::placeholder {
+        color: #545252;
+    }
+
+    .textarea-new {
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        /* Opsiyonel: focus durumundaki çerçeveyi kaldırmak için */
+        overflow: hidden;
+        /* Taşan içeriği gizle */
+        resize: none;
+        /* Kullanıcının manuel olarak boyutlandırmasını engelle */
+        box-sizing: border-box;
+        /* Padding ve border'ı yüksekliğe dahil et */
+    }
+
+    .btn-sm-new {
+        --bs-btn-padding-y: 0.15rem;
+        /* daha dar dikey boşluk */
+        --bs-btn-padding-x: 0.35rem;
+        /* daha dar yatay boşluk */
+        --bs-btn-font-size: 0.65rem;
+        /* daha küçük yazı boyutu */
+        --bs-btn-border-radius: 0.18rem;
+        /* köşeler daha az yuvarlatılmış */
+    }
+</style>

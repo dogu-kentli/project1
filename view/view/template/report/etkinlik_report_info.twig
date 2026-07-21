@@ -1,0 +1,174 @@
+{{ header }}{{ column_left }}
+<main id="page-basvuru" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+      
+        <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success border border-success shadow-sm btn-sm" {{disabled}}><i class="bi bi-filetype-xls"></i></a>
+         <button type="button" id="button-clear" data-toggle="tooltip" title="{{ "Filtreyi Temizle" }}" class="btn btn-light border border-dark shadow-sm btn-sm bg-white" ><i class="bi bi-filter"></i></button>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select name="filter_category1" id="input-category1" class="form-select auto-filter">
+                            <option value="" selected="selected">{{ text_select }}</option>
+                            {% for category1 in categories1 %}
+                                <option value="{{ category1.grup  }}"  {% if filter_category1 == category1.grup %} selected {% endif %}>{{ category1.grup }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                          <div class="col-lg-2 col-6 col-md-3">
+                            <select name="filter_category2" id="input-category2" class="form-select auto-filter">
+                           <option value="" selected="selected">{{ text_select }}</option>
+                            {% for category2 in categories2 %}
+                                  <option value="{{ category2.custom_field_value_id  }}" {% if filter_category2 == category2.custom_field_value_id %} selected {% endif %}>{{ category2.name }}</option>
+                              {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{filter_name}}" id="input-filter-name" placeholder="Bavuru ismi..." class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 ">
+                            <div class="ms-auto position-relative">
+                                <input type="date" name="filter_date_start" value="{{ filter_date_start }}" id="input-filter-name" placeholder="Başlangıç Tarihi" class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 ">
+                            <div class="ms-auto position-relative">
+                                <input type="date" name="filter_date_end" value="{{ filter_date_end }}" id="input-filter-name" placeholder="Başlangıç Tarihi" class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                       
+
+                        <div class="col-lg-1 co1-6 col-md-3">
+                            <select name="limit" class="form-select auto-filter">
+                                {% for key,value in limits %}
+                                <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-basvuru">
+                    <div class="card-body">
+
+                      <div class="table-responsive-sm">
+   <table class="table table-bordered table-striped align-middle mb-0">
+                           <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+            <tr>
+                <th style="width: 15%;">{{ column_category1 }}</th>
+                <th style="width: 15%;">{{ column_category2 }}</th>
+                <th style="width: 15%;">{{ column_etkinlik_adi }}</th> <th style="width: 15%;">{{ column_tarih }}</th>
+                <th style="width: 1%;" class="text-center">Katılım</th>
+                <th style="width: 20%;">{{ column_description }}</th>
+                <th class="text-start">{{ column_store }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for information in informations %}
+            <tr>
+                <td class="text-wrap">{{ information.category1 }}</td>
+                <td class="text-wrap">{{ information.category2 }}</td>
+                <td class="text-wrap fw-bold text-dark" style="word-break: break-word;">
+                    {{ information.etkinlik_adi }}
+                </td>
+                <td class="text-nowrap small text-muted">
+                    <i class="bi bi-calendar3 me-1"></i>{{ information.date_added }}
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-primary">{{ information.katilim }}</span>
+                </td>
+                <td class="text-wrap small text-secondary" style="max-height: 50px; overflow: hidden;">
+                    {{ information.description }}
+                </td>
+                <td class="text-start small">{{ information.store['name'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+                        <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    {{footer}}
+</main>
+<script type="text/javascript"><!--
+$('.auto-filter').on('change', function() {
+   $('#cover-spin').show(0);
+	var url = '';
+
+	if ($('input[name=\'filter_name\']').val()) {
+		url += '&filter_name=' + encodeURIComponent($('input[name=\'filter_name\']').val());
+	}
+	
+	if ($('select[name=\'filter_category1\']').val()) {
+		url += '&filter_category1=' + encodeURIComponent( $('select[name=\'filter_category1\']').val());
+	}
+	
+	if ($('select[name=\'filter_category2\']').val()) {
+		url += '&filter_category2=' + encodeURIComponent($('select[name=\'filter_category2\']').val());
+	}
+
+	if ($('input[name=\'filter_date_start\']').val()) {
+		url += '&filter_date_start=' + encodeURIComponent($('input[name=\'filter_date_start\']').val());
+	}
+	
+
+	if ($('select[name=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name=\'limit\']').val());
+	}
+	
+	location = 'index.php?route=report/etkinlik_transaction&user_token={{ user_token }}' + url;
+});
+
+$('#button-clear').on('click', function() {
+	url = 'index.php?route=report/etkinlik_transaction&user_token={{ user_token }}';
+	location = url;
+});
+//--></script> 
+
+<script type="text/javascript"><!--
+$('#button-export').on('click', function() {
+ var url = '{{export}}';
+ url += '&filter_limit=' + encodeURIComponent($('select[name=\'filter_limit\']').val());
+ location = url;
+});
+//--></script>

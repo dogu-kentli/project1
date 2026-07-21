@@ -1,0 +1,110 @@
+ .btn-rainbow-custom {
+      position: relative;
+      isolation: isolate;
+      background-color: #11141a; 
+      color: #ffffff;
+      border: 0;
+      overflow: visible; 
+      transition: transform 0.1s ease;
+    }
+
+    /* Hover'da sadece hafif scale ve yumuşak gölge (Aynen Korundu) */
+    .btn-rainbow-custom:hover,
+    .btn-rainbow-custom:focus {
+      transform: scale(1.02); /* Çok hafif büyüme */
+      color:#fff;
+    }
+
+    .btn-rainbow-custom:active {
+      transform: scale(0.99);
+    }
+
+    /* Çerçeve ve Halo - Yavaşlatılmış ve Belirginleştirilmiş Yapı (Aynen Korundu) */
+    .btn-rainbow-custom::before,
+    .btn-rainbow-custom::after {
+      content: "";
+      position: absolute;
+      inset: -2px; 
+      border-radius: inherit;
+      z-index: -1;
+      animation: udef-rainbow 12s linear infinite; /* Ağır ve pürüzsüz akış */
+      opacity: 0.9; 
+    }
+
+    .btn-rainbow-custom::after {
+      filter: blur(16px); 
+      opacity: 0.6;
+    }
+
+    /* ==========================================================================
+       RENK PALETLERİ (Mevcutlar korundu + Siyah ve Beyaz eklendi)
+       ========================================================================== */
+
+    /* KIRMIZI */
+    .btn-glow-red::before, .btn-glow-red::after {
+      background: linear-gradient(45deg, #ff003c, #99001a, #ff3366, #ff003c);
+      background-size: 400% 400%;
+    }
+
+    /* TURUNCU */
+    .btn-glow-orange::before, .btn-glow-orange::after {
+      background: linear-gradient(45deg, #ff6a00, #993d00, #ff944d, #ff6a00);
+      background-size: 400% 400%;
+    }
+
+    /* SARI */
+    .btn-glow-yellow::before, .btn-glow-yellow::after {
+      background: linear-gradient(45deg, #ffcc00, #997a00, #ffdf80, #ffcc00);
+      background-size: 400% 400%;
+    }
+
+    /* YEŞİL */
+    .btn-glow-green::before, .btn-glow-green::after {
+      background: linear-gradient(45deg, #00ff66, #006629, #66ff99, #00ff66);
+      background-size: 400% 400%;
+    }
+
+    /* MAVİ */
+    .btn-glow-blue::before, .btn-glow-blue::after {
+      background: linear-gradient(45deg, #0066ff, #002966, #66a3ff, #0066ff);
+      background-size: 400% 400%;
+    }
+
+    /* MOR */
+    .btn-glow-purple::before, .btn-glow-purple::after {
+      background: linear-gradient(45deg, #a600ff, #4c0073, #cc66ff, #a600ff);
+      background-size: 400% 400%;
+    }
+
+    /* PEMBE */
+    .btn-glow-pink::before, .btn-glow-pink::after {
+      background: linear-gradient(45deg, #ff0077, #80003c, #ff66a3, #ff0077);
+      background-size: 400% 400%;
+    }
+
+    /* YENİ: SİYAH (Asil Metalik Griler) */
+    .btn-glow-black::before, .btn-glow-black::after {
+      background: linear-gradient(45deg, #2c3036, #0f1012, #525966, #2c3036);
+      background-size: 400% 400%;
+    }
+
+    /* YENİ: BEYAZ (Saf Platin ve Gümüş Parıltı) */
+    .btn-glow-white {
+      background-color: #ffffff;
+      color: #11141a; /* Beyaz buton içi siyah yazı */
+    }
+    .btn-glow-white:hover, .btn-glow-white:focus {
+      color: #11141a;
+      background-color: #f8f9fa;
+    }
+    .btn-glow-white::before, .btn-glow-white::after {
+      background: linear-gradient(45deg, #ffffff, #888888, #e0e0e0, #ffffff);
+      background-size: 400% 400%;
+    }
+
+    /* Pürüzsüz Ağır Akış Animasyonu */
+    @keyframes udef-rainbow {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 400% 50%; }
+      100% { background-position: 0% 50%; }
+    }

@@ -1,0 +1,77 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">Bölge Formu</h5>
+            <div class="ms-auto">
+               <button type="submit" form="form-bolge" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-save"></i>
+              </button>
+               <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm bg-white btn-sm">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-bolge" class="row g-3">
+            
+            <div class="col-12">
+              <label class="form-label" for="input-name">{{ entry_name }}</label>
+              <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control"/>
+              {% if error_name %}
+                <div class="text-danger">{{ error_name }}</div>
+              {% endif %}
+            </div>
+
+           <div class="col-12">
+              <label class="form-label" for="input-name">{{ entry_description }}</label>
+
+             <textarea class="form-control" name="description" value="{{ description }}" placeholder="{{ entry_description }}" id="input-description" required="">{{ description }}</textarea>
+              {% if error_description %}
+                <div class="text-danger">{{ error_description }}</div>
+              {% endif %}
+            </div>
+
+            
+            
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ footer }}
+</main>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      $('#alert').prepend(
+              '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + error_warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );
+     }
+
+     if (success) {
+	      $('#alert').append(
+              '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + success + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );  
+    }
+});
+</script>

@@ -1,0 +1,758 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+    <div class="row">
+        <div class="col-lg-12 mx-auto">
+            <div class="card">
+                <div class="card-header py-3 bg-transparent">
+                    <div class="d-sm-flex align-items-center">
+                        <h5 class="mb-2 mb-sm-0">Aylık Teşkilat Raporu</h5>
+                        <div class="ms-auto">
+                            <button type="button" form="form-teskilat" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary button-save btn-sm">
+                                <i class="bi bi-save"></i>
+                            </button>
+                            <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm btn-sm bg-white">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-teskilat" class="form-horizontal">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="6" class="text-center">{% if store_logo  %} <img src="{{ store_logo}}" /> {% else %}<img src="view/image/logo.png" width="200" height="auto" /></a> {% endif %}
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th colspan="6" id="imza" {% if teskilat_id  < 1 %} style="display:none;" {% endif %}>
+                                        <h4>Kıymetli dernek başkanım; kurumunuzun aylık raporunu zamanında ve eksiksiz şekilde doldurmanızı rica ederim.</h4><br>
+                                        <h4>Abdullah Muhammed İslam<br> Başkan</h3>
+
+                                    </th>
+                                </tr>
+
+                                <tr>
+                                    <th colspan="6" class="text-center">
+                                        <div class="input-container">
+                                            <input type="hidden" name="name" value="{{store_name}}" placeholder="............" class="form-control" style="width:100px;">
+                                        </div>
+
+                                        <div class="input-container">
+                                            <h3><strong> {{store_name}} </strong></h3>
+                                        </div>
+                                        <br>
+                                        <div id="report-message" class="bg-light radius-10" style="font-size:14px;display:none;">
+
+                                        </div>
+
+                                        <div class="input-container">
+
+                                            <select name="donemi" id="input-rapor-donemi" onchange="donemkontrol(this)" class="form-select">
+                                                <option value="">{{"-- Dönemi --"}}</option>
+                                                {% for month in aylar %}
+                                                <option value="{{ month.text }}" {% if donemi == month.text %} selected {% endif %}>{{ month.text }}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                        </div>
+
+                                    </th>
+                                </tr>
+                                <tr id="rapor-donemi" style="display:none;">
+                                    <td class="text-center"></td>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div id="table-data" {% if teskilat_id == false %} style="display:none;" {% endif %}>
+                            <div class="mt-3">
+                                <h6 class="text-center text-uppercase">YÖNETİM / İCRA KURULU TOPLANTISI</h6>
+                                <table class="table table-bordered align-middle mb-0 ">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="text-center" colspan="2">ERKEKLER</th>
+                                            <th class="text-center" colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">KAÇ ADET YAPILDI?</th>
+                                            <th class="text-center">ORTALAMA KATILIM SAYISI</th>
+                                            <th class="text-center">KAÇ ADET YAPILDI?</th>
+                                            <th class="text-center">ORTALAMA KATILIM SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[icra_kurulu][adet1]" value="{{teskilat_raporu.icra_kurulu.adet1}}" placeholder="..." class="form-control rounded"></td>
+                                            <td><input type="number" name="teskilat_raporu[icra_kurulu][katilim1]" value="{{teskilat_raporu.icra_kurulu.katilim1}}" placeholder="..." class="form-control rounded"></td>
+                                            <td><input type="number" name="teskilat_raporu[icra_kurulu][adet2]" value="{{teskilat_raporu.icra_kurulu.adet2}}" placeholder="..." class="form-control rounded"></td>
+                                            <td><input type="number" name="teskilat_raporu[icra_kurulu][katilim2]" value="{{teskilat_raporu.icra_kurulu.katilim2}}" placeholder="..." class="form-control rounded"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">ÖĞRENCİ SAYILARI</h6>
+                                <table class="table table-bordered align-middle mb-0 ">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="text-center" colspan="2">ERKEKLER</th>
+                                            <th class="text-center" colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">HEDEF</th>
+                                            <th class="text-center">MEVCUT</th>
+                                            <th class="text-center">HEDEF</th>
+                                            <th class="text-center">MEVCUT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[ogrenci_sayisi][hedef1]" value="{{ teskilat_raporu.ogrenci_sayisi.hedef1 }}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[ogrenci_sayisi][mevcut1]" value="{{teskilat_raporu.ogrenci_sayisi.mevcut1 }}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[ogrenci_sayisi][hedef2]" value="{{ teskilat_raporu.ogrenci_sayisi.hedef2 }}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[ogrenci_sayisi][mevcut2]" value="{{teskilat_raporu.ogrenci_sayisi.mevcut2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">DERNEĞİN/TEMSİLCİLİĞİN ÖĞRENCİ EVİ SAYILARI</h6>
+                                <table class="table table-bordered align-middle mb-0 ">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="text-center">ERKEK ÖĞRENCİ EVİ SAYISI</th>
+                                            <th class="text-center">EV(LER)DE KALAN SAYISI</th>
+                                            <th class="text-center">HANIM ÖĞRENCİ EVİ SAYISI</th>
+                                            <th class="text-center">EV(LER)DE KALAN SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[ogrenci_evi_sayisi][sayi1]" value="{{teskilat_raporu.ogrenci_evi_sayisi.sayi1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[ogrenci_evi_sayisi][kalan1]" value="{{teskilat_raporu.ogrenci_evi_sayisi.kalan1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[ogrenci_evi_sayisi][sayi2]" value="{{teskilat_raporu.ogrenci_evi_sayisi.sayi2}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[ogrenci_evi_sayisi][kalan2]" value="{{teskilat_raporu.ogrenci_evi_sayisi.kalan2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">İRTİBATLI OLUNAN ÖĞRENCİ EVİ SAYILARI</h6>
+                                <table class="table table-bordered align-middle mb-0 ">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="text-center">ERKEK ÖĞRENCİ EVİ SAYISI</th>
+                                            <th class="text-center">HANIM ÖĞRENCİ EVİ SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[irtibatli_ogrenci_evi_sayisi][erkek]" value="{{teskilat_raporu.irtibatli_ogrenci_evi_sayisi.kadin}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[irtibatli_ogrenci_evi_sayisi][kadin]" value="{{teskilat_raporu.irtibatli_ogrenci_evi_sayisi.erkek}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">İRTİBATLI OLUNAN ÖĞRENCİ BİRLİĞİ / ÖĞRENCİ KULÜBÜ SAYISI</h6>
+                                <table class="table table-bordered align-middle mb-0 ">
+
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[irtibatli_ogrenci_birligi_sayisi][sayi]" value="{{teskilat_raporu.irtibatli_ogrenci_birligi_sayisi.sayi}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">ÜLKE TEMSİLCİSİ SAYILARI</h6>
+                                <table class="table table-bordered align-middle mb-0 ">
+
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[ulke_temsilcilik][sayi]" value="{{teskilat_raporu.ulke_temsilcilik.sayi}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">BURSLU ÖĞRENCİ SAYILARI</h6>
+                                <table class="table table-bordered align-middle mb-0 ">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="text-center">ERKEKLER</th>
+                                            <th class="text-center">HANIMLAR</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[burslu_ogrenci_sayisi][erkek]" value="{{teskilat_raporu.burslu_ogrenci_sayisi.erkek}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[burslu_ogrenci_sayisi][kadin]" value="{{teskilat_raporu.burslu_ogrenci_sayisi.kadin}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="section-title text-center">EĞİTİM</div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">SOHBETLER</h6>
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th colspan="2">ERKEKLER</th>
+                                            <th colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">ORTALAMA KATILIMCI SAYISI</th>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">ORTALAMA KATILIMCI SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[egitim_sohbetler][program1]" value="{{teskilat_raporu.egitim_sohbetler.program1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_sohbetler][katilim1]" value="{{teskilat_raporu.egitim_sohbetler.katilim1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_sohbetler][program2]" value="{{teskilat_raporu.egitim_sohbetler.program2}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_sohbetler][katilim2]" value="{{teskilat_raporu.egitim_sohbetler.katilim2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">KİTAP TAHLİLİ</h6>
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th colspan="2">ERKEKLER</th>
+                                            <th colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[egitim_kitap][program1]" value="{{teskilat_raporu.egitim_kitap.program1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_kitap][katilim1]" value="{{teskilat_raporu.egitim_kitap.katilim1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_kitap][program2]" value="{{teskilat_raporu.egitim_kitap.program2}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_kitap][katilim2]" value="{{teskilat_raporu.egitim_kitap.katilim2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">SEMİNER/KONFERANS</h6>
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th colspan="2">ERKEKLER</th>
+                                            <th colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[egitim_seminer][program1]" value="{{teskilat_raporu.egitim_seminer.program1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_seminer][katilim1]" value="{{teskilat_raporu.egitim_seminer.katilim1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_seminer][program2]" value="{{teskilat_raporu.egitim_seminer.program2}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_seminer][katilim2]" value="{{teskilat_raporu.egitim_seminer.katilim2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">ATÖLYE VE MESLEKİ ÇALIŞMALAR</h6>
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th colspan="2">ERKEKLER</th>
+                                            <th colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">ORTALAMA KATILIMCI SAYISI</th>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">ORTALAMA KATILIMCI SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[egitim_meslek][program1]" value="{{teskilat_raporu.egitim_meslek.program1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_meslek][katilim1]" value="{{teskilat_raporu.egitim_meslek.katilim1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_meslek][program2]" value="{{teskilat_raporu.egitim_meslek.program2}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_meslek][katilim2]" value="{{teskilat_raporu.egitim_meslek.katilim2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">DİĞER EĞİTİM ÇALIŞMALARI</h6>
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th colspan="2">ERKEKLER</th>
+                                            <th colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[egitim_diger][program1]" value="{{teskilat_raporu.egitim_diger.program1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_diger][katilim1]" value="{{teskilat_raporu.egitim_diger.katilim1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_diger][program2]" value="{{teskilat_raporu.egitim_diger.program2}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[egitim_diger][katilim2]" value="{{teskilat_raporu.egitim_diger.katilim2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="section-title text-center">SOSYAL ÇALIŞMALARI</div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">GEZİ (ŞEHİR İÇİ/DIŞI TÜM GEZİLER)</h6>
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th colspan="2">ERKEKLER</th>
+                                            <th colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_gezi][program1]" value="{{teskilat_raporu.sosyal_calismalar_gezi.program1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_gezi][katilim1]" value="{{teskilat_raporu.sosyal_calismalar_gezi.katilim1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_gezi][program2]" value="{{teskilat_raporu.sosyal_calismalar_gezi.program2}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_gezi][katilim2]" value="{{teskilat_raporu.sosyal_calismalar_gezi.katilim2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">SPORTİF ETKİNLİKLER</h6>
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th colspan="2">ERKEKLER</th>
+                                            <th colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_spor][program1]" value="{{teskilat_raporu.sosyal_calismalar_spor.program1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_spor][katilim1]" value="{{teskilat_raporu.sosyal_calismalar_spor.katilim1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_spor][program2]" value="{{teskilat_raporu.sosyal_calismalar_spor.program2}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_spor][katilim2]" value="{{teskilat_raporu.sosyal_calismalar_spor.katilim2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">KÜLTÜR-SANAT FAALİYETLERİ</h6>
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th colspan="2">ERKEKLER</th>
+                                            <th colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_sanat][program1]" value="{{teskilat_raporu.sosyal_calismalar_sanat.program1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_sanat][katilim1]" value="{{teskilat_raporu.sosyal_calismalar_sanat.katilim1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_sanat][program2]" value="{{teskilat_raporu.sosyal_calismalar_sanat.program2}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_sanat][katilim2]" value="{{teskilat_raporu.sosyal_calismalar_sanat.katilim2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="text-center text-uppercase">DİĞER SOSYAL ÇALIŞMALAR</h6>
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th colspan="2">ERKEKLER</th>
+                                            <th colspan="2">HANIMLAR</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                            <th class="text-center">PROGRAM SAYISI</th>
+                                            <th class="text-center">KATILIMCI SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_diger][program1]" value="{{teskilat_raporu.sosyal_calismalar_diger.program1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_diger][katilim1]" value="{{teskilat_raporu.sosyal_calismalar_diger.katilim1}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_diger][program2]" value="{{teskilat_raporu.sosyal_calismalar_diger.program2}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_calismalar_diger][katilim2]" value="{{teskilat_raporu.sosyal_calismalar_diger.katilim2}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="section-title text-center">DANIŞMANLIK VE REHBERLİK ÇALIŞMALARI</div>
+
+                            <div class="mt-3">
+                                
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="text-center">AKADEMİK YARDIMLARIN SAYISI</th>
+                                            <th class="text-center">SAĞLIK YARDIMLARI SAYISI</th>
+                                            <th class="text-center">BARINMA YARDIMLARI SAYISI</th>
+                                            <th class="text-center">RESMİ İŞLEM YARDIMI SAYISI</th>
+                                            <th class="text-center">DİĞER YARDIMLAR SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[rehberlik_calismalari][akademik]" value="{{teskilat_raporu.rehberlik_calismalari.akademik}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[rehberlik_calismalari][saglik]" value="{{teskilat_raporu.rehberlik_calismalari.saglik}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[rehberlik_calismalari][barinma]" value="{{teskilat_raporu.rehberlik_calismalari.barinma}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[rehberlik_calismalari][yardim]" value="{{teskilat_raporu.rehberlik_calismalari.yardim}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[rehberlik_calismalari][diger]" value="{{teskilat_raporu.rehberlik_calismalari.diger}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="section-title text-center">KURUMSAL İLİŞKİLER</div>
+
+                            <div class="mt-4">
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="text-center">GİDİLEN KURUMSAL ZİYARET SAYISI</th>
+                                            <th class="text-center">GELEN KURUMSAL ZİYARET SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[kurumsal_iliskiler][gidilen]" value="{{teskilat_raporu.kurumsal_iliskiler.gidilen}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[kurumsal_iliskiler][gelen]" value="{{teskilat_raporu.kurumsal_iliskiler.gelen}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="section-title text-center">FON ÇALIŞMALARI</div>
+                                
+                            <div class="mt-4">
+                             <div class="note">
+                                    (Burada destekler ve yardımların mali tutarları yazılmayacaktır, sadece yardım edilen öğrenci sayısı yazılacaktır.)
+                                </div>
+                                <table class="table table-bordered text-center mb-4">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="text-center">AİDAT VEREN KİŞİ SAYISI</th>
+                                            <th class="text-center">MEVCUT KUMBARA SAYISI</th>
+                                            <th class="text-center">BİREYSEL BAĞIŞÇI SAYISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[fon_calismalari][aidat]" value="{{teskilat_raporu.fon_calismalari.aidat}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[fon_calismalari][kumbara]" value="{{teskilat_raporu.fon_calismalari.kumbara}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[fon_calismalari][bagisci]" value="{{teskilat_raporu.fon_calismalari.bagisci}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+                                <h6 class="text-center text-uppercase">NAKDİ GELİRLER</h6>
+                                <table class="table table-bordered text-center mb-4">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="text-center">ZEKAT GELİRLERİ</th>
+                                            <th class="text-center">PROJE GELİRLERİ</th>
+                                            <th class="text-center">SERBEST (DİĞER) BAĞIŞ</th>
+                                            <th class="text-center">AYNİ GELİR (YAKLAŞIK MİKTAR)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[fon_calismalari][zekat]" value="{{teskilat_raporu.fon_calismalari.zekat}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[fon_calismalari][proje]" value="{{teskilat_raporu.fon_calismalari.proje}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[fon_calismalari][serbest]" value="{{teskilat_raporu.fon_calismalari.serbest}}" placeholder="..." class="form-control"></td>
+                                            <td><input type="number" name="teskilat_raporu[fon_calismalari][ayni]" value="{{teskilat_raporu.fon_calismalari.ayni}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+                                <h6 class="text-center text-uppercase">MALİ ZİYARET SAYISI</h6>
+                                <table class="table table-bordered text-center">
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[fon_calismalari][mali_ziyaret]" value="{{teskilat_raporu.fon_calismalari.mali_ziyaret}}" placeholder="..." class="form-control"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="section-title text-center">SOSYAL MEDYA HESAPLARI</div>
+
+                            <div class="mt-4">
+                                <table class="table table-bordered text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+
+                                            <th class="text-center">INSTAGRAM</th>
+                                            <th class="text-center">FACEBOOK</th>
+                                            <th class="text-center">X (TWITTER)</th>
+                                            <th class="text-center">YOUTUBE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_hesaplar][instagram_takipci]" value="{{teskilat_raporu.sosyal_hesaplar.instagram_takipci}}" class="form-control" title="Takipçi Sayısı" placeholder="Takipçi Sayısı"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_hesaplar][facebook_takipci]" value="{{teskilat_raporu.sosyal_hesaplar.facebook_takipci}}" class="form-control" title="Takipçi Sayısı" placeholder="Takipçi Sayısı"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_hesaplar][twitter_takipci]" value="{{teskilat_raporu.sosyal_hesaplar.twitter_takipci}}" class="form-control" title="Takipçi Sayısı" placeholder="Takipçi Sayısı"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_hesaplar][youtube_takipci]" value="{{teskilat_raporu.sosyal_hesaplar.youtube_takipci}}" class="form-control" title="Takipçi Sayısı" placeholder="Takipçi Sayısı"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_hesaplar][instagram_icerik]" value="{{teskilat_raporu.sosyal_hesaplar.instagram_icerik}}" class="form-control" title="İçerik Sayısı" placeholder="İçerik Sayısı"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_hesaplar][facebook_icerik]" value="{{teskilat_raporu.sosyal_hesaplar.facebook_icerik}}" class="form-control" title="İçerik Sayısı" placeholder="İçerik Sayısı"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_hesaplar][twitter_icerik]" value="{{teskilat_raporu.sosyal_hesaplar.twitter_icerik}}" class="form-control" title="İçerik Sayısı" placeholder="İçerik Sayısı"></td>
+                                            <td><input type="number" name="teskilat_raporu[sosyal_hesaplar][youtube_icerik]" value="{{teskilat_raporu.sosyal_hesaplar.youtube_icerik}}" class="form-control" title="İçerik Sayısı" placeholder="İçerik Sayısı"></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ footer }}
+</main>
+<style>
+    .input-container {
+        display: inline-block;
+        margin-right: 2px;
+        /* Inputlar arasında boşluk */
+    }
+
+    .form-control {
+        width: 100%;
+        height: 28px;
+        border: none;
+        outline: none;
+        /* Opsiyonel: focus durumundaki çerçeveyi kaldırmak için */
+        resize: none;
+        /* Yeniden boyutlamayı kapatır */
+        overflow: hidden;
+    }
+
+    .description-border-none {
+        width: 100%;
+        border-color: #eee;
+        outline: none;
+        /* Opsiyonel: focus durumundaki çerçeveyi kaldırmak için */
+        resize: none;
+        /* Yeniden boyutlamayı kapatır */
+        overflow: hidden;
+    }
+
+    .input-border-none::placeholder {
+        color: #464343;
+    }
+
+    .tooltip-inner {
+        max-width: 400px;
+        padding: 3px 8px;
+        font-size: 14px;
+        color: #000000;
+        text-align: left;
+        opacity: 1;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    .section-title {
+        background: #e5e6e7;
+        color: black;
+        padding: 12px 20px;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    h6 {
+        font-weight: 700;
+        color: #000000;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        padding-left: 10px;
+    }
+
+
+    .note {
+        font-size: 0.9rem;
+        color: #dc2626;
+        background: #fef2f2;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+</style>
+<script type="text/javascript">
+    $('.button-save').on('click', function(event) {
+        event.preventDefault(); // Burada olmalı
+
+        // Önceki hataları temizle
+        $('.text-danger,.alert-dismissible').remove();
+        $('.form-control').removeClass('is-invalid').css('border', '');
+
+        var errorArray = [];
+
+        // Dönemi kontrolü
+        var donemi = $('select[name="donemi"]').val();
+        if (donemi === '') {
+            errorArray.push('Lütfen dönemi seçin.');
+            $('select[name="donemi"]').addClass('is-invalid')
+                                     .after('<div class="text-danger"><span>Dönemi seçin</span></div>');
+        }
+
+        // Zorunlu alanlar kontrolü
+        $('#form-teskilat .required').each(function() {
+            if ($(this).val().trim() === '') {
+                errorArray.push('Lütfen gerekli alanları doldurun.');
+                $(this).next('.text-danger').remove(); // Önceki mesajı sil
+                $(this).after('<div class="text-danger"><span>Zorunlu</span></div>');
+                $(this).css('border', '1px solid #f78981');
+            } else {
+                $(this).next('.text-danger').remove();
+                $(this).css('border', '');
+            }
+        });
+
+        // Sonuç
+        if (errorArray.length === 0) {
+            $('#form-teskilat').submit();
+        } else {
+            alerterror('Lütfen zorunlu alanları doldurunuz.');
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    <!--
+    function donemkontrol(element) {
+
+        $.ajax({
+            url: 'index.php?route=teskilat/teskilat/donemkontrol&user_token={{ user_token }}&teskilat_rapor_id={{teskilat_id}}&donemi=' + element.value,
+            type: 'post',
+            dataType: 'json',
+            success: function(json) {
+
+                if (json.error.warning) {
+                    
+                    $('#table-data').hide();
+
+                    alerterror(json.error.warning);
+                }
+
+                if (json.success) {
+                    $('#report-message').addClass('alert-dismissible').html(json.success);
+                    $('#report-message').show();
+                    $('.json-table').remove();
+                    $('.button-save').prop('disabled', false);
+                    $('#table-data').show();
+                    $('#rapor-donemi').hide().find('span').remove();
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+
+    //
+    -->
+</script>
+
+{#
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const inputs = document.querySelectorAll("#form-teskilat input[type='number']");
+    inputs.forEach(input => {
+        const randomNumber = Math.floor(Math.random() * 90) + 10;
+        input.value = randomNumber;
+    });
+});
+</script>
+#}
+

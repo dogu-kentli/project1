@@ -1,0 +1,12 @@
+<div id="dernekler-data"></div>
+
+<script>
+$('#dernekler-data').delegate('.sort', 'click', function(e) {
+   $('#cover-spin').show(0);
+ e.preventDefault();
+	
+$('#dernekler-data').load(this.href);
+});
+
+$('#dernekler-data').load('index.php?route=extension/dashboard/dernekler/datadernek&user_token={{ user_token }}');
+</script>

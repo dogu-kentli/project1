@@ -1,0 +1,306 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb  d-sm-flex align-items-center mb-3">
+             
+              <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                 <ol class="breadcrumb mb-0 p-0">
+				     {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+					  {% endfor %}
+                  </ol>
+                </nav>
+              </div>
+              <div class="ms-auto d-flex gap-2">
+                <button type="submit" form="form-basvuru" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="bi bi-save"></i>{{" Kaydet"}}</button>
+                <a href="{{cancel}}" class="btn btn-light border shadow-sm bg-white"><i class="bi bi-arrow-counterclockwise"></i></a>
+              </div>
+            </div>
+            <!--end breadcrumb-->
+              
+              <div class="row">
+               <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-basvuru"> 
+                 <div class="col-lg-12 mx-auto">
+                  <div class="card">
+                    
+                    <div class="card-body">
+                       <div class="row g-3">
+                         <div class="col-12 col-lg-8">
+                            <div class="card shadow-none bg-light border">
+                              <div class="card-body row g-3">
+                                
+                                  <div class="col-12">
+                                    <label class="form-label fw-bold">{{ entry_name }}</label>
+                                    <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control"/>
+                                    {% if error_name %}
+                                    <div class="text-danger">{{ error_name }}</div>
+                                    {% endif %}
+                                  </div>
+                                  <div class="col-12 col-lg-6">
+                                    <label class="form-label fw-bold">{{ "Başlangıç Tarihi" }}</label>
+                                    <input type="date" name="date_start" value="{{ date_start }}" placeholder="" id="input-date-start" class="form-control"/>
+                                    {% if error_date_start %}
+                                      <div class="text-danger">{{ error_date_start }}</div>
+                                    {% endif %}
+                                  </div>
+                                  <div class="col-12 col-lg-6">
+                                    <label class="form-label fw-bold">{{ "Bitiş Tarihi" }}</label>
+                                    <input type="date" name="date_end" value="{{ date_end }}" placeholder="" id="input-date-added" class="form-control"/>
+                                    {% if error_date_end %}
+                                      <div class="text-danger">{{ error_date_end }}</div>
+                                    {% endif %}
+                                  </div>
+
+                                  <div class="col-12">
+                                    <label class="form-label fw-bold">{{ "Kontenjan" }}</label>
+                                    <div class="input-group mb-3">
+									    <input type="number" name="kontenjan" value="{{ kontenjan }}" placeholder="{{ "Kontenjan" }}" id="input-kontenjan" class="form-control" {% if kontenjan == '' %} disabled {% endif %}/>
+                                      <button type="button" id="button-kontenjan" class="input-group-text" id="basic-addon2">Ekle</button>
+								     </div>
+                                  </div>
+                                  
+                                  
+                                  <div class="col-12">
+                                    <label class="form-label fw-bold">Açıklama</label>
+                                    <textarea name="description"  class="form-control" id="textarea-editor" style="height: 300px; overflow-y:auto;" placeholder="Full description" rows="4" cols="4">{{description}}</textarea>
+                                  </div>
+
+                                  <div class="col-12">
+                                    <label class="form-label fw-bold">{{ "Durumu (Pasif / Aktif)" }}</label>
+                                    <div class="form-check form-switch">
+                                      {% if status %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                                      <input class="form-check-input" type="checkbox" {{ checked }} name="status" value="1" id="statusSwitch"
+                                            style="width:3rem;height:1.5rem;">
+                                      <label class="form-check-label ms-2" for="statusSwitch"></label>
+                                    </div>
+                                  </div>
+                                
+                              </div>
+                            </div>
+                         </div>
+
+                         <div class="col-12 col-lg-4">
+                            <div class="card shadow-none bg-light border">
+                              <div class="card-body">
+                                  <div class="row g-3">
+                                   <div class="col-3">
+                                    <label class="form-label fw-bold">{{ "Afiş Ekle" }}</label>
+                                    <div class="profile-avatar text-start">
+                                    <a href="javascript:void(0);" id="thumb-image" class="thumbnail">
+                                    <img src="{{ thumb }}" id="thumb-img" class="border border-primary border-primary rounded-lg shadow"  width="120" height="120"  title="Resim eklemek için tıklayın" class="rounded-circle"></a>
+                                    <input type="hidden" name="banner_image" value="{{ image }}" id="input-image"/>
+                                  </div>
+                                  </div>
+                                  
+                                    <div class="col-12">
+                                      <label class="form-label fw-bold">{{ entry_file }}</label>
+                                      <div class="form-check form-switch">
+                                        {% if filename %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                                        <input class="form-check-input" type="checkbox" {{ checked }} name="file" value="1"  id="switch-file" style="width:3rem;height:1.5rem;">
+                                        <label class="form-check-label ms-2" for="switch-file"></label>
+                                      </div>
+                                    </div>
+                                   
+                                    <div class="col-12" id="filename" style="display:none;">
+                                      <label class="form-label fw-bold">Belge</label>
+                                       <input type="text" name="filename" value="{{ filename }}" placeholder="{{ "İstenilen Belge" }}" id="input-belge" class="form-control"/>
+                                      {% if error_filename %}
+                                      <div class="text-danger">{{ error_filename }}</div>
+                                      {% endif %}
+                                    </div>
+
+                                    <div class="col-12">
+                                      <label class="form-label fw-bold">{{ "Soru Ekle" }}</label>
+                                      <div class="form-check form-switch">
+                                        {% if filename %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                                        <input class="form-check-input" type="checkbox" {{ checked }} name="ques" value="1"  id="checkbox-file" style="width:3rem;height:1.5rem;">
+                                        
+                                      </div>
+                                    </div>
+                                    <a href="javascript:;" class="btn btn-sm btn-light border shadow-sm bg-white">{{" Not: Sistemde kayıtlı olmayan bilgilerden ekleyiniz."}} </a>
+                                    <div id="question" style="display:none;">
+                                      <div class="col-12">
+                                        <label class="form-label fw-bold" for="input-status">{{ "Soru : 1" }}</label>
+                                        <input type="text" name="question[s1]" value="{{question['s1']}}" placeholder="Soru 1" class="form-control bg-light-info question-input">
+                                      </div>
+
+                                      <div class="col-12">
+                                        <label class="form-label fw-bold" for="input-status">{{ "Soru : 2" }}</label>
+                                        <input type="text" name="question[s2]" value="{{question['s2']}}" placeholder="Soru 2" class="form-control bg-light-info question-input">
+                                      </div>
+
+                                      <div class="col-12">
+                                        <label class="form-label fw-bold" for="input-status">{{ "Soru : 3" }}</label>
+                                        <input type="text" name="question[s3]" value="{{question['s3']}}" placeholder="Soru 3" class="form-control bg-light-info question-input">
+                                      </div>
+                                    </div>
+                                     {% if display %}
+                                      <div class="col-12">
+                                       <label class="form-label">Bu başvuruya <b>{{store.name}} Derneği</b> öğrencileri de başvurabilir.</label>
+                                      <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="basvuru_access" value="1" {% if basvuru_access %} checked {% endif %} style="width:3rem;height:1.5rem;">
+                                      </div>
+                                      </div>
+                                      {% endif %}
+                                     <div class="col-12">
+                                      <label class="form-label fw-bold">{{ "Geri Bildirim" }}</label>
+                                      <div class="form-check form-switch">
+                                        {% if mail_geri_bildirim == 1  %}{% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                                        <input class="form-check-input" type="checkbox" {{ checked }} name="mail_geri_bildirim" value="1"  style="width:3rem;height:1.5rem;">
+                                        
+                                      </div>
+                                      
+                                    </div>
+                                       <small class="text-muted"> {{"Not:Başvuru yapan öğrenciye mail yoluyla geri bildirimde bulunmak istiyorsanız <b>Aktif</b> yapın"}} </small>
+                                    
+                                  
+                                  </div><!--end row-->
+                              </div>
+                            </div>  
+                        </div>
+
+                       </div><!--end row-->
+                     </div>
+                    </div>
+                 </div>
+                 </form>
+              </div><!--end row-->
+        {{footer}}
+</main>
+
+<!--DOSYA SWITCH AÇ KAPA//-->
+<script type="text/javascript"><!--
+$('input[name=\'file\']').on('change',function() {
+  if($('input[name=\'file\']').is(':checked')) {
+    $('#filename').show();
+  }else{
+    $('#filename').hide();
+    $('#filename').find('input').val('');
+  }
+});
+
+$('input[name=\'file\']').trigger('change');
+//--></script>
+
+<!--SORU SWITCH AÇ KAPA//-->
+<script type="text/javascript"><!--
+$('input[name=\'ques\']').on('change',function() {
+  if($('input[name=\'ques\']').is(':checked')) {
+    $('#question').show();
+  }else{
+    $('#question').hide();
+  }
+});
+
+$('input[name=\'ques\']').trigger('change');
+//--></script>
+
+<script type="text/javascript"><!--
+$('#button-kontenjan').on('click',function() {
+  $('input[name=\'kontenjan\']').prop('disabled',false);
+});
+
+//--></script>
+
+<!--RESİM UPLOAD AND PREVIEW//-->
+<script type="text/javascript"><!--
+  $('#thumb-image').on('click', function() {
+ 
+  $('#form-upload').remove();
+
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+
+			$.ajax({
+				url: 'index.php?route=tool/upload/uploadImage&user_token={{ user_token }}',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				
+				success: function(json) {
+					if (json.error) {
+						alert(json.error);
+					}
+
+					if (json.success) {
+						alert(json.success);
+						$('#input-image').val(json['image']);
+						$('#thumb-img').attr('src',json['thumb']);
+	
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+
+//--></script>
+<script>
+$(document).ready(function () {
+	$("rte-toolbar-button[rte-cmd-name='togglemore']").css({"pointer-events": "none","opacity": "0.4"});
+	$("rte-toolbar-button[rte-tooltip='Emoji Ekle']").css({ "pointer-events": "none", "opacity": "0.4" });
+});
+</script>
+
+<script>
+	var editor1cfg = {};
+	editor1cfg.toolbar = "basic";
+	editor1cfg.lang = "tr"; // Türkçe dil ayarı
+	editor1cfg.removeButtons = ["images", "video"];
+  editorResizeMode: "none";
+	var editor1 = new RichTextEditor("#textarea-editor", editor1cfg);
+</script>
+
+<script>
+$(document).ready(function () {
+	$("rte-toolbar-button[rte-cmd-name='togglemore']").css({"pointer-events": "none","opacity": "0.4"});
+});
+
+</script>
+
+<script>
+var error_warning = '{{error_warning}}';
+var error_filename = '{{error_filename}}';
+var error_question = '{{error_question}}';
+if(error_filename) {
+  error_warning = error_filename;
+  $('input[name=\'file\']').prop('checked',true);
+   $('#filename').show();
+}
+
+if(error_question) {
+  error_warning = error_question;
+  $('input[name=\'ques\']').prop('checked',true);
+   $('#question').show();
+}
+
+
+$(document).ready(function() {
+  if(error_warning) {
+    alerterror(error_warning);
+  }
+});
+</script>
+
+<style>
+rte-floatpanel.rte-floatpanel-paragraphop {
+  display: none !important;
+}
+</style>

@@ -1,0 +1,78 @@
+<table class="table table-striped align-middle">
+<thead class="table-light">
+<tr>
+    <th class="text-info">Bölümler</th>
+    <th class="text-center text-info" style="width:5%;">Erişim</th>
+    <th class="text-center text-info" style="width:5%;">Değiştirme</th>
+    <th class="text-center text-info" style="width:1%;"></th>
+</tr>
+</thead>
+<tbody>
+    {# Önce özel satırı kontrol et #}
+    {% set has_autocomplete = false %}
+    {% for permission in permissions %}
+        {% if permission.route == 'setting/autocomplete' %}
+            {% set has_autocomplete = true %}
+        {% endif %}
+    {% endfor %}
+
+    {# Eğer hiç yoksa ekle #}
+    {% if not has_autocomplete %}
+    <tr data-rota="setting/autocomplete" style="display:none;">
+        <td class="fw-bold text-start">Otomatik Tamamlama</td>
+        <td class="text-center">
+            <input class="form-check-input" type="checkbox" name="permission[access][]" value="setting/autocomplete" checked>
+        </td>
+        <td class="text-center">
+            <input class="form-check-input" type="checkbox" name="permission[modify][]" value="setting/autocomplete" checked>
+        </td>
+        <td class="text-center">
+            <button type="button" class="btn btn-danger btn-sm remove-row"><i class="bi bi-dash-circle"></i></button>
+        </td>
+    </tr>
+    {% endif %}
+    {% for permission in permissions %}
+    <tr data-rota="{{ permission.route }}" class="{% if permission.route == 'setting/autocomplete' %} d-none {% endif %}">
+        <td class="fw-bold text-start">{{ permission.name }}</td>
+        <td class="text-center">
+            <input class="form-check-input" type="checkbox" name="permission[access][]" value="{{ permission.route }}"
+            {% if permission.route in permission_array_access %}checked{% endif %}>
+        </td>
+        <td class="text-center">
+            <input class="form-check-input" type="checkbox" name="permission[modify][]" value="{{ permission.route }}" {% if permission.route in permission_array_modify %}checked{% endif %}>
+        </td>
+        
+        <td class="text-center">
+            <i class="bi bi-x-circle remove-row text-danger" title="Sil"></i>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+    <script>
+    $(document).ready(function() {
+    $('.permission-option').find('i').remove();
+    var mevcutRotalar = [];
+    $('#data-permission tbody tr').each(function() {
+        var rota = $(this).data('rota');
+        if (rota) {
+            mevcutRotalar.push(rota);
+        }
+    });
+
+    // 2. Dropdown içindeki her bir seçeneği kontrol edelim
+    $('.permission-option').each(function() {
+        var $el = $(this); // Seçenek öğesi
+        var value = $el.data('value');
+
+        // Eğer tablo verilerinde bu rota varsa sınıf ekle
+        if (mevcutRotalar.includes(value)) {
+            
+            // Opsiyonel: Seçildiğini belirtmek için bir ikon veya işaret ekleyebilirsin
+            $el.prepend('<i class="bi bi-check-circle text-primary me-1"></i>');
+        }
+    });
+});
+
+</script>

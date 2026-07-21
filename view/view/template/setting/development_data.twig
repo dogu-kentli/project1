@@ -1,0 +1,419 @@
+    <div id="isportali-data-hidden" class="hide-div" style="display:none;">
+        <div class="icon">🔒</div>
+        <div class="message">Bu alanı görüntüleme yetkisine sahip değilsiniz.</div>
+    </div>
+
+
+    <div class="table-responsive-sm">
+        <form id="form-developer">
+            <input type="hidden" name="filter_url" value="{{filter_url}}">
+            <table id="table-isportali" class="table table-bordered align-middle mb-0 ">
+                <div class="alert border-0 border-info border-start border-4 bg-light-info alert-dismissible fade show">
+                    <div class="text-dark  font-14">Bekleyen Ödeme : <strong>{{btotal}}</strong> | Genel Toplam :<strong>{{gtotal}}</strong> <span id="toplam-tutar"></span></div>
+                    
+                </div>
+                <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                    <tr>
+                        
+                        <th style="border-left: 10px solid #018bd3;" colspan="2" class="text-start">{{ "ÖBS Geliştirme" }}</th>
+                        <th class="text-start">{{ "Türü" }}</th>
+                        <th class="text-start">{{ "Son Tarih" }}</th>
+                        <th class="text-start">{{ "Durumu" }} </th>
+                        <th class="text-start">{{ "Öncelik" }}</th>
+                        <th class="text-center">{{ "Ücret (₺)" }}</th>
+                        <th class="text-center">{{ "Ödeme" }}</th>
+                        <th class="text-center">{{ "Ödeme Tarihi" }}</th>
+                        <th colspan="2" class="text-center" style="width:1%;"> {{"Eylem"}} </th>
+                    </tr>
+                </thead>
+                <tbody class="data-list">
+                    {% if istakibilist %}
+                    {% set row = 1 %}
+
+                    {% for istakibi in istakibilist %}
+
+                    <tr id="data-list{{istakibi.development_istakibi_id}}">
+
+                        <td style="border-left: 10px solid {{istakibi.color}};"><input class="form-check-input" type="checkbox" name="select_id[]" value="{{ istakibi.development_istakibi_id }}" for="{{ istakibi.tutar }}" id="checkbox{{ istakibi.development_istakibi_id }}"></td>
+
+                        <td id="{{ istakibi.development_istakibi_id }}" class="text-left item">
+                            <span class="istakibi-span" style="display:block">{{ istakibi.gorev }}</span>
+                            <input type="text" name="gorev" value="{{ istakibi.gorev }}" placeholder="Yapılacak İş" id="gorev{{ istakibi.development_istakibi_id }}" class="form-control input-portal" onchange="saveToDB('gorev','{{ istakibi.development_istakibi_id }}')" style="display:none;" />
+                        </td>
+
+                       <td id="{{ istakibi.development_istakibi_id }}" class="text-left item">
+                          <span class="istakibi-span badge bg {{istakibi.tur_bg}}" style="display:block">{{ istakibi.tur }}</span>
+                          <select name="tur" id="tur{{ istakibi.development_istakibi_id }}" class="form-select input-portal" onchange="saveToDB('tur','{{ istakibi.development_istakibi_id }}')" style="display:none;">
+                              <option value="0" {% if istakibi.tur_id != 1 %} selected {% endif %}>Alacak</option>
+                              <option value="1" {% if istakibi.tur_id == 1 %} selected {% endif %}>Ödeme</option>
+                          </select>
+                      </td>
+
+                        <td id="{{ istakibi.development_istakibi_id }}" class="text-left item">
+                            <span class="text-left istakibi-span" style="display:block">{{ istakibi.date_end |date("d/m/Y") }} </span>
+                            <input type="date" name="date_end" value="{{istakibi.date_end}}" placeholder="Bitiş Tarihi" id="date_end{{ istakibi.development_istakibi_id }}" onchange="saveToDB('date_end','{{ istakibi.development_istakibi_id }}')" class="form-control input-portal" style="display:none;" />
+                        </td>
+
+                        <td id="{{ istakibi.development_istakibi_id }}" class="text-left item">
+                            <span class="istakibi-span {{istakibi.color_status}}" style="display:block;">{{istakibi.status}}</span>
+                            <input type="text" name="status" value="{{istakibi.status}}" for="{{ istakibi.development_istakibi_id }}" placeholder="Durumu" id="status{{ istakibi.development_istakibi_id }}" class="form-control input-portal" style="display:none;" />
+                            <input type="hidden" name="status_id" value="{{istakibi.status_id}}" id="status_id{{ istakibi.development_istakibi_id }}" onchange="saveToDB('status_id','{{ istakibi.development_istakibi_id }}')" class="form-control input-portal" />
+                        </td>
+
+                        <td id="{{ istakibi.development_istakibi_id }}" class="text-left item">
+                            <span class="istakibi-span" style="display:block">{{ istakibi.oncelik }}</span>
+                            <input type="text" name="oncelik" value="" for="{{ istakibi.development_istakibi_id }}" id="oncelik{{ istakibi.development_istakibi_id }}" class="form-control input-portal" style="display:none;" />
+                            <input type="hidden" name="oncelik_id" value="{{istakibi.oncelik_id}}" id="oncelik_id{{ istakibi.development_istakibi_id }}" onchange="saveToDB('oncelik_id','{{ istakibi.development_istakibi_id }}')" class="form-control input-portal" />
+                        </td>
+
+                        <td id="{{ istakibi.development_istakibi_id }}" class="text-left item">
+                            <span class="istakibi-span" style="display:block"><strong>{{ istakibi.ucret }}</strong></span>
+                            <input type="text" name="ucret" value="" data-mask="#.##0,00" placeholder="Ücret Tutarı" placeholder="0.00" id="ucret{{ istakibi.development_istakibi_id }}" onchange="saveToDB('ucret','{{ istakibi.development_istakibi_id }}')" class="form-control input-portal" style="display:none;" />
+                        </td>
+
+                        <td id="{{ istakibi.development_istakibi_id }}" class="text-center item">
+                            <span style="font-size:16px;"><a href="javascript:void(0);" data-toggle="tooltip" title="{{istakibi.title}}">{{ istakibi.odeme }}</a></span>
+                        </td>
+
+                        <td id="{{ istakibi.development_istakibi_id }}" class="text-center item">
+                            <span style="font-size:16px;">{% if istakibi.odeme_id == 1 %} {{ istakibi.odeme_tarihi }} {% else %} -- {% endif %}</span>
+                        </td>
+
+                        <td class="text-center">
+                            <button type="button" id="button-view" data-toggle="tooltip" title="Görüntüle" onclick="functionView('{{ istakibi.development_istakibi_id }}','{{ istakibi.personel_id }}')" class="btn btn-info btn-sm"> <i class="bi bi-pencil"></i></button>
+                        </td>
+
+                        <td class="text-center">
+                            <button type="button" id="{{istakibi.development_istakibi_id}}" class="btn btn-danger btn-sm button-delete"><i class="bi bi-dash-circle"></i></button>
+                        </td>
+                    </tr>
+
+                    {% set row = row + 1 %}
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td class="text-center" colspan="6">{{"Sonuç bulunamadı"}}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+
+            </table>
+        </form>
+    </div>
+
+    <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+
+    <div class="modal fade" id="modal-development" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">FORM DETAYLARI</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-comment">
+                        <input type="hidden" name="development_istakibi_id" value="">
+
+                        <div class="form-group">
+
+                            <textarea class="form-control" name="description" id="textarea-editor" style=" max-height: 400px;overflow-y: auto; "></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" id="button-save" class="btn btn-primary">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function functionView(id) {
+
+            $('#modal-development').modal('show');
+            $('#modal-development input[name^=\'development_istakibi_id\']').val(id);
+
+            $.ajax({
+                url: 'index.php?route=setting/development/dataView&user_token={{ user_token }}&development_istakibi_id=' + id,
+                type: 'post',
+                dataType: 'json',
+                success: function(json) {
+
+                    $('.alert-dismissible').remove();
+                    editor1.setHTMLCode('');
+
+                    if (json['description']) {
+                        editor1.setHTMLCode(json['description']);
+                    }
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                }
+            });
+
+        }
+
+        $('#button-save').on('click', function() {
+            var element = $('#modal-development input[name^=\'development_istakibi_id\']').val();
+            $.ajax({
+                url: 'index.php?route=setting/development/save&user_token={{ user_token }}&development_istakibi_id=' + element,
+                type: 'post',
+                dataType: 'json',
+                data: $('#form-comment').serialize(),
+
+                success: function(json) {
+                    $('.alert-dismissible').remove();
+
+                    if (json.error.warning) {
+                       alerterror(json.error.warning);
+                    }
+
+                    if (json.success) {
+                        $('#modal-development').modal('hide');
+
+                        alertsuccess(json.success);
+
+                        $('#development-data').load('index.php?route=setting/development/dataDevelopment&user_token={{ user_token }}');
+                    }
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                }
+            });
+
+        });
+
+        $('.button-delete').on('click', function() {
+            if (confirm('Dikkat : Bu işlem geri alınamaz. Bu görevi silmek istediğinize emin misiniz?') == false) {
+                exit();
+            }
+
+            var element = $(this).attr('id');
+
+            $.ajax({
+                url: 'index.php?route=setting/development/deleteData&user_token={{ user_token }}&development_istakibi_id=' + element,
+                type: 'post',
+                dataType: 'json',
+                success: function(json) {
+                    $('.alert-dismissible').remove();
+
+                    if (json.error.warning) {
+                       alerterror(json.error.warning);
+                    }
+
+                    if (json.success) {
+                        $('#modal-development').modal('hide');
+                        $('#development-data').load('index.php?route=setting/development/dataDevelopment&user_token={{ user_token }}');
+                       alertsuccess(json.success);
+
+                    }
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                }
+            });
+
+        });
+
+        $('#button-close').on('click', function() {
+            $('#modal-development').modal('hide');
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $("rte-toolbar-button[rte-cmd-name='togglemore']").css({
+                "pointer-events": "none",
+                "opacity": "0.4"
+            });
+            $("rte-toolbar-button[rte-tooltip='Emoji Ekle']").css({
+                "pointer-events": "none",
+                "opacity": "0.4"
+            });
+        });
+
+        $(document).ready(function() {
+            $(".form-check-input").change(function() {
+                if ($(this).is(":checked")) {
+                    $(this).closest("tr").addClass("bg bg-light-info"); // yeşilimsi arka plan
+                } else {
+                    $(this).closest("tr").removeClass("bg bg-light-info"); // varsayılan arka plan
+                }
+            });
+        });
+    </script>
+
+    <script>
+        var editor1cfg = {};
+        editor1cfg.toolbar = "basic";
+        editor1cfg.lang = "tr"; // Türkçe dil ayarı
+        editor1cfg.removeButtons = ["images", "video"];
+        editorResizeMode: "none";
+        var editor1 = new RichTextEditor("#textarea-editor", editor1cfg);
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#cover-spin').hide(0);
+        });
+
+        $(document).ready(function() {
+
+            var toplamTutar = 0;
+            $('#development-data input[type^=\'checkbox\']').on('change', function() {
+
+                var tutar = parseFloat($(this).attr('for'));
+
+                if ($(this).is(':checked')) {
+                    toplamTutar += tutar;
+                } else {
+                    toplamTutar -= tutar;
+                }
+
+                var total = toplamTutar.toLocaleString('tr-TR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                $('#button-odeme').html('Ödeme: ' + total);
+                $('header').html('<div id="total-box" class="total-box">Toplam : ₺' + total + '</div>');
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        $('input[name^=\'status\']').autocomplete({
+            'source': function(request, response) {
+                $.ajax({
+                    url: 'index.php?route=setting/development/statusautocomplete&user_token={{ user_token }}&filter_status=' + encodeURIComponent(request),
+                    dataType: 'json',
+                    success: function(json) {
+                        response($.map(json, function(item) {
+                            return {
+                                label: item['text'],
+                                value: item['status_id']
+                            }
+                        }));
+                    }
+                });
+            },
+
+            'select': function(item) {
+                $('#status' + $(this).attr('for')).val(item['label']);
+                $('#status_id' + $(this).attr('for')).val(item['value']);
+                $('#status_id' + $(this).attr('for')).trigger('change');
+            }
+        });
+
+        $('input[name^=\'oncelik\']').autocomplete({
+            'source': function(request, response) {
+                $.ajax({
+                    url: 'index.php?route=setting/development/oncelikautocomplete&user_token={{ user_token }}&filter_oncelik=' + encodeURIComponent(request),
+                    dataType: 'json',
+                    success: function(json) {
+                        response($.map(json, function(item) {
+                            return {
+                                label: item['text'],
+                                value: item['oncelik_id']
+                            }
+                        }));
+                    }
+                });
+            },
+
+            'select': function(item) {
+                $('#oncelik' + $(this).attr('for')).val(item['label']);
+                $('#oncelik_id' + $(this).attr('for')).val(item['value']);
+                $('#oncelik_id' + $(this).attr('for')).trigger('change');
+            }
+        });
+
+        $('input[name^=\'odeme\']').autocomplete({
+            'source': function(request, response) {
+                $.ajax({
+                    url: 'index.php?route=setting/development/odemeautocomplete&user_token={{ user_token }}&filter_odeme=' + encodeURIComponent(request),
+                    dataType: 'json',
+                    success: function(json) {
+                        response($.map(json, function(item) {
+                            return {
+                                label: item['text'],
+                                value: item['odeme_id']
+                            }
+                        }));
+                    }
+                });
+            },
+
+            'select': function(item) {
+                $('#odeme' + $(this).attr('for')).val(item['label']);
+                $('#odeme_id' + $(this).attr('for')).val(item['value']);
+                $('#odeme_id' + $(this).attr('for')).trigger('change');
+            }
+        });
+    </script>
+    <style>
+        #isportali-data-hidden {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Segoe UI', sans-serif;
+            color: #495057;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #isportali-data-hidden .icon {
+            font-size: 24px;
+            color: #6c757d;
+        }
+
+        #isportali-data-hidden .message {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .total-box {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 220px;
+            height: 40px;
+            background-color: #545454;
+            /* yeşil ton */
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            /* en üstte görünmesi için */
+            font-size: 16px;
+            /* çok büyük olmasın */
+            font-weight: bold;
+        }
+
+        /* Genel hücre yapısı: Çizginin görünmesi için padding eklemeyi unutma */
+
+        .gradient-green {
+            border-left: 100px solid #5bb77f;
+
+        }
+
+        .gradient-blue {
+            border-left: 15px solid #aecbf2;
+        }
+
+        .gradient-orange {
+            border-left: 15px solid #ffe5b4;
+        }
+    </style>

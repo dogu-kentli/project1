@@ -1,0 +1,470 @@
+{{ header }}{{ column_left }}
+<main id="tanitim" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+        <button type="button" id="button-add" data-toggle="tooltip" title="{{ "Yeni Talep Ekle" }}" class="btn btn-primary btn-sm button-add" {{button_add_display}}/><i class="bi bi-plus-lg"></i>{{" Talep Ekle"}}</button>
+         <button type="button" id="button-form" data-toggle="tooltip" title="{{ "Açık Form oluştur" }}" class="btn btn-warning btn-sm" {{button_form_display}}/><i class="fa fa-cog"></i>{{" Form Oluştur"}}</button>
+         <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success btn-sm" {{button_excel_display}}><i class="bi bi-file-earmark-excel" aria-hidden="true"></i></a>
+         <button type="button" data-toggle="tooltip" title="{{ "Filtreyi temizle" }}" onclick="location='index.php?route=personeller/tanitim_talebi&user_token={{ user_token }}';" class="btn btn-light border border-dark shadow-sm btn-sm bg-white">
+               <i id="filter-icon" class="bi bi-funnel-fill"></i>
+          </button>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+
+            <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_birim" value="{{filter_birim}}" id="input-filter-name" placeholder="Birim / kurum seçiniz" class="form-control ps-4">
+                                <input type="hidden" name="filter_kurum" id="filter-kurum" value="{{filter_kurum}}" class="form-control auto-filter" >
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 me-auto">
+                          
+                        </div>
+
+                        <div class="col-lg-2 col-6 me-auto">
+                          
+                        </div>
+                        
+
+                        <div class="col-lg-2 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_status" value="{{filter_birim}}" id="input-filter-name" placeholder="Durumu" class="form-control ps-4">
+                                <input type="hidden" name="filter_status_id" id="filter-status-id" value="{{filter_status}}" class="form-control auto-filter" >
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-1 co1-6 col-md-3">
+                            <select name="limit" class="form-select auto-filter">
+                              {% for limit in limits %}
+                                  <option valu="{{ limit.value }}" {% if limit.value == select_limit %} selected {% endif %}>{{limit.text}}</option>
+                              {% endfor %} 
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                 
+                 
+          <div class="card-body" id="tanitim-data"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+    {{footer}}
+</main>
+
+<div class="modal fade" id="modal-talep" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="min-width: 450px;"> 
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="exampleModalLabel">Tanıtım Talep Formu</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="form-modal-talep">
+
+          <div class="alert alert-secondary p-3 mb-4" style="max-height:180px; overflow-y:auto;">
+            <h6 class="fw-bold border-bottom pb-2 mb-2"><i class="bi bi-info-circle me-2"></i>Dikkat Edilecek Hususlar</h6>
+            <ol class="small mb-0 ps-3">
+              <li>Çalışmanın/Tasarımın amacını net belirtmek</li>
+              <li>Hazırlanma nedeni (Etkinlik, proje, kampanya vb.)</li>
+              <li>Hedef kitle (Bağışçı, kamu, öğrenci vb.)</li>
+              <li>Verilmek istenen ana mesaj</li>
+              <li>Kullanım mecrası (Sosyal medya, baskı vb.)</li>
+            </ol>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold d-block">Kurum Kategorisi</label>
+            <div class="bg-light p-2 rounded border">
+              {% if store_id == 0 %}
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" name="kurum_tipi" type="radio" value="1" id="kurum1" checked>
+                <label class="form-check-label" for="kurum1">UDEF Birimler</label>
+              </div>
+              {% endif %}
+              
+              {% if store_id != 0 %}
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" name="kurum_tipi" type="radio" value="2" id="kurum2" checked>
+                <label class="form-check-label" for="kurum2">Öğrenci Dernekleri</label>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if store_id == 0 %}
+          <div class="mb-3">
+            <label class="form-label fw-bold">Kurum/Birim Seçiniz</label>
+            <select name="personel_birim_id" class="form-select">
+              <option value="">-- Kurum / Birim Seçin --</option>
+              {% for kurum in kurumlar %}
+              <option value="{{kurum.personel_birim_id}}">{{kurum.name}}</option>
+              {% endfor %}
+            </select>
+            <div id="error-kurum" class="text-danger small mt-1"></div>
+          </div>
+          {% endif %}
+          <input type="hidden" name="store_id" value="{{store_id}}">
+
+          <div class="mb-3">
+            <label class="form-label fw-bold d-block">Tasarım Tipi</label>
+            <div class="d-flex flex-wrap gap-3 p-2 border rounded">
+              <div class="form-check">
+                <input class="form-check-input tasarim-checked" type="radio" name="tasarim_tipi" value="1" id="tasarim1" checked>
+                <label class="form-check-label" for="tasarim1">Afiş</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input tasarim-checked" type="radio" name="tasarim_tipi" value="2" id="tasarim2">
+                <label class="form-check-label" for="tasarim2">Broşür</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input tasarim-checked" type="radio" name="tasarim_tipi" value="3" id="tasarim3">
+                <label class="form-check-label" for="tasarim3">Logo</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input tasarim-checked" type="radio" name="tasarim_tipi" value="4" id="tasarim4">
+                <label class="form-check-label" for="tasarim4">Diğer</label>
+              </div>
+            </div>
+          </div>
+
+          <div id="diger" class="mb-3" style="display:none;">
+            <label class="form-label fw-bold">Diğer Detayları</label>
+            <input name="diger" type="text" placeholder="Tasarım türünü belirtiniz" class="form-control">
+            <div id="error-diger" class="text-danger small mt-1"></div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold d-block">Tasarım Kullanım Amacı</label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" name="tasarim_amaci[]" type="checkbox" value="1" id="amaci1">
+              <label class="form-check-label" for="amaci1">Sadece Online</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" name="tasarim_amaci[]" type="checkbox" value="2" id="amaci2">
+              <label class="form-check-label" for="amaci2">Baskı/Çıktı</label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Tasarım Detayları</label>
+            <textarea name="description" rows="3" placeholder="Renk tercihleri, ana mesaj, hedef kitle vb. detayları buraya yazınız..." class="form-control"></textarea>
+          </div>
+
+          <div class="mb-3">
+             <button type="button" id="button-upload" class="btn btn-outline-primary w-100">
+              <i class="bi bi-cloud-arrow-up me-2"></i>Dosya Ekle (Logo, Taslak vb.)
+            </button>
+            <div id="file-content" class="mt-2" style="display:none;"></div>
+          </div>
+
+          <div class="alert alert-warning small mb-0">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            <strong>Sınırlar:</strong> En fazla 5 dosya, her biri maks. 50 MB. 
+            <strong>Format:</strong> {{filetype}}
+          </div>
+
+        </form>
+      </div>
+      
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" id="modal-button-add" class="btn btn-primary px-4">Kaydet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# FORM OLUŞTURMA MODAL #}
+<div class="modal fade" id="modal-generate" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 35%;"> <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Harici Form Oluşturma</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <div class="form-group mb-3" id="form-url">
+          <div class="alert alert-warning">
+            <strong>Uyarı:</strong> Sisteme giriş yapmadan talep oluşturmak için bir <strong>form oluşturun</strong>. Form url'sini sadece kayıt yapacak kişi veya kurumla paylaşın.
+          </div>
+          <label for="url-textarea" class="form-label">Form url adresi:</label>
+          <textarea id="url-textarea" name="url" rows="3" placeholder="Url adresi" class="form-control input-url" style="display:none;"></textarea>
+          
+          <div class="text-end mt-2 input-url">
+            <a href="javascript:void(0)" id="button-copy" class="text-decoration-none" data-bs-toggle="tooltip" title="Kopyala">
+              <i class="fa fa-copy"></i> Kopyala
+            </a>
+          </div>    
+        </div>
+
+        <div class="d-grid gap-2"> <button type="button" id="modal-button-generate" class="btn btn-info btn-lg">
+            <i class="fa fa-refresh"></i> Form Oluştur
+          </button>        
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+$('#tanitim-data').delegate('.sort-oncelik', 'click', function(e) {
+ e.preventDefault();
+
+	
+$('#tanitim-data').load(this.href);
+});
+
+$('#tanitim-data').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+	$('#tanitim-data').load(this.href);
+});
+
+$('.auto-filter').on('change', function(e) {
+  e.preventDefault();
+ 
+  url = 'index.php?route=personeller/tanitim_talebi/dataTanitim&user_token={{ user_token }}';
+  
+  if ($('input[name=\'filter_kurum\']').val()) {
+		url += '&filter_kurum=' + encodeURIComponent($('input[name=\'filter_kurum\']').val());
+	}
+
+	if ($('input[name=\'filter_status_id\']').val()) {
+		url += '&filter_status=' + encodeURIComponent($('input[name=\'filter_status_id\']').val());
+	}
+
+	if ($('select[name^=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name^=\'limit\']').val());
+	}
+	
+	$('#tanitim-data').load(url);
+   
+  $('#cover-spin').show(0);
+});
+
+
+$('#modal-talep input[name^=\'tasarim_tipi\']').on('click', function() {
+  $('#diger').hide();
+  if($(this).val() == 4) {
+    $('#diger').show();
+  }
+});
+
+$('#tanitim-data').load('index.php?route=personeller/tanitim_talebi/dataTanitim&user_token={{ user_token }}');
+
+</script>
+
+<script type="text/javascript"><!--
+$('input[name^=\'filter_birim\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/birimautocomplete&user_token={{ user_token }}&filter_birim=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+           json.unshift({
+             name: '--Tümünü Seç--',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_birim\']').val(item['label']);
+      $('input[name^=\'filter_kurum\']').val(item['value']);
+      $('input[name^=\'filter_kurum\']').trigger('change');
+     
+    }
+  });
+
+
+   $('input[name^=\'filter_status\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/tanitim_talebi/statusautocomplete&user_token={{ user_token }}&filter_status=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          json.unshift({
+             text: '-- Tümünü Seç --',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['text'],
+              value: item['status_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_status\']').val(item['label']);
+      $('input[name^=\'filter_status_id\']').val(item['value']);
+      $('input[name^=\'filter_status_id\']').trigger('change');
+    }
+  });
+
+//--></script>
+
+<script>
+ $('#button-add').on('click', function() {
+     $('#modal-talep').modal('show'); 
+ });
+
+ $('#button-form').on('click', function() {
+     $('.input-url').hide();
+     $('textarea[name=\'url\']').val('');
+     $('#modal-button-generate').prop('disabled',false);
+    $('#modal-generate').modal('show'); 
+ });
+
+ $('#button-copy').on('click', function() {
+  var copyText  = $('textarea[name=\'url\']');
+       copyText.select();
+       document.execCommand("copy");     
+});
+
+$('#modal-button-generate').on('click', function() {
+    $.ajax({
+      url: 'index.php?route=personeller/tanitim_talebi/formGenerate&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+
+      if (json.error.warning) {
+       alerterror(json.error.warning);
+      }
+       
+       if (json['token']) {
+         $('textarea[name=\'url\']').val(json['token']);
+         $('#modal-button-generate').prop('disabled',true);
+         $('.input-url').show();
+        
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+    
+	  $('textarea[name=\'url\']').val(token);
+    
+});
+
+$('#modal-button-add').on('click', function() {
+    $('.text-danger').find('span').remove();
+
+    $.ajax({
+      url: 'index.php?route=personeller/tanitim_talebi/save&user_token={{ user_token }}&form=add',
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-modal-talep').serialize(),
+      success: function(json) {
+
+       if (json.error.warning) {
+          alerterror(json.error.warning);
+       }
+       
+      
+       if (json.success) {
+         $('#modal-talep').modal('hide');
+         $('#tanitim-data').load('index.php?route=personeller/tanitim_talebi/dataTanitim&user_token={{ user_token }}');
+         $('#modal-message').modal('show');
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ });
+</script>
+<script type="text/javascript"><!--
+$('#button-upload').on('click', function() {
+	$('#form-upload').remove();
+
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+
+			$.ajax({
+				url: 'index.php?route=catalog/download/upload&user_token={{ user_token }}&bolum=tanitim',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				beforeSend: function() {
+					$('#button-upload').button('loading');
+				},
+				complete: function() {
+					$('#button-upload').button('reset');
+				},
+				success: function(json) {
+                 $('.alert-dismissible').remove();
+					if (json.error) {
+                      alerterror(json.error);
+					}
+
+					if (json.success) {
+                       alertsuccess(json.success);
+            
+						$('#file-content').show().append('<input type="text" name="filename" value="' + json['filename'] + '" class="form-control" readonly/><input type="hidden" name="code[]" value="' + json['code'] + '" class="form-control" readonly/>');
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+//--></script>

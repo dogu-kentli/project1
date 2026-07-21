@@ -1,0 +1,162 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                 <ol class="breadcrumb mb-0 p-0">
+				            {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+					         {% endfor %}
+                  </ol>
+            </nav>
+        </div>
+        <div class="ms-auto">
+            
+        </div>
+    </div>
+    <!--end breadcrumb-->
+   
+    <hr>
+    <div class="card">
+       <div class="card-header py-3">
+          <div class="row g-3">
+            <div class="col-lg-3 col-6 me-auto">
+              <div class="ms-auto position-relative">
+                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                <input type="text" name="filter_lise" value="{{ filter_lise }}" placeholder="{{ "Lise adını yazınız." }}" class="form-control ps-4 auto-filter" placeholder="Öğrenci adı ile ara...">
+                <input type="hidden" name="filter_lise_id" value="{{ filter_lise_id }}" placeholder="{{ "Lise adını yazınız." }}" class="form-control auto-filter ps-4 auto-filter" placeholder="Öğrenci adı ile ara...">
+              </div>
+            </div>
+            </div>
+        </div>       
+        <div class="card-body">
+            <div class="table-responsive">
+                <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
+                    
+                    <div class="row">
+                        <div class="col-sm-12">
+                           <table class="table table-bordered table-striped align-middle mb-0">
+                           <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                  <tr>
+                                      <th style="width: 1px;" class="text-center">
+                                      <input type="checkbox" class="form-check-input" onclick="$('input[name*=\'selected\']').trigger('click');" class="form-check-input"/></th>
+                                      <th class="text-start">
+                                          {{ column_name }}
+                                      </th>
+                                      <th class="text-start">
+                                          {{ "Status" }}
+                                      </th>
+                                      <th class="text-center" style="width:1%;">{{ column_action }}</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% if liseler %}
+                                  {% for lise in liseler %}
+                                  <tr>
+                                      <td class="text-center">
+                                      <input type="checkbox" class="form-check-input" name="selected[]" value="{{ lise.lise_ortaogretim_id }}" class="form-check-input" {% if lise.lise_ortaogretim_id in selected %} checked="checked" {% endif %}/>
+                                         
+                                          
+                                      </td>
+                                      <td class="text-left">{{ lise.name }}</td>
+                                      <td class="text-left">
+                                          <span class="badge {% if lise.status == 'Aktif' %} bg-success {% else %} bg-danger {% endif %} text-dark">{{ lise.status }}</span>
+
+                                      </td>
+                                      <td class="text-center"><a href="{{ lise.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a></td>
+                                  </tr>
+                                  {% endfor %}
+                                  {% else %}
+                                  <tr>
+                                      <td class="text-center" colspan="5">{{ text_no_results }}</td>
+                                  </tr>
+                                  {% endif %}
+                              </tbody>
+
+                          </table>
+                        </div>
+                         <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{footer}}
+</main>
+<script type="text/javascript"><!--
+$('.auto-filter').on('change', function() {
+	url = 'index.php?route=ortaogretim/lise&user_token={{ user_token }}'; 
+
+	if ($('input[name=\'filter_lise\']').val()) {
+		url += '&filter_lise=' + encodeURIComponent($('input[name=\'filter_lise\']').val());
+	}
+
+  if ($('input[name=\'filter_lise_id\']').val()) {
+		url += '&filter_lise_id=' + encodeURIComponent($('input[name=\'filter_lise_id\']').val());
+	}	
+	
+   $('#cover-spin').show(0);
+
+	 location = url;
+});
+
+$('#button-clear').on('click', function() {
+	url = 'index.php?route=ortaogretim/lise&user_token={{ user_token }}'; 
+
+   $('#cover-spin').show(0);
+
+	location = url;
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'filter_lise\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=ortaogretim/lise/autocomplete&user_token={{ user_token }}&filter_lise=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+         json.unshift({
+             name: '--TÜMÜNÜ SEÇ--',
+             value: '',
+          });
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['lise_ortaogretim_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_lise\']').val(item['label']);
+    $('input[name=\'filter_lise_id\']').val(item['value']);
+    $('input[name=\'filter_lise_id\']').trigger('change');
+	}
+});
+//--></script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

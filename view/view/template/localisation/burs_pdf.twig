@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="{{ lang }}">
+<head>
+<meta charset="UTF-8" />
+<title >{{ title }}</title>
+<base href="{{ base }}" />
+<link href="view/stylesheet/bootstrap2.css?v=87888888" type="text/css" rel="stylesheet"/>
+<link href="view/javascript/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link type="text/css" href="view/stylesheet/stylesheet.css" rel="stylesheet" media="all" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+   
+</head>
+<body>
+<div class="container" style="page-break-after: always;padding:8px;">
+  <div class="container-fluid">
+      <div class="pull-right">
+       <button type="button" id="btnPrint" data-toggle="tooltip" title="{{ "Pdf olarak döküm al" }}" onclick="pdfPrint()" class="btn btn-light btn-sm"><i class="fa fa-file-pdf"></i> {{"Pdf Döküm"}}</button>
+       </div>
+  </div> <br>    
+   <div id="staj-listesi" >   
+        {{html}}
+   </div>
+ 
+</div>
+
+<script>
+function pdfPrint() {
+    $('#staj-listesi table td, #staj-listesi th').each(function() {
+        const bgColor = $(this).css('background-color');
+        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+            $(this).attr('style', $(this).attr('style') + `background-color: ${bgColor} !important;`);
+        }
+    });
+
+    $('#dosyalar').find('a').attr('href','#');
+
+    const pageTitle = 'BURS BAŞVURUSU';
+    const stylesheet = 'view/stylesheet/bootstrap2.css?v=9788888';
+    const win = window.open('', 'width=100%,height=700');
+    const content = $('#staj-listesi')[0].outerHTML;
+
+    win.document.write(`
+        <html>
+            <head>
+                <title>${pageTitle}</title>
+                <link rel="stylesheet" href="${stylesheet}">
+                <style>
+                    /* Yazdırma için özel stiller */
+                    @media print {
+                        body {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                        table {
+                            width: 100% !important;
+                            border-collapse: collapse !important;
+                            page-break-after: auto !important;
+                        }
+                        tr {
+                            page-break-inside: avoid !important;
+                            page-break-after: auto !important;
+                        }
+                        td, th {
+                            page-break-inside: avoid !important;
+                            page-break-after: auto !important;
+                            background-color: inherit !important;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                        thead {
+                            display: table-header-group !important;
+                        }
+                        tfoot {
+                            display: table-footer-group !important;
+                        }
+                    }
+                    
+                    /* Ekstra güvence için normal görünümde de renkleri koru */
+                    td[style*="background-color"], th[style*="background-color"] {
+                        background-color: inherit !important;
+                    }
+                </style>
+            </head>
+            <body style="margin: 0; padding: 0;">
+                <div style="width: 100%; margin: 0 auto; padding: 20px;">
+                    ${content}
+                </div>
+                <script>
+                    // Yazdırma işlemi tamamlandıktan sonra pencereyi kapat
+                    window.onafterprint = function() {
+                        window.close();
+                    };
+                <\/script>
+            </body>
+        </html>
+    `);
+    
+    win.document.close();
+    
+    // Yazdırma işlemini biraz geciktirerek tarayıcının stilleri yüklemesini sağla
+    setTimeout(function() {
+        win.print();
+        
+    }, 500);
+
+ 
+}
+</script>
+
+</body>
+</html>
+<style>
+.table{font-size:14px;}
+</style>

@@ -1,0 +1,902 @@
+{{ header }}{{ column_left }}
+<main id="content" class="page-content">
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ breadcrumb.text }}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+         <div class="ms-auto text-end">
+            <button type="button" data-toggle="tooltip" title="{{ "Gelişmiş filtre" }}" class="btn btn-light border border-dark shadow-sm btn-sm bg-white" data-bs-toggle="collapse" data-bs-target="#filter-panel"><i class="bi bi-filter"></i> Filtre 
+				<i id="filter-icon" class="bi bi-arrow-down"></i>
+			</button>
+
+            <a href="javascript:void(0);" data-toggle="tooltip" title="{{ "Excel dökümü al" }}" id="button-export" class="btn btn-success btn-sm shadow-sm">
+                <i class="bi bi-file-earmark-excel"></i> Döküm Al
+            </a>
+			<button type="button" data-toggle="tooltip" title="{{ "Tüm filtreyi temizle" }}" onclick="location='index.php?route=report/ogrenci_transaction&user_token={{ user_token }}';" class="btn btn-outline-danger btn-sm px-4 me-2">
+                Filtre <i class="bi bi-x"></i>
+             </button>
+        </div>
+    </div>
+
+    <div id="ogrenci-filter" class="card shadow-sm border-0">
+        <div class="card-body">
+            
+            <div class="collapse mb-4" id="filter-panel">
+                <div class="p-4 border rounded bg-light">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+						 <label class="form-label small fw-bold">Öğrenci Adı</label>
+						     <div class="ms-auto position-relative">
+							  <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                             <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="Öğrenci Adı" class="form-control ps-4 {% if filter_name %} bg-light-info {% endif %}" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">E-Posta</label>
+                            <input type="text" name="filter_email" value="{{ filter_email }}" placeholder="E-posta adresi" class="form-control {% if filter_email %} bg-light-info {% endif %}"  />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">T.C. Kimlik No</label>
+                            <input type="text" name="filter_kimlik" value="{{ filter_kimlik }}" placeholder="Kimlik No" class="form-control {% if filter_kimlik %} bg-light-info {% endif %}" />
+                        </div>
+						 <div class="col-md-3">
+                            <label class="form-label small fw-bold">Cinsiyet</label>
+                            <select name="filter_gender"id="input-gender"  class="form-select {% if filter_gender %} bg-light-info {% endif %}">
+                                <option value="">{{ text_all }}</option>
+                                <option value="E" {% if filter_gender == 'E' %} selected {% endif %}>Erkek</option>
+                                <option value="K" {% if filter_gender == 'K' %} selected {% endif %}>Bayan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Grubu</label>
+                            <select name="filter_customer_group_id" id="input-customer-group" class="form-select {% if filter_customer_group_id %} bg-light-info {% endif %}">
+								<option value="">{{ text_all }}</option>
+								{% for customer_group in customer_groups %}
+								{% if customer_group.customer_group_id == filter_customer_group_id %}
+									<option value="{{ customer_group.customer_group_id }}" selected="selected">{{ customer_group.name }}</option>
+								{% else %}
+									<option value="{{ customer_group.customer_group_id }}">{{ customer_group.name }}</option>
+								{% endif %}
+								{% endfor %}
+							</select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Durum</label>
+                            <select name="filter_status" class="form-select {% if filter_status %} bg-light-info {% endif %}">
+                                <option value="">{{ text_all }}</option>
+                                 {% for key,value in status_array %}
+                                 <option value="{{key}}" {% if filter_status == key and filter_status != '' %} selected="selected" {% endif %}>{{ value }}</option>
+						         {% endfor %}
+                            </select>
+                        </div>
+
+						<div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ entry_medeni_durumu }}</label>
+                            <select name="filter_medeni" id="input-medeni" class="form-select {% if filter_medeni %} bg-light-info {% endif %}">
+							   <option value="">{{ text_all }}</option>
+                               <option value="2" {% if filter_medeni == 2 %} selected="selected" {% endif %}>{{ text_evli }}</option>
+							   <option value="1" {% if filter_medeni == 1 %} selected="selected" {% endif %}>{{ text_bekar }}</option>
+                            </select>
+                        </div>
+
+						<div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ entry_barinma }}</label>
+                            <select name="filter_barinma" id="input-barinma" class="form-select {% if filter_barinma %} bg-light-info {% endif %}">
+							   <option value="">{{ text_all }}</option>
+                               <option value="1" {% if filter_barinma == 1 %} selected="selected" {% endif %}>{{ text_ev }}</option>
+							   <option value="2" {% if filter_barinma == 2 %} selected="selected" {% endif %}>{{ text_yurt }}</option>
+                            </select>
+                        </div>
+                       
+					   {% for custom_field in custom_fields %}
+                      {% if custom_field.location_sort == 'account1' %}
+						<div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ custom_field.name }}</label>
+                            <select name="filter_kgrubu" id="input-custom-field{{ custom_field.custom_field_id }}"  class="form-select {% if filter_kgrubu %} bg-light-info {% endif %}">
+							 <option value="">{{ text_all }}</option>
+							    {% for custom_field_value in custom_field.custom_field_value %}
+								<option value="{{ custom_field_value.custom_field_value_id }}" {% if custom_field_value.custom_field_value_id == filter_kgrubu %} selected="selected" {% endif %}>{{ custom_field_value.name }}</option>					
+								{% endfor %}
+                            </select>
+                        </div>
+						{% endif %}
+                       {% endfor %} 
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Bölge</label>
+                            <select name="filter_bolge" onchange="bolge(this, '{{ filter_country }}');" class="form-select {% if filter_bolge %} bg-light-info {% endif %}">
+                                <option value="">{{ text_all }}</option>
+                                {% for bolge in bolgeler %}
+                                <option value="{{ bolge.bolge_id }}" {% if filter_bolge == bolge.bolge_id %}selected{% endif %}>{{ bolge.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Ülke</label>
+                            <select name="filter_country" class="form-select {% if filter_country %} bg-light-info {% endif %}" id="filter_country">
+                                <option value="">{{ text_all }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+						 <label class="form-label small fw-bold">Üniversite/</label>
+						     <div class="ms-auto position-relative">
+							  <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                             <input type="text" name="filter_universite" value="{{ filter_universite}}" id="input-universite" placeholder="Üniversite Adı" class="form-control ps-4 {% if filter_universite %} bg-light-info {% endif %}"  />
+							 <input type="hidden" name="f_universite_id" value="{{ f_universite_id }}" id="input-universite" class="form-control"/>
+                            </div>
+                        </div>
+
+						<div class="col-md-3">
+						 <label class="form-label small fw-bold">Fakülte</label>
+						     <div class="ms-auto position-relative">
+							  <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                             <input type="text" name="filter_fakulte" value="{{ filter_fakulte}}" id="input-fakulte" placeholder="Fakülte Adı" class="form-control ps-4 {% if filter_fakulte %} bg-light-info {% endif %}"  />
+							 <input type="hidden" name="f_fakulte_id" value="{{ f_fakulte_id }}" id="input-fakulte" class="form-control"/>
+                            </div>
+                        </div>
+
+						<div class="col-md-3">
+						 <label class="form-label small fw-bold">Bölüm</label>
+						     <div class="ms-auto position-relative">
+							  <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                             <input type="text" name="filter_bolum" value="{{ filter_bolum}}" placeholder="Bölüm Adı" id="input-name" class="form-control ps-4 {% if filter_bolum %} bg-light-info {% endif %}"  />
+							 <input type="hidden" name="f_bolum_id" value="{{ f_bolum_id }}" id="input-bolum" class="form-control"/>
+                            </div>
+                        </div>
+
+						{% for custom_field in custom_fields %}
+                        {% if custom_field.location_sort == 'account5' %}
+						<div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ custom_field.name }}</label>
+                            <select name="filter_kgrubu" id="input-custom-field{{ custom_field.custom_field_id }}"  class="form-select {% if filter_kgrubu %} bg-light-info {% endif %}">
+							 <option value="">{{ text_all }}</option>
+							    {% for custom_field_value in custom_field.custom_field_value %}
+								<option value="{{ custom_field_value.custom_field_value_id }}" {% if custom_field_value.custom_field_value_id == filter_kgrubu %} selected="selected" {% endif %}>{{ custom_field_value.name }}</option>					
+								{% endfor %}
+                            </select>
+                        </div>
+						{% endif %}
+                       {% endfor %} 
+
+					   {% for custom_field in custom_fields %}
+                        {% if custom_field.location_sort == 'account14' %}
+						<div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ custom_field.name }}</label>
+                            <select name="filter_hobi[]" id="input-custom-field{{ custom_field.custom_field_id }}"  class="multiple-select select2-hidden-accessible {% if filter_hobi %} bg-light-info {% endif %}" data-placeholder="İlgi Alanları"  multiple="multiple">
+							   <option value="">{{ text_all }}</option>
+							    {% for custom_field_value in custom_field.custom_field_value %}
+								<option value="{{ custom_field_value.custom_field_value_id }}" {% if custom_field_value.custom_field_value_id in filter_hobi %} selected="selected" {% endif %}>{{ custom_field_value.name }}</option>					
+								{% endfor %}
+                            </select>
+                        </div>
+						{% endif %}
+                       {% endfor %} 
+
+                        {% for custom_field in custom_fields %}
+                        {% if custom_field.location_sort == 'account7' %}
+						<div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ custom_field.name }}</label>
+                            <select name="filter_dil[]" id="input-custom-field{{ custom_field.custom_field_id }}"  class="multiple-select select2-hidden-accessible" data-placeholder="İyi derecede bildiği diller"  multiple="multiple">
+							    <option value="">{{ text_all }}</option>
+								{% for custom_field_value in custom_field.custom_field_value %}
+								<option value="{{ custom_field_value.custom_field_value_id }}"  {% if custom_field_value.custom_field_value_id in filter_dil %} selected="selected" {% endif %}>{{ custom_field_value.name }}</option>					
+								{% endfor %}
+                            </select>
+                        </div>
+						{% endif %}
+                       {% endfor %} 
+
+                        {% for custom_field in custom_fields %}
+                        {% if custom_field.location_sort == 'account8' %}
+						<div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ custom_field.name }}</label>
+                            <select name="filter_music" id="input-custom-field{{ custom_field.custom_field_id }}" class="form-select" data-placeholder="Enstrumanlar" >
+							    <option value="">{{ text_all }}</option>
+								{% for custom_field_value in custom_field.custom_field_value %}
+								<option value="{{ custom_field_value.custom_field_value_id }}"  {% if custom_field_value.custom_field_value_id in filter_dil %} selected="selected" {% endif %}>{{ custom_field_value.name }}</option>					
+								{% endfor %}
+                            </select>
+                        </div>
+						{% endif %}
+                       {% endfor %} 
+
+					    <div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ entry_akademi }}</label>
+                            <select name="filter_akademi" id="input-tez-sertifika" class="form-select {% if filter_akademi %} bg-light-info {% endif %}" id="filter_country">
+                                <option value="">{{ text_all }}</option>
+								<option value="1" {% if filter_akademi == 1 %} selected="selected" {% endif %} >{{ text_akademi1 }}</option>
+								<option value="2" {% if filter_akademi == 2 %} selected="selected" {% endif %} >{{ text_akademi2 }}</option>
+			
+                            </select>
+                        </div>
+
+						{% for custom_field in custom_fields %}
+                        {% if custom_field.location_sort == 'account6' %}
+						<div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ custom_field.name }}</label>
+                            <select name="filter_gorev[]" id="input-custom-field{{ custom_field.custom_field_id }}" class="multiple-select select2-hidden-accessible" data-placeholder="Aldığı Görevler"  multiple="multiple">
+							    <option value="">{{ text_all }}</option>
+								{% for custom_field_value in custom_field.custom_field_value %}
+								<option value="{{ custom_field_value.custom_field_value_id }}"  {% if custom_field_value.custom_field_value_id in filter_gorev %} selected="selected" {% endif %}>{{ custom_field_value.name }}</option>					
+								{% endfor %}
+                            </select>
+                        </div>
+						{% endif %}
+                       {% endfor %} 
+
+                       {% for custom_field in custom_fields %}
+                        {% if custom_field.location_sort == 'account15' %}
+						<div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ custom_field.name }}</label>
+                            <select name="filter_burs[]" id="input-custom-field{{ custom_field.custom_field_id }}" class="multiple-select select2-hidden-accessible" data-placeholder="Aldığı Burslar"  multiple="multiple">
+							    <option value="">{{ text_all }}</option>
+								{% for custom_field_value in custom_field.custom_field_value %}
+								<option value="{{ custom_field_value.custom_field_value_id }}"  {% if custom_field_value.custom_field_value_id in filter_burs %} selected="selected" {% endif %}>{{ custom_field_value.name }}</option>					
+								{% endfor %}
+                            </select>
+                        </div>
+						{% endif %}
+                        {% endfor %} 
+                        
+						<div class="col-md-3">
+                            <label class="form-label small fw-bold">{{ entry_il }}</label>
+                            <select name="filter_il" id="select-input-il" class="single-select {% if filter_il %} bg-light-info {% endif %}">
+                                <option value="" selected="selected">{{ text_select }}</option>
+					            {% for sehir in sehirler %}
+                                <option value="{{sehir.il_id}}" {% if sehir.il_id == filter_il %} selected="selected" {% endif %}/ >{{ sehir.name }}</option>
+							    {% endfor %}
+			
+                            </select>
+                        </div>
+
+						<div class="col-md-2">
+                            <label class="form-label small fw-bold">{{ entry_ilce}}</label>
+                            <select name="filter_ilce" id="select-input-ilce" class="single-select {% if filter_ilce %} bg-light-info {% endif %}"></select>
+                        </div>
+
+						<div class="col-md-1 d-flex flex-column justify-content-center align-items-center mb-3">
+							<label class="form-label small fw-bold">{{ entry_yetim }}</label>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" name="filter_yetim" value="1" {% if filter_yetim == 1 %} checked{% endif %}>
+							</div>
+						</div>
+
+						<div class="col-md-1 d-flex flex-column justify-content-center align-items-center mb-3">
+							<label class="form-label small fw-bold">{{ entry_hafiz }}</label>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" name="filter_hafiz" value="1" {% if filter_hafiz == 1 %} checked {% endif %}>
+							</div>
+						</div>
+
+						 <div class="col-md-2">
+                            <label class="form-label small fw-bold">Limit</label>
+                            <select name="limit" class="form-select {% if limit %} bg-light-info {% endif %}">
+								 {% for key,value in limits %}
+						   <option value="{{value}}" {% if limit == value %} selected="selected" {% endif %}>{{value}}</option>
+						   {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row mt-3 border-top pt-3 align-items-center">
+						<!-- Sol taraf: tüm checkboxlar -->
+						<div class="col-md-10" style="font-size:13px;">
+							<label class="form-label fw-bold">{{ entry_column }}</label>
+							<span class="fw-normal">{{ text_column }}</span><br>
+
+							<div class="form-check form-check-inline">
+							<input class="form-check-input checkbox-column" type="checkbox" name="filter_column1" value="dogum_tarihi" id="filter_column1"
+								{% if filter_column1 in columns %} checked {% endif %}>
+							<label class="form-check-label" for="filter_column1">Doğum Tarihi</label>
+							</div>
+
+							<div class="form-check form-check-inline">
+							<input class="form-check-input checkbox-column" type="checkbox" name="filter_column2" value="medeni" id="filter_column2"
+								{% if filter_column2 in columns %} checked {% endif %}>
+							<label class="form-check-label" for="filter_column2">Medeni Hali</label>
+							</div>
+
+							<div class="form-check form-check-inline">
+							<input class="form-check-input checkbox-column" type="checkbox" name="filter_column3" value="cocuk" id="filter_column3"
+								{% if filter_column3 in columns %} checked {% endif %}>
+							<label class="form-check-label" for="filter_column3">Çocuk Sayısı</label>
+							</div>
+
+							<div class="form-check form-check-inline">
+							<input class="form-check-input checkbox-column" type="checkbox" name="filter_column4" value="barinma" id="filter_column4"
+								{% if filter_column4 in columns %} checked {% endif %}>
+							<label class="form-check-label" for="filter_column4">Barınma Ev/Yurt</label>
+							</div>
+
+							<div class="form-check form-check-inline">
+							<input class="form-check-input checkbox-column" type="checkbox" name="filter_column5" value="burs_status" id="filter_column5"
+								{% if filter_column5 in columns %} checked {% endif %}>
+							<label class="form-check-label" for="filter_column5">Burs Durumu</label>
+							</div>
+
+							<div class="form-check form-check-inline">
+							<input class="form-check-input checkbox-column" type="checkbox" name="filter_column6" value="customer_group_id" id="filter_column6"
+								{% if filter_column6 in columns %} checked {% endif %}>
+							<label class="form-check-label" for="filter_column6">Öğrenci Grubu</label>
+							</div>
+
+							<div class="form-check form-check-inline">
+							<input class="form-check-input checkbox-column" type="checkbox" name="filter_column7" value="kan_grubu" id="filter_column7"
+								{% if filter_column7 in columns %} checked {% endif %}>
+							<label class="form-check-label" for="filter_column7">Kan Grubu</label>
+							</div>
+
+							<div class="form-check form-check-inline">
+							<input class="form-check-input checkbox-column" type="checkbox" name="filter_column8" value="dil" id="filter_column8"
+								{% if filter_column8 in columns %} checked {% endif %}>
+							<label class="form-check-label" for="filter_column8">Bildiği Diller</label>
+							</div>
+
+							<div class="form-check form-check-inline">
+							<input class="form-check-input checkbox-column" type="checkbox" name="filter_column9" value="adres" id="filter_column9"
+								{% if filter_column9 in columns %} checked {% endif %}>
+							<label class="form-check-label" for="filter_column9">Adresi</label>
+							</div>
+						</div>
+
+						<!-- Sağ taraf: filtreleme butonu -->
+						<div class="col-md-2 text-end">
+							<button type="button" id="button-filter" class="btn btn-info btn-sm px-4">
+							<i class="bi bi-search"></i> Filtrele
+							</button>
+						</div>
+						</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive-sm">
+               <table class="table table-bordered table-striped align-middle mb-0">
+                           <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                        <tr >
+                            <th style="width: 50px;" class="text-center">#</th>
+                            <th style="width: 180px;">{{ column_name }}</th>
+                            <th style="width: 120px;">Ülke/Bölge</th>
+                            <th style="width: 220px;">Okul Bilgileri</th>
+                            <th style="width: 120px;">{{ column_telefon }} / E-Posta</th>
+                            <th style="width: 130px;">{{ column_store }}</th>
+                            <th style="width: 80px;" class="text-center">Cinsiyet</th>
+                            <th style="width: 110px;" class="text-center">{{ column_status }}</th>
+                            <th style="width: 140px;" class="text-center">{{ column_date_added }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if customers %}
+                            {% set row_num = row %}
+                            {% for customer in customers %}
+                            {% set row_num = row_num + 1 %}
+                            <tr>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill bg-light text-dark border fw-normal shadow-sm">{{ row_num }}</span>
+                                </td>
+                                <td class="text-wrap">
+                                    <div class="fw-bold text-dark">{{ customer.name }}</div>
+                                    
+                                </td>
+                                <td class="text-wrap small">
+                                    <strong>{{ customer.country['name'] }}</strong><br>
+                                    <span class="text-muted">{{ customer.bolge['name'] }}</span>
+                                </td>
+                                <td class="text-wrap small">
+                                    <div class="text-primary fw-bold" style="font-size: 0.78rem;">{{ customer.universite['name'] }}</div>
+                                    <div class="text-dark">{{ customer.fakulte['name'] }}</div>
+                                    <div class="text-muted italic">{{ customer.bolum }}</div>
+                                </td>
+                                <td class="small">{{ customer.telephone }}
+                                <div class="small text-muted">{{ customer.email }}</div>
+                                </td>
+                                <td class="text-wrap small text-secondary">
+                                    {{ customer.store['name'] }}
+                                </td>
+                                <td class="text-center">
+                                    <span class="fw-bold {{ customer.gender == 'E' ? 'text-info' : 'text-danger' }}">
+                                        {{ customer.gender == 'E' ? 'E' : 'K' }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    {% if customer.status == 1 %}
+                                        <span class="badge bg-success">Aktif</span>
+                                    {% elseif customer.status == 2 %}
+                                        <span class="badge bg-warning">Mezun</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Pasif</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center small">
+                                    <div class="d-flex align-items-center justify-content-center text-muted">
+                                        <i class="bi bi-calendar3 me-2 text-primary" style="font-size: 0.75rem;"></i>
+                                        {{ customer.date_added }}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="9" class="text-center py-5 text-muted">{{ text_no_results }}</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+        </div>
+    </div>
+	{{footer}}
+</main>
+
+
+
+<script type="text/javascript"><!--
+$('#button-filter-reset').on('click', function() {
+  url = 'index.php?route=report/ogrenci_transaction&user_token={{ user_token }}';  
+  location = url;
+});
+
+$('#filter-panel').on('shown.bs.collapse', function () {
+    $('#filter-icon').removeClass('bi-arrow-down').addClass('bi-arrow-up');
+});
+
+$('#filter-panel').on('hidden.bs.collapse', function () {
+    $('#filter-icon').removeClass('bi-arrow-up').addClass('bi-arrow-down');
+});
+
+
+$('.checkbox-column').on('click', function() {
+  $.ajax({
+		url: 'index.php?route=report/ogrenci_transaction/columnFilter&user_token={{ user_token }}', 
+		type: 'post',
+		dataType: 'json',
+		data: $('#form-checkbox').serialize(),
+		success: function(json) {
+			console.log(json['column1']);
+			
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+
+});
+</script>
+
+
+<script type="text/javascript"><!--
+$('#button-filter').on('click', function() {
+	$('#cover-spin').show(0);
+    url = 'index.php?route=report/ogrenci_transaction&user_token={{ user_token }}';
+
+    if ($('input[name="filter_name"]').val()) {
+        url += '&filter_name=' + encodeURIComponent($('input[name="filter_name"]').val());
+    }
+
+    if ($('input[name="filter_email"]').val()) {
+        url += '&filter_email=' + encodeURIComponent($('input[name="filter_email"]').val());
+    }
+
+    if ($('select[name="filter_customer_group_id"]').val()) {
+        url += '&filter_customer_group_id=' + encodeURIComponent($('select[name="filter_customer_group_id"]').val());
+    }
+
+    if ($('select[name="filter_status"]').val()) {
+        url += '&filter_status=' + encodeURIComponent($('select[name="filter_status"]').val());
+    }
+
+    if ($('select[name="filter_gender"]').val()) {
+        url += '&filter_gender=' + encodeURIComponent($('select[name="filter_gender"]').val());
+    }
+
+    if ($('select[name="filter_medeni"]').val()) {
+        url += '&filter_medeni=' + encodeURIComponent($('select[name="filter_medeni"]').val());
+    }
+
+    if ($('select[name="filter_barinma"]').val()) {
+        url += '&filter_barinma=' + encodeURIComponent($('select[name="filter_barinma"]').val());
+    }
+
+    if ($('select[name="filter_kgrubu"]').val()) {
+        url += '&filter_kgrubu=' + encodeURIComponent($('select[name="filter_kgrubu"]').val());
+    }
+
+    if ($('input[name="filter_kimlik"]').val()) {
+        url += '&filter_kimlik=' + encodeURIComponent($('input[name="filter_kimlik"]').val());
+    }
+
+    if ($('select[name="filter_sinif"]').val()) {
+        url += '&filter_sinif=' + encodeURIComponent($('select[name="filter_sinif"]').val());
+    }
+
+    var filter_hobi = $('select[name="filter_hobi[]"]').val();
+	if (filter_hobi && filter_hobi.length > 0) {
+		url += '&filter_hobi=' + encodeURIComponent(filter_hobi);
+	}
+
+	var filter_dil = $('select[name="filter_dil[]"]').val();
+	if (filter_dil && filter_dil.length > 0) {
+		url += '&filter_dil=' + encodeURIComponent(filter_dil);
+	}
+
+	var filter_music = $('select[name="filter_music"]').val();
+	if (filter_music && filter_music !== '') {
+		url += '&filter_music=' + encodeURIComponent(filter_music);
+	}
+
+    if ($('select[name="filter_bolge"]').val()) {
+        url += '&filter_bolge=' + encodeURIComponent($('select[name="filter_bolge"]').val());
+    }
+
+    if ($('select[name="filter_il"]').val()) {
+        url += '&filter_il=' + encodeURIComponent($('select[name="filter_il"]').val());
+    }
+
+    if ($('select[name="filter_ilce"]').val()) {
+        url += '&filter_ilce=' + encodeURIComponent($('select[name="filter_ilce"]').val());
+    }
+
+    if ($('input[name="filter_yetim"]:checked').val()) {
+        url += '&filter_yetim=' + encodeURIComponent($('input[name="filter_yetim"]:checked').val());
+    }
+
+    if ($('input[name="filter_hafiz"]:checked').val()) {
+        url += '&filter_hafiz=' + encodeURIComponent($('input[name="filter_hafiz"]:checked').val());
+    }
+
+    if ($('select[name="filter_country"]').val()) {
+        url += '&filter_country=' + encodeURIComponent($('select[name="filter_country"]').val());
+    }
+
+    if ($('input[name="filter_universite"]').val()) {
+        url += '&filter_universite=' + encodeURIComponent($('input[name="filter_universite"]').val());
+    }
+
+    if ($('input[name="f_universite_id"]').val()) {
+        url += '&f_universite_id=' + encodeURIComponent($('input[name="f_universite_id"]').val());
+    }
+
+    if ($('input[name="filter_fakulte"]').val()) {
+        url += '&filter_fakulte=' + encodeURIComponent($('input[name="filter_fakulte"]').val());
+    }
+
+    if ($('input[name="f_fakulte_id"]').val()) {
+        url += '&f_fakulte_id=' + encodeURIComponent($('input[name="f_fakulte_id"]').val());
+    }
+
+    if ($('input[name="filter_bolum"]').val()) {
+        url += '&filter_bolum=' + encodeURIComponent($('input[name="filter_bolum"]').val());
+    }
+
+    if ($('input[name="f_bolum_id"]').val()) {
+        url += '&f_bolum_id=' + encodeURIComponent($('input[name="f_bolum_id"]').val());
+    }
+
+    if ($('input[name="filter_gdate"]').val()) {
+        url += '&filter_gdate=' + encodeURIComponent($('input[name="filter_gdate"]').val());
+    }
+
+	var filter_gorev = $('select[name="filter_gorev[]"]').val();
+	if (filter_gorev && filter_gorev.length > 0) {
+		url += '&filter_gorev=' + encodeURIComponent(filter_gorev);
+	}
+
+    if ($('input[name="filter_gdate_start"]').val()) {
+        url += '&filter_gdate_start=' + encodeURIComponent($('input[name="filter_gdate_start"]').val());
+    }
+
+    if ($('input[name="filter_gdate_end"]').val()) {
+        url += '&filter_gdate_end=' + encodeURIComponent($('input[name="filter_gdate_end"]').val());
+    }
+
+    if ($('input[name="filter_kdate"]').val()) {
+        url += '&filter_kdate=' + encodeURIComponent($('input[name="filter_kdate"]').val());
+    }
+
+    if ($('input[name="filter_ddate"]').val()) {
+        url += '&filter_ddate=' + encodeURIComponent($('input[name="filter_ddate"]').val());
+    }
+
+	var filter_burs = $('select[name="filter_burs[]"]').val();
+	if (filter_burs && filter_burs.length > 0) {
+		url += '&filter_burs=' + encodeURIComponent(filter_burs);
+	}
+
+    if ($('input[name="filter_bdate_start"]').val()) {
+        url += '&filter_bdate_start=' + encodeURIComponent($('input[name="filter_bdate_start"]').val());
+    }
+
+    if ($('input[name="filter_bdate_end"]').val()) {
+        url += '&filter_bdate_end=' + encodeURIComponent($('input[name="filter_bdate_end"]').val());
+    }
+
+	if ($('select[name="limit"]').val()) {
+        url += '&limit=' + encodeURIComponent($('select[name="limit"]').val());
+    }
+
+ 
+    location = url;
+});
+//--></script>
+
+<script type="text/javascript"><!--
+$('#select-input-il').on('change', function() {
+  var element = this;
+
+  if(element.value == '') {
+      $('select[name=\'filter_ilce\']').prop('disabled', true);
+  }else{
+      $('select[name=\'filter_ilce\']').prop('disabled', false);
+  }
+
+	$.ajax({
+		url: 'index.php?route=setting/autocomplete/sehirautocomplete&user_token={{ user_token }}&sehir_id=' + element.value,
+		dataType: 'json',
+		success: function(json) {
+			html = '<option value="">{{ text_select }}</option>';
+
+			if (json['city'] && json['city'] != '') {
+				for (i = 0; i < json['city'].length; i++) {
+					html += '<option value="' + json['city'][i]['ilce_id'] + '"';
+
+					if (json['city'][i]['ilce_id'] == '{{ filter_ilce }}' ) {
+						html += ' selected="selected"';
+					}else{
+					   html += '';
+					}
+
+					html += '>' + json['city'][i]['name'] + '</option>';
+				}
+			} else {
+				html += '<option value="">{{ text_none }}</option>';
+			}
+
+			    $('select[name=\'filter_ilce\']').html(html);
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+$('select[name=\'filter_il\']').trigger('change');
+//--></script>
+
+<script type="text/javascript"><!--
+$('input[name=\'filter_name\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=setting/autocomplete/customerautocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['customer_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_name\']').val(item['label']);
+	}
+});
+
+$('input[name=\'filter_email\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=setting/autocomplete/customerautocomplete&user_token={{ user_token }}&filter_email=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['email'],
+						value: item['customer_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_email\']').val(item['label']);
+	}
+});
+//--></script>
+
+<script type="text/javascript"><!--
+function bolge(element, index, filter_country) {
+	$.ajax({
+		url: 'index.php?route=setting/autocomplete/bolgeautocomplete&user_token={{ user_token }}&bolge_id=' + element.value,
+		dataType: 'json',
+		beforeSend: function() {
+			$('select[name=\'bolge_id\']').prop('disabled', true);
+		},
+		complete: function() {
+			$('select[name=\'bolge_id\']').prop('disabled', false);
+		},
+		success: function(json) {
+
+			html = '<option value="">{{ text_select }}</option>';
+
+			if (json['country'] && json['country'] != '') {
+				for (i = 0; i < json['country'].length; i++) {
+					html += '<option value="' + json['country'][i]['country_id'] + '"';
+
+					if (json['country'][i]['country_id'] == '{{ filter_country }}' ) {
+						html += 'selected="selected"';
+					}else{
+					    html += '';
+					}
+
+					html += '>' + json['country'][i]['name'] + '</option>';
+				}
+			} else {
+				html += '<option value="">{{ text_none }}</option>';
+			}
+
+			$('select[name=\'filter_country\']').html(html);
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+}
+
+$('select[name$=\'filter_bolge\']').trigger('change');
+//--></script>
+
+<script type="text/javascript">
+$('input[name=\'filter_universite\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=report/ogrenci_transaction/universite&user_token={{ user_token }}&filter_universite=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['universite_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_universite\']').val(item['label']);
+		$('input[name=\'f_universite_id\']').val(item['value']);
+
+	}
+});
+
+$('input[name=\'filter_fakulte\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=report/ogrenci_transaction/fakulte&user_token={{ user_token }}&filter_fakulte=' + encodeURIComponent($('input[name=\'filter_fakulte\']').val()) + '&f_universite_id=' + encodeURIComponent($('input[name=\'f_universite_id\']').val()),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['fakulte_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_fakulte\']').val(item['label']);
+		$('input[name=\'f_fakulte_id\']').val(item['value']);
+	}
+});
+
+$('input[name=\'filter_bolum\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=report/ogrenci_transaction/bolum&user_token={{ user_token }}&filter_bolum=' + encodeURIComponent($('input[name=\'filter_bolum\']').val()) + '&f_fakulte_id=' + encodeURIComponent($('input[name=\'f_fakulte_id\']').val()),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['bolum_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_bolum\']').val(item['label']);
+		$('input[name=\'f_bolum_id\']').val(item['value']);
+	}
+});
+//--></script>
+
+<script type="text/javascript"><!--
+$('#button-export').on('click', function() {
+ var url = '{{export}}';
+    location = url;		
+});
+//--></script>
+{#
+<script type="text/javascript"><!--
+function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+				
+        display = display.text(minutes + ':' + seconds);
+
+        if (--timer < 0) {
+            timer = 0;
+						$('.countdown-alert').html('<span class="text-danger">Süre sona erdi</span>');
+						$('#button-onay').prop('disabled',true);
+						$('#button-onay').hide();
+						$('#button-refresh').show();
+        }
+    }, 1000);
+}
+
+jQuery(function ($) {
+    var fiveMinutes = 10 * 1;
+     display = $('.countdown');
+    startTimer(fiveMinutes, display);
+});
+//--></script>
+
+<script type="text/javascript"><!--
+$('#button-refresh').on('click', function() {
+   $('.countdown').text('');
+   $('#modal-sms').modal('hide');
+	 $('.countdown-alert').remove();
+	 $('#button-export').trigger('click');
+});
+//--></script>
+#}
+<script type="text/javascript"><!--
+$('#button-onay').on('click', function() {
+  if($('input[name=\'sms_code\']').val() == '') {
+		$('input[name=\'sms_code\']').css('border-color','red');
+		exit();
+	}
+
+  $.ajax({
+		url: 'index.php?route=tool/sms/smsonay&user_token={{ user_token }}',
+		type: 'post',
+		dataType: 'json',
+		data: 'code=' + $('input[name=\'sms_code\']').val(),
+		success: function(json) {
+		
+			 if (json.success) {
+				  $('#modal-sms').modal('hide');
+           location = json.success;
+			 }else{
+				  $('input[name=\'sms_code\']').css('border-color','red');
+					$('.countdown-alert').html('<span class="text-danger">' + json.error['code'] + '</span>');
+			 }
+			
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+//--></script>
+
+

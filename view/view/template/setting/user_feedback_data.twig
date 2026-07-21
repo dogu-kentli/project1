@@ -1,0 +1,395 @@
+ <div class="table-responsive-sm">
+    <table class="table table-striped align-middle mb-0 table-sm">
+        <thead class="table-light align-middle">
+            <tr>
+                <th class="text-start" style="width:20%">{{ " Kullanıcı" }}</th>
+                
+                <th class="text-start">{{ "Açıklama" }}</th>
+                <th class="text-start">{{ "Bildirim" }}</th>
+                <th class="text-start">{{ "Bölüm" }}</th>
+                 <th class="text-start">{{ "Öncelik" }}</th>
+                 <th class="text-start">{{ "Tarih" }}</th>
+                <th class="text-start">{{ "Durumu" }}</th>
+                <th class="text-center" style="width:8%;">{{ "Dosya" }}</th>
+                <th colspan="3" class="text-center select-limit" style="width:1%;"> {{"Eylem"}}  </th>
+            </tr>
+        </thead>
+        <tbody class="data-list">
+            {% if bildirimler %}
+            {% set row = 1 %}
+            {% for bildirim in bildirimler %}
+            <tr id="data-list{{bildirim.feedback_id}}" >
+                <td id="{{ bildirim.feedback_id }}" class="text-start">
+                {{ bildirim.user }}<br>
+                {{ bildirim.store }}
+                
+                </td>
+                
+                <td id="{{ bildirim.feedback_id }}" class="text-start item">{{ bildirim.text }}</td>
+                <td id="{{ bildirim.feedback_id }}" class="text-start item">{{ bildirim.bildirim_tipi }}</td>
+                <td id="{{ bildirim.feedback_id }}" class="text-start item">{{ bildirim.bolum }}</td>
+                <td id="{{ bildirim.feedback_id }}" class="text-start item">{{ bildirim.oncelik }}</td>
+                <td id="{{ bildirim.feedback_id }}" class="text-start item">{{ bildirim.date_added }}</td>
+                <td class="text-start"><span class="badge {{bildirim.status_bg}}">{{ bildirim.status }}</span></td>
+                <td class="text-center">
+               
+                {% if bildirim.download %}
+                <a href="{{bildirim.download}}" data-toggle="tooltip" title="Tasarım dosyasını indir" class="btn btn-link btn-lg text-info">
+                    <i class="bi bi-file-pdf"></i>
+                </a>
+                {% else %}
+                        <i class="bi bi-dash"></i>
+                {% endif %}
+
+                </td>
+                {% if user_group_id == 1 %}
+                <td class="text-center" {{button_revizyon_display}}>
+                    <button type="button" id="button-revizyon" name="{{ bildirim.feedback_id }}" data-toggle="tooltip" title="Revizyon Talebi" class="btn btn-warning btn-xs" {{button_revizyon}}>
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                </td>
+                {% endif %}
+                
+                {% if button_edit %}
+                <td class="text-center">
+                    <button type="button" id="button-view" data-toggle="tooltip" title="Görüntüle" onclick="functionEdit('{{ bildirim.feedback_id }}')" class="btn btn-info btn-xs">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </td>
+                {% else %}
+                <td class="text-center">
+                    <button type="button" id="button-view" data-toggle="tooltip" title="Görüntüle" onclick="functionView('{{ bildirim.feedback_id }}')" class="btn btn-info btn-xs">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </td>
+                {% endif %}
+                <td class="text-center" {{button_delete_display}}>
+                    <button type="button" id="{{bildirim.feedback_id}}" class="btn btn-danger btn-xs button-delete">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </td>
+            </tr>
+
+            {% set row = row + 1 %}
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td class="text-center" colspan="9">{{"Sonuç bulunamadı"}}</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+ <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+
+{# GÖRÜNTÜLEME MODAL#}
+<div id="modal-feedback-view" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+    <div class="modal-content border-0 shadow">
+      
+      <div class="modal-header border-bottom-0 pb-0">
+        <h6 class="modal-title fw-bold text-secondary">Geri Bildirim Detayları</h6>
+        <button type="button" class="btn-close small" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      
+      <form id="form-feedback-edit">
+       <input type="hidden" name="feedback_id" value="0">
+        <div class="modal-body">
+       
+              <div class="small text-muted mb-3">
+                <div class="list-group list-group-flush border rounded-3 overflow-hidden"></div>
+              </div>
+              
+              <div class="description p-2 bg-light rounded small mb-4 border-start border-3 border-primary"></div>
+              <div class="revizyon p-2 bg-light rounded small mb-4 border-start border-3 border-warning" style="display:none;"></div>
+
+              <div class="mb-3" id="status-feedback">
+                <label class="form-label small fw-bold text-uppercase text-muted">Durum Güncelle</label>
+                <select name="status" class="form-select">
+                  <option value="0">Onay Bekliyor</option>
+                  <option value="2">İşleme Alındı</option>
+                  <option value="3">Revizyon Talebi</option>
+                  <option value="1">Tamamlandı</option>
+                </select>
+              </div>
+
+              <div class="mb-3" id="text" style="display:none;">
+                <textarea name="text" rows="3" placeholder="İşlem notu ekleyin..." class="form-control form-control-sm"></textarea>
+              </div>
+
+              <div id="dokuman" style="display:none;" class="mb-3">
+                <label class="form-label small fw-bold text-muted">Dosya Yükle (.zip)</label>
+                <div class="input-group input-group-sm">
+                  <input type="text" id="input-filename" class="form-control" placeholder="Seçilmedi" readonly>
+                  <button type="button" id="button-upload-tasarim" class="btn btn-outline-primary">Dosya Seç</button>
+                </div>
+                <input type="hidden" name="code" id="input-code" />
+                
+                <div id="note" class="mt-2" style="display:none;">
+                  <span class="badge bg-warning text-dark fw-normal w-100 p-2" style="white-space: normal;">Maksimum 50 MB, .zip formatı gereklidir.</span>
+                </div>
+              </div>
+            </div>
+
+           <div class="modal-footer border-top-0 pt-0">
+            <button type="button" id="modal-button-update" class="btn btn-primary">Güncelle</button>
+           </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+{# REVİZYON MODAL #}
+<div id="modal-revizyon" class="modal fade" tabindex="-1" aria-labelledby="revizyonModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="min-width: 400px; max-width: 35%;">
+    <div class="modal-content shadow-lg">
+      
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold" id="revizyonModalLabel">
+          <i class="bi bi-pencil-square me-2 text-primary"></i>Revizyon Talebi
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      
+      <form id="form-feedback-revizyon">
+        <input type="hidden" name="feedback_id" value="">
+        
+        <div class="modal-body pb-4">
+          <div class="alert alert-info small mb-3">
+            Lütfen düzeltme yapılacak kısımla ilgili açıklayıcı bir metin yazınız..
+          </div>
+
+          <div class="form-group">
+            <label class="form-label fw-bold">Revizyon Açıklaması</label>
+            <textarea 
+              name="text" rows="5" placeholder="Örn: Raporlar istediğim formatta gelmiyor,etkinlik takviminde şu detay lazımı..." class="form-control border-primary-subtle"></textarea>
+            <div id="error-revizyon" class="text-danger small mt-1"></div>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-primary btn-save-revizyon px-4">
+            <i class="fa-solid fa-floppy-disk me-1"></i> {{ button_save|default('Revizyonu Gönder') }}
+          </button>
+        </div>
+      </form>
+        
+    </div>
+  </div>
+</div>
+
+
+
+
+<script type="text/javascript"><!--
+// MODAL GÖRÜNTÜLEME 
+
+function functionView(feedback_id) {
+    $('#form-feedback-edit input[name="feedback_id"]').val(feedback_id);
+    $('.table tr').removeClass('bg bg-light-info');
+    $('#data-list' + feedback_id).addClass('bg bg-light-info');
+    $('#modal-feedback-view').modal('show');
+    $('#status-feedback').hide();
+    $('#modal-feedback-view .btn-primary').hide();
+    
+    $.ajax({
+      url: 'index.php?route=setting/user_feedback/getFeedbackInfo&user_token={{ user_token }}&feedback_id=' + feedback_id,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+       $('.list-group-item').remove();
+       $('.description').find('p').remove();
+       $('.revizyon').find('p').remove().hide();
+       $('.dropdown-menu').find('li').attr('class','');
+        
+       if (json['html']) {
+         $('#modal-feedback-view .list-group').append(json['html']);
+         $('#modal-feedback-view .description').append(json['description']);
+         $('#modal-feedback-view .revizyon').append(json['revizyon']).show();
+         $('#modal-feedback-view select[name^=\'status\']').val(json['status']);
+         $('#modal-feedback-view textarea[name^=\'text\']').val(json['revizyon']);
+        }
+
+        if (json['button_save']) {
+         $('#status-feedback').show();
+         $('#modal-feedback-view .btn-primary').prop('disabled',false);
+         $('#modal-feedback-view .btn-primary').show();
+        }
+
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+}
+
+function functionEdit(feedback_id) {
+    $('#modal-feedback input[name="feedback_id"]').val(feedback_id);
+    $('.table tr').removeClass('bg bg-light-info');
+    $('#data-list' + feedback_id).addClass('bg bg-light-info');
+    $('#modal-feedback').modal('show');
+    $('#modal-feedback .note').find('small').remove().hide();
+
+    $.ajax({
+      url: 'index.php?route=setting/user_feedback/getFeedbackInfo&user_token={{ user_token }}&feedback_id=' + feedback_id,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+       
+       if (json['html']) {
+         $('#modal-feedback textarea[name="description"]').val(json['description_value']);
+         $('#modal-feedback .talep' + json['bildirim_tipi_value']).prop('checked',true);
+         $('#modal-feedback select').val(json['bolum_value']);
+         $('#modal-feedback .form-range').val(json['oncelik_value']);
+         $('#modal-feedback .note').html('<small>' + json['revizyon'] + '</small>').show();
+         $('#modal-feedback .filename').val(json['filename']);
+         $('#modal-feedback .code').val(json['code']);
+
+        }
+
+        if (json['button_save']) {
+         $('#status-feedback').show();
+         $('#modal-feedback-view .btn-primary').prop('disabled',false);
+         $('#modal-feedback-view .btn-primary').show();
+        }
+
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+}
+
+$('#modal-button-update').on('click', function() {
+     $.ajax({
+      url: 'index.php?route=setting/user_feedback/savefeedback&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      data : $('#form-feedback-edit').serialize(),
+      
+      success: function(json) {
+    
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+
+        if (json.success) {
+         $('#modal-feedback-view').modal('hide');
+          $('#feedback-data').load('index.php?route=setting/user_feedback/dataFeedback&user_token={{ user_token }}');
+          alertsuccess(json.success);
+          
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+
+ $('select[name^=\'status\']').on('change', function() {
+    $('#dokuman,#text').hide();
+   
+    if($(this).val() == 3) {
+      $('#text').show();
+    }
+ });
+
+  $('#btn-help').on('click', function() {
+     $('#note').toggle(); 
+ });
+ </script> 
+<script>
+ $('.button-delete').on('click', function() {
+    if (confirm('Dikkat : Bu işlem geri alınamaz. Bu görevi silmek istediğinize emin misiniz?') == false) {    
+        exit();
+    }
+   
+    var element = $(this).attr('id');
+	
+     $.ajax({
+      url: 'index.php?route=setting/user_feedback/deleteData&user_token={{ user_token }}&feedback_id='  + element,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        $('.alert-dismissible').remove();
+
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+                
+        if (json.success) {
+          $('#modal_feedback').modal('hide');
+          $('#feedback-data').load('index.php?route=setting/user_feedback/dataFeedback&user_token={{ user_token }}'); 
+          alertsuccess(json.success);
+                  
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+//--></script>
+
+{# REVİZYON İŞLEMLERİ JQUERY #}
+<script type="text/javascript"><!--
+$('button[id^=\'button-revizyon\']').on('click', function() {
+    $('#modal-revizyon input[name^=\'feedback_id\']').val($(this).attr('name'));
+    $('#modal-revizyon').modal('show');
+});
+
+$('#modal-revizyon .btn-save-revizyon').on('click', function() {
+    var element = $('#modal-revizyon input[name^=\'feedback_id\']').val();
+    $.ajax({
+      url: 'index.php?route=setting/user_feedback/revizyon&user_token={{ user_token }}&feedback_id='  + element,
+      type: 'post',
+      dataType: 'json',
+      data : '&text=' +  $('#modal-revizyon textarea[name^=\'text\']').val(),
+
+      success: function(json) {   
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+
+        if (json.success) {
+           $('#modal-revizyon').modal('hide');
+           $('#feedback-data').load('index.php?route=setting/user_feedback/dataFeedback&user_token={{ user_token }}');
+           alertsuccess(json.success);
+          
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+});
+//--></script>
+
+<style>
+.btn-xs {
+  padding: 0.20rem 0.5rem;
+  font-size: 0.75rem;
+}
+</style>
+
+
+
+
+

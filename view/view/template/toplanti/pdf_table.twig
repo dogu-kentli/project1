@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ title }}</title>
+    <base href="{{ base }}" />
+    <link href="view/stylesheet/bootstrap2.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <link rel="icon" type="image/png" href="view/image/favicon.png">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #f8f9fa;
+            --accent-color: #34495e;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        .main-container {
+            background: white;
+            padding: 40px;
+            margin: 20px auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            border-radius: 8px;
+        }
+
+        .header-logo {
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+        }
+
+        .table {
+            width: 100%;
+            margin-bottom: 25px;
+            border-collapse: collapse;
+            border: 1px solid var(--border-color);
+        }
+
+        .table thead th {
+            background-color:#018bd3 !important;
+            color: white !important;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            padding: 12px;
+            border: none;
+        }
+
+        .table-secondary-head {
+            background-color: var(--secondary-color) !important;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .table td {
+            padding: 10px;
+            vertical-align: middle;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .toplanti-info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+
+        .info-item b { color: var(--primary-color); }
+
+        .btn-print {
+            background-color: #e74c3c;
+            color: white !important;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-print:hover { background-color: #c0392b; }
+
+        .karar-detay {
+            color: #666;
+            font-style: italic;
+            display: block;
+            margin-top: 5px;
+            padding-left: 15px;
+            border-left: 2px solid #ddd;
+        }
+
+        /* Yazdırma Modu Düzenlemeleri */
+        @media print {
+            body { background: white; }
+            .main-container { box-shadow: none; margin: 0; width: 100%; max-width: none; padding: 10px; }
+            .no-print { display: none; }
+            .table thead th { background-color: #018bd3 !important; -webkit-print-color-adjust: exact; }
+            tr { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="no-print text-right" style="margin-bottom: 20px;">
+        <button type="button" id="btnPrint" class="btn-print">
+            
+        <i class="fa-solid fa-file-pdf"></i> PDF DÖKÜM AL
+        </button>
+    </div>
+
+    <div id="toplanti-formu">
+        <div align="center" class="header-logo">
+            {% if store_logo %}
+                <img src="{{ store_logo }}" style="max-height: 70px;"/>
+            {% else %}
+                <img src="view/image/logo.png" width="170" />
+            {% endif %}
+            <h3 style="margin-top: 15px; color: #2c3e50; font-weight: bold;">TOPLANTI TUTANAĞI</h3>
+        </div>
+
+        <div class="toplanti-info-bar">
+            <div class="info-item"><b>No:</b> {{ no }}</div>
+            <div class="info-item" style="font-size: 1.2em; text-transform: uppercase;">{{ name }}</div>
+            <div class="info-item"><b>Tarih/Saat</b> {{ tarih }} {{ saat }}</div>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th colspan="8" class="text-center">KATILIMCI LİSTESİ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set personeller = personeller %}
+                {% for i in 0..column_personel - 1 %}
+                    {% set j = column_personel + i %}
+                    <tr>
+                        <td style="width:1%; background:#f9f9f9;"><b>{{ personeller[i].row }}</b></td>
+                        <td>{{ personeller[i].personel }}</td>
+                        <td><small>{{ personeller[i].birim }}</small></td>
+                        <td style="width:1%;">{{ personeller[i].statu }}</td>
+                        
+                        {% if j < personeller|length %}
+                            <td style="width:1%; background:#f9f9f9;"><b>{{ personeller[j].row }}</b></td>
+                            <td>{{ personeller[j].personel }}</td>
+                            <td><small>{{ personeller[j].birim }}</small></td>
+                            <td style="width:1%;">{{ personeller[j].statu }}</td>
+                        {% else %}
+                            <td colspan="4" style="background:#fcfcfc;"></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table class="table " >
+            <thead>
+                <tr>
+                    <th colspan="4" class="text-center">TOPLANTI GÜNDEMİ</th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for i in 0..column_gundem - 1 %}
+            {% set j = column_gundem + i %}
+            <tr>
+                <!-- Row hücresi dar -->
+                <td style="width:1%; background:#f9f9f9;"><strong>{{ gundemler[i].row }}</strong></td>
+                <!-- Name hücresi geniş -->
+                <td style="width:42%;" class="text-center">{{ gundemler[i].name }}</td>
+
+                {% if j < gundemler|length %}
+                    <!-- Row hücresi dar -->
+                    <td style="width:1%; background:#f9f9f9;" ><strong>{{ gundemler[j].row }}</strong></td>
+                    <!-- Name hücresi geniş -->
+                    <td style="width:42%;" class="text-center">{{ gundemler[j].name }}</td>
+                {% else %}
+                    <td colspan="2"></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+        </table>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th colspan="5" class="text-center">ALINAN KARARLAR</th>
+                </tr>
+                <tr class="table-secondary-head">
+                    <td style="width:1%;">No</td>
+                    <td>Karar ve Açıklama</td>
+                    <td style="width:15%;">Sorumlu</td>
+                    <td style="width:10%;" class="text-center">Statü</td>
+                    <td style="width:12%;" class="text-center">Vade</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for karar in kararlar %}
+                <tr>
+                    <td class="text-center"><b>{{ karar.row }}</b></td>
+                    <td>
+                        {{ karar.name }}
+                        {% if karar.detay %}
+                            <span class="karar-detay">{{ karar.detay }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ karar.personel }}</td>
+                    <td class="text-center">
+                        <span class="badge">{{ karar.statu }}</span>
+                    </td>
+                    <td class="text-center">{{ karar.karar_tarihi }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table class="table">
+            <thead>
+                <tr><th colspan="3">DİLEK, TEMENNİ VE KAPANIŞ</th></tr>
+            </thead>
+            <tbody>
+                {% for key, item in description %}
+                <tr>
+                    <td style="width:5%;">{{ key }}</td>
+                    <td>{{ item.description }}</td>
+                    <td style="width:20%;"><b>{{ item.name }}</b></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $('#btnPrint').click(function () {
+        const pageTitle = '{{ name }}';
+        const content = $('#toplanti-formu').html();
+        const win = window.open('', '', 'width=1000,height=800');
+
+        win.document.write(`
+            <html>
+                <head>
+                    <title>${pageTitle}</title>
+                    <link rel="stylesheet" href="view/stylesheet/bootstrap2.css">
+                    <style>
+                        body { font-family: sans-serif; padding: 20px; }
+                        .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .table border, .table td, .table th { border: 1px solid #ccc !important; }
+                        .table thead th { background-color: #2c3e50 !important; color: white !important; -webkit-print-color-adjust: exact; }
+                        .toplanti-info-bar { display: flex; justify-content: space-between; background: #eee; padding: 10px; margin-bottom: 20px; -webkit-print-color-adjust: exact; }
+                        .karar-detay { display: block; font-size: 0.9em; color: #555; margin-top: 5px; }
+                        @media print { 
+                            .no-print { display: none; }
+                            tr { page-break-inside: avoid; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${content}
+                </body>
+            </html>
+        `);
+
+        win.document.close();
+        setTimeout(function() {
+            win.focus();
+            win.print();
+            // win.close(); // İsteğe bağlı
+        }, 500);
+    });
+</script>
+
+</body>
+</html>

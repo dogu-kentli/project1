@@ -1,0 +1,399 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end">
+            {% if store_id == 0 %}
+            <button type="button" id="button-delete" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i>Tümünü Sil</button>
+            {% endif %}
+
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div id="customer-cart-filter" class="row g-3">
+
+                        <div class="col-lg-1 col-6 ">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_cart" value="{{ filter_cart }}" placeholder="{{"Kart ID"}}" class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6 ">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="{{"Öğrenci Adı"}}" class="form-control ps-4 auto-filter" placeholder="Telefon...">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6 col-md-2">
+                            <select name="filter_store" class="form-select auto-filter">
+                                <option value="">{{text_all}}</option>
+                                {% for store in stores %}
+                                <option value="{{ store.store_id }}" {% if filter_store == store.store_id %} selected="selected" {% endif %}>{{store.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2 col-6 col-md-2 ms-auto">
+                            <select name="filter_status" class="form-select auto-filter">
+                                <option value="" {% if filter_status == '' %} selected="selected" {% endif %}>{{text_select}}</option>
+                                <option value="1" {% if filter_status == 1 %} selected="selected" {% endif %}>{{"Onaylandı"}}</option>
+                                <option value="0" {% if filter_status != '' and filter_status == 0 %} selected="selected" {% endif %}>{{"Onay Bekliyor"}}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-1 co1-6 col-md-3">
+                            <select name="limit" class="form-select auto-filter">
+                                {% for key,value in limits %}
+                                <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-customer">
+                    <div class="card-body">
+
+                        <div class="table-responsive-sm">
+                            <table class="table table-bordered table-striped align-middle mb-0">
+                                <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                    <tr>
+                                        <th>{{ "Kart ID" }}</th>
+                                        <th>{{ "Öğrenci Adı" }}</th>
+                                        <th>{{ "Derneği" }}</th>
+                                        <th>{{ "Başvuru Tarihi" }}</th>
+                                        <th>{{ "Durumu" }}</th>
+                                        <th colspan="2" class="text-center" style="width:1%;">Eylem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if customers %}
+                                    {% for customer in customers %}
+                                    <tr>
+                                        <td class="text-start" id="cart-{{customer.customer_id}}">
+                                            <strong>{{ customer.cardID }}</strong>
+
+                                        </td>
+                                        <td class="text-start text-primary">
+                                            <strong><a href="{{customer.edit}}" target="_blank">{{ customer.name }}</a></strong>
+
+                                        </td>
+                                        <td class="text-start">
+                                            <div class="border rounded p-2 bg-light">
+                                                {{ customer.store.name}}
+                                            </div>
+                                        </td>
+
+                                        <td class="text-start">{{ customer.date_added }}</td>
+                                        <td class="text-start" id="status-{{customer.customer_id}}">
+                                            {% if customer.status == 0 %} <span class="badge bg-info">{{"Onay Bekliyor"}}</span>{% endif %}
+                                            {% if customer.status == 1 %} <span class="badge bg-success">{{"Onaylandı"}} </span>{% endif %}
+                                            {% if customer.status == 2 %} <span class="badge bg-danger ">{% endif %}
+                                                {% if customer.status == 3 %} <span class="badge bg-primary">{{"Düzeltme Yapıldı"}} </span>{% endif %}
+                                        </td>
+
+                                        <td>
+
+                                            <a href="javascript:void(0);" data-toggle="tooltip" title="{{ "Öğrenci profilini Görüntüle" }}" onclick="profile('{{customer.customer_id}}')" class="btn btn-info btn-sm">
+                                                <i class="bi bi-eye-fill"></i>
+                                            </a>
+                                        </td>
+
+                                        <td>
+
+                                            <a href="javascript:void(0);" data-toggle="tooltip" title="{{ "Sil" }}" onclick="deleteCart('{{customer.customer_id}}','{{cardID}}')" class="btn btn-danger btn-sm" aria-label="delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+
+
+                                        </td>
+
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center" colspan="4">{{ text_no_results }}</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+                                {{ pagination }}
+                            </div>
+                            <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+                                {{ results }}
+                            </div>
+                        </div>
+                </form>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    {{footer}}
+
+
+    <div class="modal fade" id="modal-view" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style=>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="button-cart-reset" onclick="$('textarea[name=\'text\']').show(); resetCard('{{cart_id}}','{{customer_id}}');" class="btn btn-danger">{{ "İptal Et"}}</button>
+                    <button type="button" onclick="onayCard(this,'{{customer_id}}')" class="btn btn-success" {% if onay == 1 %} disabled {% endif %}>
+                        <span class="spinner-border spinner-border-sm loading visually-hidden" role="status" aria-hidden="true"></span>
+                        <span class="reset"> <i class="bi bi-check"></i>{{"Onayla"}}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+<script>
+    function profile(customer_id) {
+        $('.modal-body').load('index.php?route=customer/customer_cart/profileinfo&user_token={{ user_token }}&customer_id=' + customer_id);
+        $('#modal-view').modal('show');
+
+    }
+
+    function revizeFunction(customer_id) {
+        var text = $('#modal-view textarea').val();
+        if (text == '') {
+            alert("Lütfen bir açıklama yazınız.");
+            exit();
+        }
+
+        $.ajax({
+            url: 'index.php?route=customer/customer_cart/cardrevize&user_token={{ user_token }}&customer_id=' + customer_id,
+            dataType: 'json',
+            data: 'text=' + text,
+            type: 'post',
+
+            success: function(json) {
+                if (json.error.warning) {
+                    $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error.warning + '</div>');
+                }
+
+                if (json.success) {
+                    $('#modal-view').modal('hide');
+                    $('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json.success + '</div>');
+                }
+
+
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+
+
+    function deleteCart(id, cart_id) {
+        if (!confirm('Silmek istediğinizden emin misiniz?')) {
+            return; // İşlemden çık
+        }
+
+        $.ajax({
+            url: 'index.php?route=customer/customer_cart/deleteCart&user_token={{ user_token }}&delete=' + id + '&cart_id=' + cart_id,
+            dataType: 'json',
+            type: 'post',
+
+            success: function(json) {
+                if (json.error.warning) {
+                    $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error.warning + '</div>');
+                }
+
+                if (json.success) {
+                    location = json.success;
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+</script>
+<script>
+    $('input[name=\'filter_name\']').autocomplete({
+        'source': function(request, response) {
+            $.ajax({
+                url: 'index.php?route=customer/customer/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+                dataType: 'json',
+                success: function(json) {
+                    response($.map(json, function(item) {
+                        return {
+                            label: item['name'],
+                            value: item['customer_id']
+                        }
+                    }));
+                }
+            });
+        },
+        'select': function(item) {
+            $('input[name=\'filter_name\']').val(item['label']);
+            $('input[name=\'filter_customer_id\']').val(item['value']);
+            $('input[name=\'filter_customer_id\']').trigger('change');
+        }
+    });
+</script>
+
+<script>
+    function onayCard(el, customer_id) {
+        var $btn = $(el); // jQuery objesi haline getiriyoruz
+        $.ajax({
+            url: 'index.php?route=customer/customer_cart/cardOnay&user_token={{ user_token }}&customer_id=' + customer_id,
+            dataType: 'json',
+            type: 'post',
+
+            beforeSend: function() {
+                $btn.find(".loading").removeClass("visually-hidden");
+                $btn.find(".reset").addClass("visually-hidden");
+            },
+
+            success: function(json) {
+                if (json.error.warning) {
+                   alerterror(json.error.warning);
+                }
+
+                if (json.success) {
+                    alertsuccess(json.success);
+                }
+            },
+
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+</script>
+
+<script>
+    function resetCard(cartid, customer_id) {
+        var text_confirm = "!Uyarı : Bu işlem oluşturulmuş kartı iptal eder?";
+
+        if ($('textarea[name=\'text\']').val() == '') {
+            alert('Lütfen iptal nedenini yazınız.');
+            $('#button-cart-reset').prop('class', 'btn btn-info').html('<i class="bi bi-save"></i> Gönder');
+            exit();
+        }
+
+        $.ajax({
+            url: 'index.php?route=customer/customer_cart/reset&user_token={{ user_token }}&reset=' + cartid,
+            type: 'post',
+            data: 'text=' + $('textarea[name=\'text\']').val(),
+            dataType: 'json',
+
+            success: function(json) {
+
+                if (json.error.warning) {
+                    alerterror(json.error.warning);
+                }
+
+                if (json.success) {
+                    $('#modal-view').load('index.php?route=customer/customer_cart/profileinfo&user_token={{ user_token }}&customer_id=' + customer_id);
+                    alertsuccess(json.success);
+
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    }
+</script>
+<script>
+    $('#customer-cart-filter .auto-filter').on('change', function() {
+        $('#cover-spin').show(0);
+        url = 'index.php?route=customer/customer_cart&user_token={{ user_token }}';
+
+        if ($('input[name=\'filter_name\']').val()) {
+            url += '&filter_name=' + encodeURIComponent($('input[name=\'filter_name\']').val());
+        }
+
+        if ($('input[name=\'filter_customer_id\']').val()) {
+            url += '&filter_customer_id=' + encodeURIComponent($('input[name=\'filter_customer_id\']').val());
+        }
+
+        if ($('select[name=\'filter_store\']').val()) {
+            url += '&filter_store=' + encodeURIComponent($('select[name=\'filter_store\']').val());
+        }
+
+        if ($('select[name=\'filter_status\']').val()) {
+            url += '&filter_status=' + encodeURIComponent($('select[name=\'filter_status\']').val());
+        }
+
+        if ($('select[name=\'limit\']').val()) {
+            url += '&limit=' + encodeURIComponent($('select[name=\'limit\']').val());
+        }
+
+        location = url;
+    });
+
+    $('#button-clear').on('click', function() {
+        url = 'index.php?route=customer/customer_cart&user_token={{ user_token }}';
+        location = url;
+    });
+</script>
+<script>
+    var error_warning = '{{error_warning}}';
+    var success = '{{success}}';
+    $(document).ready(function() {
+        if (error_warning) {
+            alerterror(error_warning);
+        }
+
+        if (success) {
+            alertsuccess(success);
+        }
+    });
+</script>
+<style>
+    /* Varsayılan (mobil) genişlik Bootstrap'in kendi ayarıyla kalır */
+    .modal-dialog {
+        max-width: 100%;
+        /* Mobilde tam genişlik */
+    }
+
+    /* Daha büyük ekranlarda farklı genişlik uygula */
+    @media (min-width: 768px) {
+        .modal-dialog {
+            max-width: 633px;
+            /* Burada istediğin genişliği ayarlayabilirsin */
+        }
+    }
+</style>

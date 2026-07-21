@@ -1,0 +1,121 @@
+{{ header }}{{ column_left }}
+<main id="tanitim" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+        <button type="button" data-toggle="tooltip" title="{{ "Yeni Ekle" }}" onclick="$('#modal-feedback').modal('show');$('#modal-feedback').find('input, textarea, select').val(''); $('#modal-feedback .note').hide();" class="btn btn-primary btn-sm button-add" {{button_add_display}}/><i class="bi bi-plus-lg"></i>{{" Ekle"}}</button>
+         
+         <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success btn-sm" {{button_excel_display}}><i class="bi bi-file-earmark-excel" aria-hidden="true"></i></a>
+         <button type="button" data-toggle="tooltip" title="{{ "Filtreyi temizle" }}" onclick="location='index.php?route=setting/user_feedback&user_token={{ user_token }}';" class="btn btn-light border border-dark shadow-sm btn-sm bg-white">
+               <i id="filter-icon" class="bi bi-funnel-fill"></i>
+          </button>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+
+            <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{filter_name}}" id="input-filter-name" placeholder="Bir isim yazınız" class="form-control ps-4">
+                                <input type="hidden" name="filter_kurum" id="filter-kurum" value="{{filter_kurum}}" class="form-control auto-filter" >
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 me-auto">
+                          
+                        </div>
+
+                        <div class="col-lg-2 col-6 me-auto">
+                          
+                        </div>
+                        
+
+                        <div class="col-lg-2 col-6 col-md-3">
+                        <select name="filter_status" class="form-select auto-filter">
+                            <option value="">{{ "--Hepsi--" }}</option>
+                            {% for key,value in status_array %}
+                            {% if key == 0 %}
+                                <option value="0" {% if filter_status == '0' %} selected {% endif %}>{{ value }}</option>
+                            {% else %}
+                                <option value="{{ key }}" {% if key == filter_status %} selected {% endif %}>{{ value }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        </div>
+
+
+                        <div class="col-lg-2 co1-6 col-md-3">
+                            <select name="limit" class="form-select auto-filter">
+                              {% for limit in limits %}
+                                  <option valu="{{ limit.value }}" {% if limit.value == select_limit %} selected {% endif %}>{{limit.text}}</option>
+                              {% endfor %} 
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                 
+                 
+          <div class="card-body" id="feedback-data"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+    {{footer}}
+</main>
+
+<script>
+
+$('#feedback-data').delegate('.sort-oncelik', 'click', function(e) {
+ e.preventDefault();
+
+	
+$('#feedback-data').load(this.href);
+});
+
+$('#feedback-data').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+	$('#feedback-data').load(this.href);
+});
+
+$('.auto-filter').on('change', function(e) {
+  e.preventDefault();
+ 
+  url = 'index.php?route=setting/user_feedback/dataFeedback&user_token={{ user_token }}';
+  
+	if ($('input[name=\'filter_status\']').val()) {
+		url += '&filter_status=' + encodeURIComponent($('input[name=\'filter_status\']').val());
+	}
+
+	if ($('select[name^=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name^=\'limit\']').val());
+	}
+	
+	$('#feedback-data').load(url);
+   
+  $('#cover-spin').show(0);
+});
+
+
+$('#feedback-data').load('index.php?route=setting/user_feedback/dataFeedback&user_token={{ user_token }}');
+
+</script>

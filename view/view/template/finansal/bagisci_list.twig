@@ -1,0 +1,310 @@
+{{ header }}{{ column_left }}
+<main id="isportali" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end">
+         <button type="button" id="button-add" data-toggle="tooltip" title="{{ "Yeni Bağışçı Ekle" }}" class="btn btn-primary button-add btn-sm" {{button_add_display}}/><i class="bi bi-plus-lg"></i>{{" Ekle"}}</button>
+         <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success btn-sm" {{button_excel_display}}><i class="bi bi-download" aria-hidden="true"></i></a>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+
+            <div class="card-header py-3">
+                    <div class="row g-3 ">
+                       <div class="col-lg-3 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input name="filter_name" value="{{filter_name}}" class="form-control auto-filter px-4" placeholder="Bir isim yazınız">
+                                
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-6 me-auto"></div>
+                        <div class="col-lg-1 col-6 me-auto"></div>
+                       <div class="col-lg-1 col-6 me-auto"></div>
+                        <div class="col-lg-2 co1-6 col-md-3">
+                          <select name="filter_country" placeholder="Bir ülke seçiniz" class="form-select auto-filter">
+                            <option value="">--{{ "Tüm Ülkeler" }}--</option>
+                            {% for country in countries %}
+                            <option value="{{ country.country_id }}" {% if filter_country == country.country_id %} selected {% endif %}>{{ country.name }}</option>
+                            {% endfor %}
+                        </select>
+                        </div>
+
+                       <div class="col-lg-1 col-6 me-auto"></div>
+                       
+                       <div class="col-lg-1 co1-6 col-md-3">
+                          <select name="limit" class="form-select auto-filter" id="select-limit">
+                          {% for key,value in limits %}
+						    <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+						   {% endfor %}
+                         </select>
+                        </div>
+                    </div>
+                </div>
+                 
+                 
+          <div class="card-body" id="bagisci-data"></div>
+        </div>
+        </div>
+
+
+    </div>
+
+  {{footer}}  
+</main>
+
+{# GÖRÜNTÜLEME MODAL #}
+<div class="modal fade" id="modal-bagisci" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="max-width: 700px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Bağışçı Ekle / Düzenle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-modal-bagisci">
+          <input type="hidden" name="form" value="add" id="hidden-form">
+          <input type="hidden" name="bagisci_id" value="0" id="hidden-bagisci-id">
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="input-ad" class="form-label">Adı:</label>
+              <input type="text" name="ad" placeholder="Adı" class="form-control" id="input-ad">
+            </div>
+            <div class="col-md-6">
+              <label for="input-soyad" class="form-label">Soyadı:</label>
+              <input type="text" name="soyad" placeholder="Soyadı" class="form-control" id="input-soyad">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="input-telefon" class="form-label">Telefon:</label>
+              <input type="text" name="telefon" placeholder="Telefon Numarası" class="form-control" id="input-telefon">
+            </div>
+            <div class="col-md-6">
+              <label for="input-email" class="form-label">Email:</label>
+              <input type="email" name="email" placeholder="E-Posta Adresi" class="form-control" id="input-email">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="input-country" class="form-label">Ülkesi:</label>
+            <select name="country_id" class="form-select" id="input-country">
+              <option value="">--Ülke Seçiniz--</option>
+              {% for country in countries %}
+                <option value="{{ country.country_id }}">{{ country.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="input-sehir" class="form-label">İli:</label>
+              <select name="sehir_id" class="form-select" id="input-sehir" onchange="sehir(this);">
+                <option value="">--İl Seçiniz--</option>
+                {% for sehir in sehirler %}
+                  <option value="{{ sehir.il_id }}">{{ sehir.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="input-ilce" class="form-label">İlçesi:</label>
+              <select name="ilce_id" class="form-select" id="input-ilce"></select>
+              <input name="city_id" type="hidden" value="" id="input-city-id">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="input-gender" class="form-label">Cinsiyet:</label>
+            <select name="gender" class="form-select" id="input-gender">
+              <option value="">--Seçim Yapın--</option>
+              <option value="K">Bayan</option>
+              <option value="E">Erkek</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="input-dogum-tarihi" class="form-label">Doğum Tarihi:</label>
+            <input type="date" name="dogum_tarihi" class="form-control" id="input-dogum-tarihi">
+          </div>
+
+          <div class="mb-3">
+            <label for="message-text" class="form-label">Adresi:</label>
+            <textarea name="adres" class="form-control" id="message-text" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" id="modal-button-save" class="btn btn-primary">Kaydet</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$('#bagisci-data').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+	$('#bagisci-data').load(this.href);
+});
+
+$('.auto-filter').on('change', function(e) {
+  e.preventDefault();
+ 
+  url = 'index.php?route=finansal/bagisci/dataBagisci&user_token={{ user_token }}';
+  
+  if ($('input[name=\'filter_name\']').val()) {
+		url += '&filter_name=' + encodeURIComponent($('input[name=\'filter_name\']').val());
+	}
+
+  if ($('select[name=\'filter_country\']').val()) {
+		url += '&filter_country=' + encodeURIComponent($('select[name=\'filter_country\']').val());
+	}
+
+	if ($('select[name^=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name^=\'limit\']').val());
+	}
+	
+  $('#cover-spin').show(0);
+	
+  $('#bagisci-data').load(url);
+
+});
+
+$('#bagisci-data').load('index.php?route=finansal/bagisci/dataBagisci&user_token={{ user_token }}');
+
+</script>
+
+<script>
+ $('#button-add').on('click', function() {
+     $('#modal-bagisci').modal('show'); 
+     $('#modal-bagisci input,select,textarea').val(''); 
+     $('#modal-bagisci input[name^=\'form\']').val('add');
+ });
+
+$('#modal-button-save').on('click', function() {
+    $.ajax({
+      url: 'index.php?route=finansal/bagisci/save&user_token={{ user_token }}&form=add',
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-modal-bagisci').serialize(),
+      success: function(json) {
+        $('#modal-bagisci .text-danger').remove();
+
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+
+        if (json.error.ad) {
+         $('input[name^="ad"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.ad + '</span>');
+        }
+
+        if (json.error.soyad) {
+         $('input[name^="soyad"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.soyad + '</span>');
+        }
+
+        if (json.error.telefon) {
+         $('input[name="telefon"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.telefon + '</span>');
+        }
+
+        if (json.error.email) {
+         $('input[name="email"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.email + '</span>');
+        }
+
+        if (json.error.country) {
+         $('select[name="country_id"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.country + '</span>');
+        }
+
+        if (json.error.il) {
+         $('select[name="sehir_id"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.il + '</span>');
+        }
+
+        if (json.error.ilce) {
+         $('select[name="ilce_id"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.ilce + '</span>');
+        }
+
+        if (json.error.mahalle) {
+         $('input[name="mahalle"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.mahalle + '</span>');
+        }
+
+        if (json.error.gender) {
+         $('select[name="gender"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.gender + '</span>');
+        }
+
+        if (json.error.dogum_tarihi) {
+         $('input[name="dogum_tarihi"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.dogum_tarihi + '</span>');
+        }
+
+        if (json.error.adres) {
+         $('textarea[name="adres"]').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error.adres + '</span>');
+        }
+
+        if (json.success) {
+          $('#modal-bagisci').modal('hide'); 
+          $('#bagisci-data').load('index.php?route=finansal/bagisci/dataBagisci&user_token={{ user_token }}');
+          alertsuccess(json.success);
+        }
+
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ });
+</script>
+
+<script type="text/javascript"><!--
+function sehir(element) {
+  var city_id = $('#modal-bagisci input[name=\'city_id\']').val();
+	$.ajax({
+		url: 'index.php?route=setting/autocomplete/sehirautocomplete&user_token={{ user_token }}&sehir_id=' + element.value,
+		dataType: 'json',
+		beforeSend: function() {
+			$('select[name=\'sehir_id\']').prop('disabled', true);
+		},
+		complete: function() {
+			$('select[name=\'sehir_id\']').prop('disabled', false);
+		},
+		success: function(json) {
+
+			html = '<option value="">{{ text_select }}</option>';
+
+			if (json['city'] && json['city'] != '') {
+				for (i = 0; i < json['city'].length; i++) {
+					html += '<option value="' + json['city'][i]['ilce_id'] + '"';
+          if (json['city'][i]['ilce_id'] == city_id) {
+            html += ' selected="selected"';
+          }
+					html += '>' + json['city'][i]['name'] + '</option>';
+				}
+			} else {
+				html += '<option value="0">{{ text_none }}</option>';
+			}
+
+			$('select[name=\'ilce_id\']').html(html);
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+}
+
+$('select[name$=\'sehir_id\']').trigger('change');
+//--></script>
+

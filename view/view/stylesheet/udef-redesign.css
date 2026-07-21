@@ -1,0 +1,3336 @@
+
+:root {
+    /* Tipografi — Inter (2026 UI standardı), system fallback */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+    /* Yazı boyut ölçeği */
+    --fs-11: 11px;
+    --fs-12: 12px;
+    --fs-13: 13px;
+    --fs-14: 14px;
+    --fs-15: 15px;
+    --fs-16: 16px;
+    --fs-18: 18px;
+    --fs-20: 20px;
+    --fs-24: 24px;
+    --fs-28: 28px;
+    --fs-32: 32px;
+
+    /* ---- Base yüzeyler (saf hex — bu tokenlar mod tarafından
+       override edilir; --c-bg/--c-surface vs. aşağıda accent ile
+       tintlenerek hesaplanır.) ---- */
+    --c-bg-base:        #f5f4ed;   /* sıcak krem — sayfa zemini */
+    --c-surface-base:   #fefdf9;   /* kart/yüzey — krem-beyaz, hafifçe ayrılır */
+    --c-sidebar-base:   #faf9f2;   /* sidebar — zeminle yumuşak ayrım */
+    --c-surface-2-base: #efeee4;   /* alt-yüzey (table-stripe, input bg) */
+    --c-line-base:      #e0ddd0;   /* kenarlık — kreme uyumlu sıcak ton */
+    --c-line-soft-base: #ebe9dd;
+
+    /* Yazı tonları */
+    --c-ink-900:       #1a1d24;
+    --c-ink-700:       #2f3540;
+    --c-ink-500:       #62687a;
+    --c-ink-300:       #9ea4b2;
+    --c-ink-on-accent: #ffffff;
+
+    /* ---- Header üst bar (modern flat: yüzey rengi zemin,
+       ikonlar/butonlar ghost; accent vurgu için alt 2px gradient
+       strip + focus halkası + badge + hover state'ler) ---- */
+    --c-header-text:       var(--c-ink-900);
+    --c-header-text-muted: var(--c-ink-500);
+    --c-header-control:    transparent;
+    --c-header-border:     var(--c-line);
+
+    /* ---------- Varsayılan ACCENT (Mavi) ----------
+       .headercolor* blokları bu üç token'i override eder. */
+    --c-primary:         #0d6efd;
+    --c-primary-600:     #0b5ed7;
+    --c-primary-700:     #084298;
+}
+
+/* Türev (derived) tokenlar — base + accent karışımları.
+   color-mix lazy çalışır: hem mode (base değişir) hem accent
+   (primary değişir) değiştiğinde otomatik adapte olur.
+
+   Light modda accent yüzdeleri:
+     bg 5%, surface 2%, sidebar 4%, surface-2 6%, line 8%, line-soft 4%
+   Dark modda yüzdeler hafifçe artar (aşağıda html.dark-theme'de
+   yeniden tanımlanmaz — color-mix denklemi aynı kalır, sadece
+   base'ler ve primary değişir). */
+:root {
+    --c-bg:        color-mix(in srgb, var(--c-primary) 8%,  var(--c-bg-base));
+    --c-surface:   color-mix(in srgb, var(--c-primary) 3%,  var(--c-surface-base));
+    --c-surface-2: color-mix(in srgb, var(--c-primary) 9%,  var(--c-surface-2-base));
+    --c-bg-elev:   var(--c-surface);
+    --c-sidebar-bg: color-mix(in srgb, var(--c-primary) 6%,  var(--c-sidebar-base));
+    --c-line:      color-mix(in srgb, var(--c-primary) 14%, var(--c-line-base));
+    --c-line-soft: color-mix(in srgb, var(--c-primary) 7%,  var(--c-line-soft-base));
+
+    --c-primary-50:        color-mix(in srgb, var(--c-primary) 10%, var(--c-surface));
+    --c-primary-100:       color-mix(in srgb, var(--c-primary) 18%, var(--c-surface));
+    --c-primary-soft:      color-mix(in srgb, var(--c-primary) 28%, var(--c-surface));
+    --c-primary-focus:     color-mix(in srgb, var(--c-primary) 30%, transparent);
+
+    --c-sidebar-border:       var(--c-line);
+    --c-sidebar-text:         var(--c-ink-700);
+    --c-sidebar-text-muted:   var(--c-ink-500);
+    --c-sidebar-label:        var(--c-ink-500);
+    --c-sidebar-bg-active:    var(--c-primary-100);
+    --c-sidebar-text-active:  var(--c-primary);
+    --c-sidebar-icon:         var(--c-primary);
+
+    --c-input-bg:          var(--c-surface);
+    --c-input-border:      var(--c-line);
+    --c-input-text:        var(--c-ink-900);
+    --c-input-placeholder: var(--c-ink-300);
+
+    /* Header arkaplanı — her zaman surface (modern flat).
+       Tema seti accent'i alt 2px gradient strip + ghost hover ile
+       görünür kalır, header'ın kendi rengini boğmaz. */
+    --c-header-bg:         var(--c-surface);
+}
+
+
+/* ---------- DARK mode ----------
+   Sadece base tokenları (saf hex) ve text tokenlarını override
+   eder. Türev tokenlar :root'ta color-mix ile yazılı; lazy
+   evaluation ile dark base'lere otomatik adapte olur. */
+html.dark-theme {
+    --c-bg-base:        #0c1424;
+    --c-surface-base:   #151d33;
+    --c-sidebar-base:   #111929;
+    --c-surface-2-base: #1c253c;
+    --c-line-base:      #2c354c;
+    --c-line-soft-base: #1f273a;
+
+    --c-ink-900:       #f1f5f9;
+    --c-ink-700:       #d6dde8;
+    --c-ink-500:       #98a1b3;
+    --c-ink-300:       #6b7385;
+
+    /* Dark modda accent yüzdesi biraz daha yüksek — koyu base'de
+       tint daha az görünür çünkü kontrast düşük. */
+    --c-bg:        color-mix(in srgb, var(--c-primary) 8%,  var(--c-bg-base));
+    --c-surface:   color-mix(in srgb, var(--c-primary) 5%,  var(--c-surface-base));
+    --c-surface-2: color-mix(in srgb, var(--c-primary) 8%,  var(--c-surface-2-base));
+    --c-bg-elev:   var(--c-surface);
+    --c-sidebar-bg: color-mix(in srgb, var(--c-primary) 6%,  var(--c-sidebar-base));
+    --c-line:      color-mix(in srgb, var(--c-primary) 14%, var(--c-line-base));
+    --c-line-soft: color-mix(in srgb, var(--c-primary) 8%,  var(--c-line-soft-base));
+
+    --c-header-bg:         var(--c-surface);
+    --c-header-text:       var(--c-ink-900);
+    --c-header-text-muted: var(--c-ink-500);
+    --c-header-control:    transparent;
+    --c-header-border:     var(--c-line);
+
+    --c-input-bg:          var(--c-surface-2);
+    --c-input-border:      var(--c-line);
+    --c-input-text:        var(--c-ink-900);
+    --c-input-placeholder: var(--c-ink-300);
+}
+
+
+/* ---------- SEMI-DARK mode (sidebar koyu, body cream-light) ---------- */
+html.semi-dark {
+    --c-sidebar-base:   #111929;
+    --c-sidebar-bg: color-mix(in srgb, var(--c-primary) 7%, var(--c-sidebar-base));
+    --c-sidebar-text:       #d6dde8;
+    --c-sidebar-text-muted: #98a1b3;
+    --c-sidebar-label:      #98a1b3;
+}
+
+/* minimal-theme: explicit override yok — :root defaultlarını alır
+   (cream light look). */
+
+
+/* ==============================================================
+   2. ACCENT setleri (6 mode-agnostik palette)
+   ============================================================== */
+
+/* --- Set 1 / Mavi --------------------------------------------- */
+html.headercolor1 {
+    --c-primary:     #0d6efd;
+    --c-primary-600: #0b5ed7;
+    --c-primary-700: #084298;
+}
+
+/* --- Set 2 / Turkuaz ------------------------------------------ */
+html.headercolor2 {
+    --c-primary:     #0891b2;
+    --c-primary-600: #0e7490;
+    --c-primary-700: #155e75;
+}
+
+/* --- Set 3 / Yeşil -------------------------------------------- */
+html.headercolor3 {
+    --c-primary:     #16a34a;
+    --c-primary-600: #15803d;
+    --c-primary-700: #166534;
+}
+
+/* --- Set 4 / Turuncu ------------------------------------------ */
+html.headercolor4 {
+    --c-primary:     #ea580c;
+    --c-primary-600: #c2410c;
+    --c-primary-700: #9a3412;
+}
+
+/* --- Set 5 / Mor ---------------------------------------------- */
+html.headercolor5 {
+    --c-primary:     #7c3aed;
+    --c-primary-600: #6d28d9;
+    --c-primary-700: #5b21b6;
+}
+
+/* --- Set 6 / Pembe -------------------------------------------- */
+html.headercolor6 {
+    --c-primary:     #db2777;
+    --c-primary-600: #be185d;
+    --c-primary-700: #9d174d;
+}
+
+
+/* ==============================================================
+   3. Element kuralları
+   ----------------------------------------------------------------
+   Selector deseni: `html[class*="headercolor"] X`
+   - Specificity: 0,1,2 (html=type, [class*=...]=attr, X=class)
+   - light-theme.css'in `html.light-theme X` (0,2,1) ile eşit veya
+     üstün; cascade'de sonra yüklendiği için her durumda kazanır.
+   ============================================================== */
+
+
+/* ==============================================================
+   3.0 Tipografi — Inter font sistemi
+   ----------------------------------------------------------------
+   Inter, 2026 UI standardı (data-yoğun panel için ideal: küçük
+   boyutlarda okunur, tabular figures built-in, Türkçe karakter
+   tam destek). style.css'in 13px Roboto temelini 14px Inter ile
+   override eder.
+   ============================================================== */
+
+html[class*="headercolor"] body {
+    font-family: var(--font-sans);
+    font-size: var(--fs-14);
+    line-height: 1.5;
+    letter-spacing: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Inter alternatif rakam 1 (cv11) + tek-katlı g (ss03) */
+    font-feature-settings: "cv11", "ss03";
+}
+
+/* Bootstrap'in 'inherit'i kıramadığı yerler — açık override */
+html[class*="headercolor"] .navbar,
+html[class*="headercolor"] .card,
+html[class*="headercolor"] .btn,
+html[class*="headercolor"] .form-control,
+html[class*="headercolor"] .form-select,
+html[class*="headercolor"] .form-label,
+html[class*="headercolor"] .form-check-label,
+html[class*="headercolor"] .input-group-text,
+
+html[class*="headercolor"] .dropdown-item,
+html[class*="headercolor"] .offcanvas,
+html[class*="headercolor"] .modal,
+html[class*="headercolor"] .alert,
+html[class*="headercolor"] .breadcrumb,
+html[class*="headercolor"] .nav,
+html[class*="headercolor"] .pagination,
+html[class*="headercolor"] .badge,
+html[class*="headercolor"] .accordion,
+html[class*="headercolor"] .tooltip,
+html[class*="headercolor"] .popover,
+html[class*="headercolor"] .sidebar-wrapper,
+html[class*="headercolor"] .menu-title,
+html[class*="headercolor"] .menu-label,
+html[class*="headercolor"] table,
+html[class*="headercolor"] input,
+html[class*="headercolor"] select,
+html[class*="headercolor"] textarea,
+html[class*="headercolor"] button {
+    font-family: var(--font-sans);
+}
+
+/* Başlıklar — Inter'in tasarımı için sıkı letter-spacing */
+html[class*="headercolor"] h1,
+html[class*="headercolor"] h2,
+html[class*="headercolor"] h3,
+html[class*="headercolor"] h4,
+html[class*="headercolor"] h5,
+html[class*="headercolor"] h6 {
+    font-family: var(--font-sans);
+    color: var(--c-ink-900);
+    letter-spacing: -0.011em;
+    line-height: 1.3;
+}
+
+html[class*="headercolor"] h1 { font-size: var(--fs-28); font-weight: 600; }
+html[class*="headercolor"] h2 { font-size: var(--fs-24); font-weight: 600; }
+html[class*="headercolor"] h3 { font-size: var(--fs-20); font-weight: 600; }
+html[class*="headercolor"] h4 { font-size: var(--fs-18); font-weight: 500; }
+html[class*="headercolor"] h5 { font-size: var(--fs-16); font-weight: 500; }
+html[class*="headercolor"] h6 { font-size: var(--fs-14); font-weight: 500; }
+
+/* Card title — design system: 15px / 500 */
+html[class*="headercolor"] .card-title {
+    font-size: var(--fs-15);
+    font-weight: 500;
+    letter-spacing: -0.005em;
+}
+
+/* Form etiketi — 13px / 500 */
+html[class*="headercolor"] .form-label,
+html[class*="headercolor"] .form-check-label {
+    font-size: var(--fs-13);
+    font-weight: 500;
+}
+
+/* Sidebar menü öğeleri — daha modern hissetmesi için 14px / 500 */
+html[class*="headercolor"] .sidebar-wrapper .metismenu a {
+    font-size: var(--fs-14);
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+html[class*="headercolor"] .sidebar-wrapper .metismenu .menu-title {
+    font-weight: 500;
+    font-size: var(--fs-14);
+}
+
+/* Menü etiketi (İNSAN / İŞLEMLER / KURUMSAL / SİSTEM) — typografi'nin
+   doğal kullanımı: küçük caps + tracked. */
+html[class*="headercolor"] .menu-label,
+html[class*="headercolor"] .sidebar-wrapper .menu-label {
+    font-size: var(--fs-11);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 18px 14px 6px;
+}
+
+/* Logo wordmark (sol üst UDEF rozet) */
+html[class*="headercolor"] .sidebar-wrapper .logo-text {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* Üst bardaki kullanıcı adı vb. */
+html[class*="headercolor"] .top-header .user-name,
+html[class*="headercolor"] .top-header .navbar .nav-link {
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+/* Tablo — tabular figürler (sayı sütunları hizalı kalsın) */
+html[class*="headercolor"] .table,
+html[class*="headercolor"] .table td,
+html[class*="headercolor"] .table th,
+html[class*="headercolor"] .pagination,
+html[class*="headercolor"] .badge,
+html[class*="headercolor"] .notify-badge {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum", "cv11", "ss03";
+}
+
+html[class*="headercolor"] .table th {
+    font-weight: 600;
+    font-size: var(--fs-13);
+    letter-spacing: 0.01em;
+    text-transform: none;
+}
+
+/* Butonlar — Inter'in display ağırlıklarıyla buton metin daha kalın */
+html[class*="headercolor"] .btn {
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+html[class*="headercolor"] .btn-sm {
+    font-size: var(--fs-13);
+}
+
+/* Form input metni */
+html[class*="headercolor"] .form-control,
+html[class*="headercolor"] .form-select {
+    font-size: var(--fs-14);
+    letter-spacing: 0;
+}
+
+/* Code / mono blokları (varsa) */
+html[class*="headercolor"] code,
+html[class*="headercolor"] pre,
+html[class*="headercolor"] kbd,
+html[class*="headercolor"] samp,
+html[class*="headercolor"] .text-mono {
+    font-family: var(--font-mono);
+}
+
+
+/* ---- Genel: body / page ---------------------------------------- */
+html[class*="headercolor"] body {
+    background-color: var(--c-bg);
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .wrapper,
+html[class*="headercolor"] .page-content {
+    background-color: var(--c-bg);
+}
+
+html[class*="headercolor"] h1,
+html[class*="headercolor"] h2,
+html[class*="headercolor"] h3,
+html[class*="headercolor"] h4,
+html[class*="headercolor"] h5,
+html[class*="headercolor"] h6 {
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] p,
+html[class*="headercolor"] small,
+html[class*="headercolor"] label {
+    color: inherit;
+}
+
+html[class*="headercolor"] .text-secondary {
+    color: var(--c-ink-500);
+}
+
+html[class*="headercolor"] .text-muted {
+    color: var(--c-ink-500);
+}
+
+html[class*="headercolor"] .text-primary {
+    color: var(--c-primary);
+}
+
+html[class*="headercolor"] .bg-primary {
+    background-color: var(--c-primary);
+}
+
+html[class*="headercolor"] .border-primary {
+    border-color: var(--c-primary);
+}
+
+
+/* ---- Sidebar (menü) ------------------------------------------- */
+html[class*="headercolor"] .sidebar-wrapper,
+html[class*="headercolor"] .sidebar-wrapper .sidebar-header {
+    background-color: var(--c-sidebar-bg);
+    border-right-color: var(--c-sidebar-border);
+    border-bottom-color: var(--c-sidebar-border);
+}
+
+html[class*="headercolor"] .sidebar-wrapper .sidebar-header .logo-text {
+    color: var(--c-primary);
+}
+
+html[class*="headercolor"] .sidebar-wrapper .toggle-icon,
+html[class*="headercolor"] .sidebar-wrapper .sidebar-header > div:first-child > a > i {
+    color: var(--c-primary);
+}
+
+html[class*="headercolor"] .sidebar-wrapper .metismenu a {
+    color: var(--c-sidebar-text);
+}
+
+/* Menü ikonları — accent rengiyle.
+   column_left.twig'in inline `style="color:var(--c-primary, ...)"`
+   ile bizim CSS aynı sonucu verir; inline style daha spesifiktir,
+   bu yüzden template tarafında da CSS değişkeni kullanılmalıdır
+   (template güncellendi). */
+html[class*="headercolor"] .sidebar-wrapper .metismenu a .parent-icon i,
+html[class*="headercolor"] .sidebar-wrapper .metismenu a > i.bi {
+    color: var(--c-primary);
+}
+
+html[class*="headercolor"] .sidebar-wrapper .metismenu .mm-active > a,
+html[class*="headercolor"] .sidebar-wrapper .metismenu a:active,
+html[class*="headercolor"] .sidebar-wrapper .metismenu a:focus,
+html[class*="headercolor"] .sidebar-wrapper .metismenu a:hover {
+    color: var(--c-sidebar-text-active);
+    background-color: var(--c-sidebar-bg-active);
+}
+
+html[class*="headercolor"] .sidebar-wrapper .metismenu .mm-active > a .parent-icon i,
+html[class*="headercolor"] .sidebar-wrapper .metismenu a:hover .parent-icon i {
+    color: var(--c-sidebar-text-active);
+}
+
+html[class*="headercolor"] .sidebar-wrapper .menu-label {
+    color: var(--c-sidebar-label);
+}
+
+html[class*="headercolor"] .sidebar-wrapper .metismenu ul {
+    border-color: var(--c-sidebar-border);
+    background-color: transparent;
+}
+
+html[class*="headercolor"] .metismenu .has-arrow:after {
+    border-color: var(--c-sidebar-text-muted);
+}
+
+
+html[class*="headercolor"] .top-header {
+    position: relative;
+}
+
+html[class*="headercolor"] .top-header .navbar {
+    background-color: var(--c-header-bg);
+    border-bottom: 1px solid var(--c-header-border);
+    padding: 0 18px;
+    min-height: 60px;
+    box-shadow: none;
+}
+
+/* Alt 2px accent strip — tema seti'nin sürekli görünür izi */
+html[class*="headercolor"] .top-header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: linear-gradient(90deg,
+        var(--c-primary) 0%,
+        var(--c-primary-600) 50%,
+        var(--c-primary-700) 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+
+html[class*="headercolor"] .top-header .navbar .top-navbar .nav-link {
+    color: var(--c-ink-700);
+    font-weight: 500;
+    font-size: var(--fs-14);
+    text-transform: none;
+    letter-spacing: 0;
+    padding: 0 14px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    border-radius: 8px;
+    transition: background-color .15s, color .15s;
+}
+
+html[class*="headercolor"] .top-header .navbar .top-navbar .nav-link:hover {
+    color: var(--c-primary);
+    background-color: var(--c-primary-50);
+}
+
+/* Kullanıcı adı */
+html[class*="headercolor"] .top-header .navbar .user-name {
+    color: var(--c-ink-900);
+    font-weight: 500;
+    font-size: var(--fs-13);
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Mobil & ek toggle ikonları */
+html[class*="headercolor"] .top-header .navbar .mobile-toggle-icon,
+html[class*="headercolor"] .top-header .navbar .search-toggle-icon {
+    color: var(--c-ink-700);
+    background-color: transparent;
+    border: 1px solid transparent;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color .15s;
+}
+
+html[class*="headercolor"] .top-header .navbar .mobile-toggle-icon:hover,
+html[class*="headercolor"] .top-header .navbar .search-toggle-icon:hover {
+    background-color: var(--c-primary-50);
+    color: var(--c-primary);
+}
+
+/* --- Search bar — kompakt, integrated ----------------------- */
+html[class*="headercolor"] .top-header .navbar .searchbar {
+    max-width: 380px;
+    margin-left: auto;
+    margin-right: 8px;
+    position: relative;
+    height: 38px;       /* tüm header öğeleriyle aynı dikey eksen */
+    align-items: center;
+    /* Visual styling FORM'da (input transparent) — focus'taki transform
+       form'a uygulanır, içerideki icon ve / hint form ile beraber kayar,
+       stacking-context çakışması yok (önceden icon kayboluyordu). */
+    background-color: var(--c-bg-elev);
+    border: 1px solid var(--c-line);
+    border-radius: 10px;
+    transition:
+        background-color .18s cubic-bezier(.16, 1, .3, 1),
+        border-color    .18s cubic-bezier(.16, 1, .3, 1),
+        box-shadow      .2s cubic-bezier(.16, 1, .3, 1),
+        transform       .15s cubic-bezier(.16, 1.2, .3, 1);
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--c-ink-900) 8%, transparent),
+        0 1px 6px color-mix(in srgb, var(--c-ink-900) 4%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 35%, transparent);
+}
+
+html[class*="headercolor"] .top-header .navbar .searchbar:focus-within {
+    border-color: var(--c-primary);
+    transform: translateY(-1px);
+    box-shadow:
+        0 4px 12px color-mix(in srgb, var(--c-primary) 22%, transparent),
+        0 2px 4px color-mix(in srgb, var(--c-primary) 12%, transparent),
+        0 0 0 3px var(--c-primary-focus),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 40%, transparent);
+}
+
+
+/* --- Duyuru/bildirim dropdown searchbar — premium kompakt varyant ---
+   Bell icon dropdown (.dropdown-large) içindeki .dropdown-searchbar
+   header'daki ana searchbar'la aynı görsel dile sahip ama kompakt.
+   Lifted shadow + focus-within glow + clear button + mark highlight.
+   Universal :has() retrofit'i bu sınıfı atladığı için (605. satırın
+   üstündeki :not(.dropdown-searchbar) sayesinde) burada özel kuralları
+   tanımlıyoruz. */
+html[class*="headercolor"] .dropdown-searchbar {
+    position: relative;
+    background-color: var(--c-bg-elev);
+    border: 1px solid var(--c-line);
+    border-radius: 8px;
+    transition:
+        background-color .18s cubic-bezier(.16, 1, .3, 1),
+        border-color    .18s cubic-bezier(.16, 1, .3, 1),
+        box-shadow      .2s cubic-bezier(.16, 1, .3, 1),
+        transform       .15s cubic-bezier(.16, 1.2, .3, 1);
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--c-ink-900) 8%, transparent),
+        0 1px 4px color-mix(in srgb, var(--c-ink-900) 4%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 30%, transparent);
+}
+
+/* Focus state — kompakt dropdown için subtle. Eski tasarımdaki
+   header searchbar'ın 3 katmanlı mavi glow halkasını dropdown'a
+   uygulamak abartıydı; üstelik dropdown açılınca autofocus
+   tetikleniyor ve kullanıcı henüz typing yapmadan glow görüyordu
+   ("for no reason glowing" şikayeti). Şimdi sadece border'a subtle
+   primary tint + hafif inner shadow — etkileşim hissedilir ama
+   görsel olarak rahatsız etmez. */
+html[class*="headercolor"] .dropdown-searchbar:focus-within {
+    border-color: color-mix(in srgb, var(--c-primary) 40%, var(--c-line));
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--c-ink-900) 8%, transparent),
+        0 1px 4px color-mix(in srgb, var(--c-ink-900) 4%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 30%, transparent);
+}
+
+html[class*="headercolor"] .dropdown-searchbar .form-control {
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    padding: 6px 36px 6px 36px;       /* icon + clear button room */
+    height: 36px;
+    font-size: 13px;
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .dropdown-searchbar .form-control:focus {
+    box-shadow: none;
+    background-color: transparent;
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .dropdown-searchbar .form-control::placeholder {
+    color: var(--c-ink-500);
+    font-weight: 400;
+}
+
+html[class*="headercolor"] .dropdown-searchbar .search-icon {
+    color: var(--c-ink-500);
+    pointer-events: none;
+    z-index: 2;
+    transition: color .15s ease-out;
+}
+
+html[class*="headercolor"] .dropdown-searchbar:focus-within .search-icon {
+    color: var(--c-primary);
+}
+
+/* Clear (×) button — sadece input doluyken görünür */
+html[class*="headercolor"] .dropdown-searchbar .udef-search-clear {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: 0;
+    color: var(--c-ink-500);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: background-color .12s ease-out, color .12s ease-out;
+}
+
+html[class*="headercolor"] .dropdown-searchbar.has-value .udef-search-clear {
+    display: inline-flex;
+}
+
+html[class*="headercolor"] .dropdown-searchbar .udef-search-clear:hover {
+    background-color: var(--c-surface-2);
+    color: var(--c-ink-700);
+}
+
+html[class*="headercolor"] .dropdown-searchbar .udef-search-clear i {
+    font-size: 14px;
+}
+
+/* Match count chip — input'un altında, sağa yaslı */
+html[class*="headercolor"] .udef-search-meta {
+    display: none;
+    padding: 4px 10px 6px;
+    font-size: 11px;
+    color: var(--c-ink-500);
+    border-bottom: 1px dashed var(--c-line);
+    margin-bottom: 4px;
+}
+
+html[class*="headercolor"] .udef-search-meta.show {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+html[class*="headercolor"] .udef-search-meta strong {
+    color: var(--c-primary);
+    font-weight: 600;
+}
+
+/* Highlight — eşleşen substring üzerine sarı vurgu */
+html[class*="headercolor"] .header-message-list mark.udef-search-hl {
+    background-color: color-mix(in srgb, var(--c-warning, #b9802b) 30%, transparent);
+    color: inherit;
+    padding: 0 2px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+/* Empty state — hiç eşleşme yoksa */
+html[class*="headercolor"] .header-message-list .udef-search-empty {
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--c-ink-500);
+    font-size: 13px;
+}
+
+html[class*="headercolor"] .header-message-list .udef-search-empty i {
+    display: block;
+    font-size: 24px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+
+/* ----------------------------------------------------------------
+   Universal list filter retrofit — JS herhangi bir list sayfasının
+   filter row'unu algılar ve secondary filter col'larını gizler.
+   .udef-filter-row → marker, primary search dışındaki col'lar default
+   gizli, .is-expanded class'ı eklenince hepsi görünür. customer_list
+   gibi elle konsolide edilmiş template'lerde (.udef-filter-section
+   marker'ı varsa) bu retrofit devreye girmez. */
+.udef-filter-row .udef-filter-col-secondary {
+    display: none;
+}
+
+.udef-filter-row.is-expanded .udef-filter-col-secondary {
+    display: block;
+    animation: udef-filter-fade-in .2s ease-out;
+}
+
+@keyframes udef-filter-fade-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.udef-filters-toggle {
+    white-space: nowrap;
+}
+
+.udef-filters-toggle .udef-filter-count {
+    font-size: 11px;
+    padding: 2px 6px;
+}
+
+
+/* ----------------------------------------------------------------
+   Quick-filter strip (.udef-quick-filter) — ana filter row'un üstüne
+   yerleştirilen ufak "hızlı süzgeç" çubuğu. Pill button group + label. */
+html[class*="headercolor"] .udef-quick-filter {
+    padding: 0;
+    margin-top: -4px;
+}
+
+html[class*="headercolor"] .udef-quick-filter > span {
+    color: var(--c-ink-500);
+    font-size: var(--fs-13);
+    letter-spacing: 0.01em;
+}
+
+html[class*="headercolor"] .udef-quick-filter .btn-group-sm .btn {
+    padding: 4px 12px;
+    font-size: var(--fs-13);
+    font-weight: 500;
+}
+
+
+/* ----------------------------------------------------------------
+   UNIVERSAL search bar — Skodash'ın .search-icon overlay pattern'i
+   site genelinde 20+ template'de kullanılıyor (customer_list,
+   bagisci_list, basvuru_list, mezun_list, anket_list vb.). CSS :has()
+   ile wrapper'ı auto-detect edip header search'ın premium hissini
+   uygula. Template'lere dokunmadan tek kuralla hepsi tek seferde
+   stillenmiş olur.
+
+   Pattern:
+     <div class="...position-relative...">
+       <div class="search-icon position-absolute ..."><i class="bi bi-search"></i></div>
+       <input class="form-control ...">
+     </div>
+
+   Header (.searchbar) ve dropdown (.dropdown-searchbar) ayrı tutuldu
+   çünkü kendi özelleştirmeleri var.
+   ---------------------------------------------------------------- */
+
+html[class*="headercolor"] *:has(> .search-icon):not(.searchbar):not(.dropdown-searchbar) {
+    background-color: var(--c-bg-elev);
+    border: 1px solid var(--c-line);
+    border-radius: 10px;
+    transition:
+        background-color .18s cubic-bezier(.16, 1, .3, 1),
+        border-color    .18s cubic-bezier(.16, 1, .3, 1),
+        box-shadow      .2s cubic-bezier(.16, 1, .3, 1),
+        transform       .15s cubic-bezier(.16, 1.2, .3, 1);
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--c-ink-900) 8%, transparent),
+        0 1px 6px color-mix(in srgb, var(--c-ink-900) 4%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 35%, transparent);
+}
+
+html[class*="headercolor"] *:has(> .search-icon):not(.searchbar):not(.dropdown-searchbar):focus-within {
+    border-color: var(--c-primary);
+    transform: translateY(-1px);
+    box-shadow:
+        0 4px 12px color-mix(in srgb, var(--c-primary) 22%, transparent),
+        0 2px 4px color-mix(in srgb, var(--c-primary) 12%, transparent),
+        0 0 0 3px var(--c-primary-focus),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 40%, transparent);
+}
+
+html[class*="headercolor"] *:has(> .search-icon):not(.searchbar):not(.dropdown-searchbar) > .form-control {
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+html[class*="headercolor"] *:has(> .search-icon):not(.searchbar):not(.dropdown-searchbar) > .form-control:focus {
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    outline: 0;
+    transform: none;
+}
+
+html[class*="headercolor"] .btn-group-vertical {
+    display: inline-flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: visible;
+}
+
+html[class*="headercolor"] .btn-group-vertical > .btn:first-child:not(:last-child) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+html[class*="headercolor"] .btn-group-vertical > .btn:last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+}
+
+html[class*="headercolor"] .btn-group-vertical > .btn:not(:first-child):not(:last-child) {
+    border-radius: 0;
+    border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+}
+
+html[class*="headercolor"] .btn-group-text,
+html[class*="headercolor"] .input-group > .btn-group-text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background-color: var(--c-surface-2);
+    border: 1px solid var(--c-line);
+    color: var(--c-ink-700);
+    font-size: var(--fs-14);
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+html[class*="headercolor"] .btn-group-text:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+html[class*="headercolor"] .btn-group-text:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+html[class*="headercolor"] .btn-group-text:not(:first-child) {
+    border-left: 0;
+}
+
+html[class*="headercolor"] .btn-group-text:not(:last-child) {
+    border-right: 0;
+}
+
+html[class*="headercolor"] .btn-group-text i,
+html[class*="headercolor"] .btn-group-text svg {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+html[class*="headercolor"] .btn-group-separator {
+    align-self: stretch;
+    background-color: color-mix(in srgb, currentColor 16%, transparent);
+    flex-shrink: 0;
+    margin: 0;
+    width: 1px;
+    min-height: 100%;
+}
+
+html[class*="headercolor"] .btn-group-vertical > .btn-group-separator,
+html[class*="headercolor"] .btn-group-separator[data-orientation="horizontal"] {
+    width: auto;
+    height: 1px;
+    min-height: 0;
+    min-width: 100%;
+}
+
+html[class*="headercolor"] .btn-group > .btn-outline-primary:not(:first-child) {
+    border-left: 1px solid var(--c-primary);
+}
+
+html[class*="headercolor"] .btn-group .btn-outline-primary.active,
+html[class*="headercolor"] .btn-group .btn-outline-primary:active {
+    background-color: var(--c-primary);
+    color: #ffffff;
+    border-color: var(--c-primary);
+}
+
+html[class*="headercolor"] .btn-group {
+    display: inline-flex;
+    border-radius: 8px;
+    overflow: visible;
+}
+
+html[class*="headercolor"] .btn-group > .btn:first-child:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+html[class*="headercolor"] .btn-group > .btn:last-child:not(:first-child),
+html[class*="headercolor"] .btn-group > .dropdown-toggle-split {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 1px solid color-mix(in srgb, #ffffff 22%, transparent);
+}
+
+html[class*="headercolor"] .btn-group > .dropdown-toggle-split {
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: 600;
+}
+
+html[class*="headercolor"] .btn-group > .dropdown-toggle-split.show,
+html[class*="headercolor"] .btn-group > .dropdown-toggle-split[aria-expanded="true"] {
+    background-color: var(--c-primary-700);
+    border-color: var(--c-primary-700);
+}
+
+html[class*="headercolor"] .btn-group.udef-pill-group {
+    gap: 6px;
+}
+
+html[class*="headercolor"] .btn-group.udef-pill-group > .btn,
+html[class*="headercolor"] .btn-group.udef-pill-group > .btn:first-child:not(:last-child),
+html[class*="headercolor"] .btn-group.udef-pill-group > .btn:last-child:not(:first-child),
+html[class*="headercolor"] .btn-group.udef-pill-group > .btn:not(:first-child):not(:last-child) {
+    border-radius: 8px;
+}
+
+.udef-counter {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum", "cv11", "ss03";
+    line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* Hareket kısıtlı tercih edilince: doğrudan final değeri göster,
+       animasyon yapma. JS bu media query'i feature-detect ile kontrol
+       ediyor. */
+}
+
+
+body.udef-debug-header .top-header .navbar > *,
+body.udef-debug-header .top-header .navbar .top-navbar > *,
+body.udef-debug-header .top-header .navbar .top-navbar-right > *,
+body.udef-debug-header .top-header .navbar .navbar-nav > li,
+body.udef-debug-header .top-header .navbar .navbar-nav > a,
+body.udef-debug-header .top-header .navbar .navbar-nav > li > a,
+body.udef-debug-header .top-header .navbar .messages,
+body.udef-debug-header .top-header .navbar .projects,
+body.udef-debug-header .top-header .navbar .user-setting {
+    outline: 1px dashed rgba(255, 0, 0, 0.7) !important;
+    outline-offset: 0;
+}
+
+body.udef-debug-header .top-header .navbar > *::before {
+    content: attr(class);
+    position: absolute;
+    bottom: -14px;
+    left: 0;
+    font: 9px/1 monospace;
+    color: red;
+    background: white;
+    padding: 1px 3px;
+    z-index: 999;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+html[class*="headercolor"] .top-header .navbar .searchbar .form-control {
+    background-color: transparent;
+    border: 0;
+    color: var(--c-ink-900);
+    border-radius: 10px;
+    padding: 8px 56px 8px 38px; 
+    font-size: var(--fs-14);
+    height: 36px;
+    box-shadow: none;
+}
+
+html[class*="headercolor"] .top-header .navbar .searchbar .form-control::placeholder {
+    color: var(--c-ink-500);
+    font-weight: 400;
+}
+
+html[class*="headercolor"] .top-header .navbar .searchbar .form-control:focus {
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    outline: 0;
+    transform: none;   /* transform .searchbar'da (form), input'ta değil */
+}
+
+
+.udef-search-shortcut {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    pointer-events: none;
+    transition: opacity .18s ease-out;
+}
+
+.udef-search-shortcut kbd {
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-line);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--c-ink-700);
+    line-height: 1.4;
+    font-weight: 500;
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--c-ink-900) 6%, transparent);
+}
+
+/* Input focus aldığında veya değer varsa hint kaybolur */
+html[class*="headercolor"] .top-header .navbar .searchbar:focus-within .udef-search-shortcut {
+    opacity: 0;
+}
+
+html[class*="headercolor"] .top-header .navbar .searchbar .search-icon {
+    pointer-events: none;
+}
+
+html[class*="headercolor"] .top-header .navbar .searchbar .search-icon i {
+    color: var(--c-ink-500);
+    font-size: 15px;
+}
+
+
+html[class*="headercolor"] .top-header .navbar .button-setting,
+html[class*="headercolor"] .top-header .navbar .nav-item.dropdown > .nav-link.dropdown-toggle:not(.user-setting *):not(.user-name *) {
+    padding: 0;
+}
+
+html[class*="headercolor"] .top-header .navbar .messages,
+html[class*="headercolor"] .top-header .navbar .projects,
+html[class*="headercolor"] .top-header .navbar .notifications {
+    background-color: var(--c-bg-elev);
+    border: 1px solid var(--c-line);
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 0 3px;
+    padding: 0;
+    transition:
+        background-color .18s cubic-bezier(.16, 1, .3, 1),
+        border-color   .18s cubic-bezier(.16, 1, .3, 1),
+        color          .15s,
+        box-shadow     .2s cubic-bezier(.16, 1, .3, 1),
+        transform      .15s cubic-bezier(.16, 1.2, .3, 1);
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--c-ink-900) 8%, transparent),
+        0 1px 6px color-mix(in srgb, var(--c-ink-900) 4%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 35%, transparent);
+}
+
+
+html[class*="headercolor"] .top-header .navbar .messages > i,
+html[class*="headercolor"] .top-header .navbar .projects > i,
+html[class*="headercolor"] .top-header .navbar .notifications > i {
+    color: var(--c-ink-700);
+    font-size: 17px;
+    margin: 0;
+    line-height: 1;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+html[class*="headercolor"] .top-header .navbar .nav-link:hover .messages,
+html[class*="headercolor"] .top-header .navbar .nav-link:hover .projects,
+html[class*="headercolor"] .top-header .navbar .nav-link:hover .notifications,
+html[class*="headercolor"] .top-header .navbar .button-setting:hover .messages {
+    background-color: var(--c-primary-50);
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    transform: translateY(-1px);
+    box-shadow:
+        0 4px 10px color-mix(in srgb, var(--c-primary) 22%, transparent),
+        0 2px 4px color-mix(in srgb, var(--c-primary) 12%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 40%, transparent);
+}
+
+/* Active/pressed durum — basınç ile aşağı iner */
+html[class*="headercolor"] .top-header .navbar .nav-link:active .messages,
+html[class*="headercolor"] .top-header .navbar .nav-link:active .projects,
+html[class*="headercolor"] .top-header .navbar .nav-link:active .notifications,
+html[class*="headercolor"] .top-header .navbar .button-setting:active .messages {
+    background-color: var(--c-primary-100);
+    transform: scale(0.96) translateY(0);
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--c-primary) 14%, transparent),
+        inset 0 1px 2px color-mix(in srgb, var(--c-primary) 12%, transparent);
+}
+
+html[class*="headercolor"] .top-header .navbar .nav-link:hover .messages i,
+html[class*="headercolor"] .top-header .navbar .nav-link:hover .projects i,
+html[class*="headercolor"] .top-header .navbar .nav-link:hover .notifications i,
+html[class*="headercolor"] .top-header .navbar .button-setting:hover .messages i {
+    color: var(--c-primary);
+}
+
+html[class*="headercolor"] .top-header .navbar .notify-badge {
+    background-color: var(--c-primary);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 600;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    line-height: 14px;
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    border: 2px solid var(--c-header-bg);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--c-primary) 30%, transparent);
+    letter-spacing: 0;
+}
+
+html[class*="headercolor"] .top-header .navbar .user-setting {
+    background-color: var(--c-bg-elev);
+    border: 1px solid var(--c-line);
+    border-radius: 999px;
+    padding: 3px 14px 3px 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 4px;
+    height: 38px;
+    box-sizing: border-box;
+    line-height: 1;
+    transition:
+        background-color .18s cubic-bezier(.16, 1, .3, 1),
+        border-color   .18s cubic-bezier(.16, 1, .3, 1),
+        color          .15s,
+        box-shadow     .2s cubic-bezier(.16, 1, .3, 1),
+        transform      .15s cubic-bezier(.16, 1.2, .3, 1);
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--c-ink-900) 8%, transparent),
+        0 1px 6px color-mix(in srgb, var(--c-ink-900) 4%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 35%, transparent);
+}
+
+html[class*="headercolor"] .top-header .navbar .nav-link:hover .user-setting,
+html[class*="headercolor"] .top-header .navbar .user-setting:hover {
+    background-color: var(--c-primary-50);
+    border-color: var(--c-primary);
+    transform: translateY(-1px);
+    box-shadow:
+        0 4px 10px color-mix(in srgb, var(--c-primary) 22%, transparent),
+        0 2px 4px color-mix(in srgb, var(--c-primary) 12%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #ffffff 40%, transparent);
+}
+
+html[class*="headercolor"] .top-header .navbar .nav-link:active .user-setting,
+html[class*="headercolor"] .top-header .navbar .user-setting:active {
+    background-color: var(--c-primary-100);
+    transform: scale(0.97) translateY(0);
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--c-primary) 14%, transparent),
+        inset 0 1px 2px color-mix(in srgb, var(--c-primary) 12%, transparent);
+}
+
+html[class*="headercolor"] .top-header .navbar .user-setting img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+html[class*="headercolor"] .top-header .navbar .dropdown-toggle-nocaret::after {
+    display: none;
+}
+
+/* Navbar dropdown menüleri (zil, apps, user) header bg'yle uyumlu */
+html[class*="headercolor"] .top-header .navbar .dropdown-menu {
+    margin-top: 8px;
+    border-radius: 12px;
+    border: 1px solid var(--c-line);
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--c-ink-900) 16%, transparent);
+}
+
+/* Bildirim dropdown başlığı */
+html[class*="headercolor"] .top-header .navbar .dropdown-menu .h5 {
+    color: var(--c-ink-900);
+    font-size: var(--fs-15);
+    font-weight: 600;
+}
+
+/* Bildirim listesinin hover'i */
+html[class*="headercolor"] .top-header .navbar .header-message-list .dropdown-item:hover {
+    background-color: var(--c-primary-50);
+}
+
+
+html[class*="headercolor"] .card {
+    background-color: var(--c-surface);
+    border-color: var(--c-line);
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .card .card-header {
+    background-color: transparent;
+    border-bottom-color: var(--c-line);
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .card .card-title {
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .card .text-secondary {
+    color: var(--c-ink-500);
+}
+
+html[class*="headercolor"] main.page-content .card.radius-10 {
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-line);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--c-ink-900) 5%, transparent);
+    transition:
+        border-color .18s cubic-bezier(.16, 1, .3, 1),
+        box-shadow  .2s  cubic-bezier(.16, 1, .3, 1),
+        transform   .18s cubic-bezier(.16, 1.2, .3, 1);
+}
+
+html[class*="headercolor"] main.page-content .card.radius-10:hover {
+    border-color: color-mix(in srgb, var(--c-primary) 22%, var(--c-line));
+    box-shadow:
+        0 10px 28px color-mix(in srgb, var(--c-ink-900) 9%, transparent),
+        0 2px 6px  color-mix(in srgb, var(--c-ink-900) 5%, transparent);
+    transform: translateY(-2px);
+}
+
+/* KPI card-body — biraz daha generous padding */
+html[class*="headercolor"] main.page-content .card.radius-10:has(.widget-icon-large) .card-body {
+    padding: 18px 20px 14px;
+}
+
+
+html[class*="headercolor"] main.page-content .card.radius-10 .udef-counter {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--c-ink-900);
+    font-variant-numeric: tabular-nums;
+}
+
+
+html[class*="headercolor"] main.page-content .card.radius-10:has(.widget-icon-large) .card-body > .d-flex > div:first-child > .text-secondary:first-child {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-ink-500);
+    margin-bottom: 4px !important;
+}
+
+/* Delta line (font-13) — pill badge, success/danger soft tint */
+html[class*="headercolor"] main.page-content .card.radius-10 .font-13 {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 4px !important;
+    line-height: 1.4;
+}
+
+html[class*="headercolor"] main.page-content .card.radius-10 .font-13 i {
+    font-size: 11px;
+}
+
+html[class*="headercolor"] main.page-content .card.radius-10 .font-13.text-success {
+    background-color: color-mix(in srgb, #16a34a 14%, var(--c-surface));
+    color: #16a34a;
+}
+
+html[class*="headercolor"] main.page-content .card.radius-10 .font-13.text-danger {
+    background-color: color-mix(in srgb, #dc3545 14%, var(--c-surface));
+    color: #dc3545;
+}
+
+/* Widget icon large — tinted-icon style override */
+html[class*="headercolor"] .widget-icon-large {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--c-primary) 14%, var(--c-surface));
+    color: var(--c-primary);
+    transition: transform .2s cubic-bezier(.16, 1.2, .3, 1), box-shadow .2s;
+    box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--c-ink-900) 6%, transparent);
+}
+
+html[class*="headercolor"] main.page-content .card.radius-10:hover .widget-icon-large {
+    transform: scale(1.05) rotate(-2deg);
+}
+
+/* Per-color KPI icon variants — Bootstrap bg-gradient-* override edilir.
+   Apps grid ile aynı color palette ve aynı tint formülü (%14 brand over surface). */
+html[class*="headercolor"] .widget-icon-large.bg-gradient-purple {
+    background: color-mix(in srgb, #7c3aed 14%, var(--c-surface)) !important;
+    color: #7c3aed !important;
+}
+html[class*="headercolor"] main.page-content .card.radius-10:hover .widget-icon-large.bg-gradient-purple {
+    box-shadow: 0 8px 22px color-mix(in srgb, #7c3aed 26%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--c-ink-900) 6%, transparent);
+}
+
+html[class*="headercolor"] .widget-icon-large.bg-gradient-success {
+    background: color-mix(in srgb, #16a34a 14%, var(--c-surface)) !important;
+    color: #16a34a !important;
+}
+html[class*="headercolor"] main.page-content .card.radius-10:hover .widget-icon-large.bg-gradient-success {
+    box-shadow: 0 8px 22px color-mix(in srgb, #16a34a 26%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--c-ink-900) 6%, transparent);
+}
+
+html[class*="headercolor"] .widget-icon-large.bg-gradient-danger {
+    background: color-mix(in srgb, #dc3545 14%, var(--c-surface)) !important;
+    color: #dc3545 !important;
+}
+html[class*="headercolor"] main.page-content .card.radius-10:hover .widget-icon-large.bg-gradient-danger {
+    box-shadow: 0 8px 22px color-mix(in srgb, #dc3545 26%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--c-ink-900) 6%, transparent);
+}
+
+html[class*="headercolor"] .widget-icon-large.bg-gradient-info {
+    background: color-mix(in srgb, #0891b2 14%, var(--c-surface)) !important;
+    color: #0891b2 !important;
+}
+html[class*="headercolor"] main.page-content .card.radius-10:hover .widget-icon-large.bg-gradient-info {
+    box-shadow: 0 8px 22px color-mix(in srgb, #0891b2 26%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--c-ink-900) 6%, transparent);
+}
+
+/* Bootstrap bg-gradient utility default'unu temizle — tinted bg ile çakışır */
+html[class*="headercolor"] .widget-icon-large.bg-gradient {
+    background-image: none !important;
+}
+
+/* Bootstrap text-white utility'sini KPI icon'da kaldır (artık brand color icon var) */
+html[class*="headercolor"] main.page-content .widget-icon-large.text-white {
+    color: inherit;
+}
+
+/* Sparkline — kartın alt kenarına yapışacak şekilde bleed et,
+   görsel olarak kartın bir parçası olur, ayrı bir blok gibi durmaz */
+html[class*="headercolor"] main.page-content .card.radius-10 .kpi-sparkline {
+    margin-left: -20px;
+    margin-right: -20px;
+    margin-bottom: -14px;
+    margin-top: 10px;
+    opacity: 0.85;
+    transition: opacity .2s;
+}
+
+html[class*="headercolor"] main.page-content .card.radius-10:hover .kpi-sparkline {
+    opacity: 1;
+}
+
+html[class*="headercolor"] #dernekler-data .card.radius-10,
+html[class*="headercolor"] #basvuru-data .card.radius-10,
+html[class*="headercolor"] #etkinlik-data .card.radius-10 {
+    overflow: hidden; /* rounded corners follow the footer/table cleanly */
+}
+
+/* Card header — daha generous padding + alt çizgi */
+html[class*="headercolor"] #dernekler-data .card-header,
+html[class*="headercolor"] #basvuru-data .card-header,
+html[class*="headercolor"] #etkinlik-data .card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--c-line);
+}
+
+html[class*="headercolor"] #dernekler-data .card-header h6,
+html[class*="headercolor"] #basvuru-data .card-header h6,
+html[class*="headercolor"] #etkinlik-data .card-header h6 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    color: var(--c-ink-900);
+}
+
+/* Card body — p-0 kalır (table edge-to-edge) ama cell padding ile breathability */
+html[class*="headercolor"] #dernekler-data .card-body,
+html[class*="headercolor"] #basvuru-data .card-body,
+html[class*="headercolor"] #etkinlik-data .card-body {
+    padding: 0;
+}
+
+/* Table cell padding — 5px değil 10px 18px (yan boşluklar büyütüldü) */
+html[class*="headercolor"] #dernekler-data .table tbody td,
+html[class*="headercolor"] #basvuru-data .table tbody td,
+html[class*="headercolor"] #etkinlik-data .table tbody td {
+    padding: 11px 18px;
+    border-color: var(--c-line);
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+/* First column (bölge/şube ismi) — başlık vurgusu */
+html[class*="headercolor"] #dernekler-data .table tbody td:first-child,
+html[class*="headercolor"] #basvuru-data .table tbody td:first-child,
+html[class*="headercolor"] #etkinlik-data .table tbody td:first-child {
+    color: var(--c-ink-900);
+    font-weight: 500;
+    letter-spacing: -0.005em;
+}
+
+/* Son sütun (toplam değer) — bold + tabular nums + primary'ye eğilim */
+html[class*="headercolor"] #dernekler-data .table tbody td:last-child,
+html[class*="headercolor"] #basvuru-data .table tbody td:last-child,
+html[class*="headercolor"] #etkinlik-data .table tbody td:last-child {
+    color: var(--c-ink-900);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+}
+
+
+html[class*="headercolor"] #dernekler-data .table tbody td:not(:first-child):not(:last-child),
+html[class*="headercolor"] #basvuru-data .table tbody td:not(:first-child):not(:last-child),
+html[class*="headercolor"] #etkinlik-data .table tbody td:not(:first-child):not(:last-child) {
+    color: color-mix(in srgb, var(--c-ink-500) 50%, var(--c-ink-300));
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+}
+
+
+html[class*="headercolor"] #dernekler-data .table tbody tr,
+html[class*="headercolor"] #basvuru-data .table tbody tr,
+html[class*="headercolor"] #etkinlik-data .table tbody tr {
+    transition: background-color .12s ease-out;
+}
+
+html[class*="headercolor"] #dernekler-data .table tbody tr:hover,
+html[class*="headercolor"] #basvuru-data .table tbody tr:hover,
+html[class*="headercolor"] #etkinlik-data .table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--c-primary) 5%, var(--c-surface));
+}
+
+/* Card footer — tinted bg + generous padding */
+html[class*="headercolor"] #dernekler-data .card-footer,
+html[class*="headercolor"] #basvuru-data .card-footer,
+html[class*="headercolor"] #etkinlik-data .card-footer {
+    padding: 12px 18px;
+    border-top: 1px solid var(--c-line);
+    background-color: color-mix(in srgb, var(--c-primary) 4%, var(--c-surface));
+}
+
+html[class*="headercolor"] #dernekler-data .card-footer strong,
+html[class*="headercolor"] #basvuru-data .card-footer strong,
+html[class*="headercolor"] #etkinlik-data .card-footer strong {
+    color: var(--c-ink-900);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+}
+
+
+/* ---- Butonlar (accent) ---------------------------------------- */
+html[class*="headercolor"] .btn-primary {
+    background-color: var(--c-primary);
+    border-color: var(--c-primary);
+    color: #ffffff;
+}
+
+html[class*="headercolor"] .btn-primary:hover,
+html[class*="headercolor"] .btn-primary:focus,
+html[class*="headercolor"] .btn-primary:active,
+html[class*="headercolor"] .btn-primary.active {
+    background-color: var(--c-primary-600);
+    border-color: var(--c-primary-600);
+    color: #ffffff;
+}
+
+html[class*="headercolor"] .btn-outline-primary {
+    color: var(--c-primary);
+    border-color: var(--c-primary);
+    background-color: transparent;
+}
+
+html[class*="headercolor"] .btn-outline-primary:hover,
+html[class*="headercolor"] .btn-outline-primary:active {
+    background-color: var(--c-primary);
+    color: #ffffff;
+}
+
+html[class*="headercolor"] .btn-info {
+    background-color: var(--c-primary);
+    border-color: var(--c-primary);
+    color: #ffffff;
+}
+
+html[class*="headercolor"] .btn-outline-info {
+    color: var(--c-primary);
+    border-color: var(--c-primary);
+    background-color: transparent;
+}
+
+html[class*="headercolor"] .btn-outline-info:hover,
+html[class*="headercolor"] .btn-outline-info:active,
+html[class*="headercolor"] .btn-outline-info.active {
+    background-color: var(--c-primary);
+    color: #ffffff;
+}
+
+html[class*="headercolor"] .btn-light {
+    background-color: var(--c-surface-2);
+    border-color: var(--c-line);
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .btn-light:hover {
+    background-color: var(--c-line-soft);
+}
+
+
+/* ---- Bağlantılar --------------------------------------------- */
+html[class*="headercolor"] a {
+    color: var(--c-primary);
+}
+
+html[class*="headercolor"] a:hover {
+    color: var(--c-primary-600);
+}
+
+/* Sidebar bağlantıları link rengi miras almasın */
+html[class*="headercolor"] .sidebar-wrapper a {
+    color: inherit;
+}
+
+
+/* ---- Tablolar ------------------------------------------------- */
+html[class*="headercolor"] .table {
+    color: var(--c-ink-900);
+    border-color: var(--c-line);
+}
+
+html[class*="headercolor"] .table thead th,
+html[class*="headercolor"] .table .table-light th {
+    background-color: var(--c-surface-2);
+    color: var(--c-ink-700);
+    border-bottom-color: var(--c-line);
+}
+
+html[class*="headercolor"] .table > :not(caption) > * > * {
+    border-bottom-color: var(--c-line-soft);
+    background-color: transparent;
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: var(--c-surface-2);
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .table-hover > tbody > tr:hover > * {
+    background-color: var(--c-primary-50);
+    color: var(--c-ink-900);
+}
+
+
+/* ---- Formlar -------------------------------------------------- */
+html[class*="headercolor"] .form-control,
+html[class*="headercolor"] .form-select {
+    background-color: var(--c-input-bg);
+    border-color: var(--c-input-border);
+    color: var(--c-input-text);
+}
+
+html[class*="headercolor"] .form-control::placeholder {
+    color: var(--c-input-placeholder);
+}
+
+html[class*="headercolor"] .form-control:focus,
+html[class*="headercolor"] .form-select:focus {
+    background-color: var(--c-input-bg);
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 0.2rem var(--c-primary-focus);
+    color: var(--c-input-text);
+}
+
+html[class*="headercolor"] .form-label {
+    color: var(--c-ink-700);
+}
+
+html[class*="headercolor"] .form-check-input:checked {
+    background-color: var(--c-primary);
+    border-color: var(--c-primary);
+}
+
+html[class*="headercolor"] .form-check-input:focus {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 0.2rem var(--c-primary-focus);
+}
+
+html[class*="headercolor"] .form-check-label {
+    color: var(--c-ink-700);
+}
+
+html[class*="headercolor"] .form-switch .form-check-input:checked {
+    background-color: var(--c-primary);
+}
+
+html[class*="headercolor"] .input-group-text {
+    background-color: var(--c-surface-2);
+    border-color: var(--c-input-border);
+    color: var(--c-ink-700);
+}
+
+
+
+
+html[class*="headercolor"] .dropdown-item {
+    color: var(--c-ink-700);
+}
+
+html[class*="headercolor"] .dropdown-item:hover,
+html[class*="headercolor"] .dropdown-item:focus {
+    background-color: var(--c-primary-50);
+    color: var(--c-primary);
+}
+
+html[class*="headercolor"] .dropdown-divider {
+    border-top-color: var(--c-line);
+}
+
+
+/* ---- Offcanvas (ayarlar paneli) ------------------------------- */
+html[class*="headercolor"] .offcanvas {
+    background-color: var(--c-surface);
+    color: var(--c-ink-900);
+    border-color: var(--c-line);
+}
+
+html[class*="headercolor"] .offcanvas-header {
+    border-bottom-color: var(--c-line);
+}
+
+html[class*="headercolor"] .offcanvas-title,
+html[class*="headercolor"] .offcanvas-body h5,
+html[class*="headercolor"] .offcanvas-body h6 {
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .offcanvas-body .form-check-label {
+    color: var(--c-ink-700);
+}
+
+html[class*="headercolor"] hr {
+    border-color: var(--c-line);
+    opacity: 1;
+}
+
+
+/* ---- Modal (popup) ------------------------------------------- */
+html[class*="headercolor"] .modal-content {
+    background-color: var(--c-surface);
+    color: var(--c-ink-900);
+    border-color: var(--c-line);
+}
+
+html[class*="headercolor"] .modal-header {
+    border-bottom-color: var(--c-line);
+}
+
+html[class*="headercolor"] .modal-footer {
+    border-top-color: var(--c-line);
+}
+
+html[class*="headercolor"] .modal .list-group-item {
+    background-color: var(--c-surface);
+    border-color: var(--c-line);
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .modal .list-group-item.bg-primary {
+    background-color: var(--c-primary);
+    color: #fff;
+}
+
+/* Koyu modda btn-close ikonu görünür kalsın (Bootstrap'in
+   varsayılan close ikonu siyah PNG). */
+html.dark-theme .btn-close {
+    filter: invert(1) grayscale(100%) brightness(2);
+}
+
+
+/* ---- Accordion (form bölümleri) ------------------------------ */
+html[class*="headercolor"] .accordion-item {
+    background-color: var(--c-surface);
+    border-color: var(--c-line);
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .accordion-button {
+    background-color: var(--c-surface);
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .accordion-button:not(.collapsed) {
+    background-color: var(--c-primary-50);
+    color: var(--c-primary);
+    box-shadow: inset 0 -1px 0 var(--c-line);
+}
+
+html[class*="headercolor"] .accordion-button:focus {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 0.2rem var(--c-primary-focus);
+}
+
+html[class*="headercolor"] .accordion-body {
+    background-color: var(--c-surface);
+    color: var(--c-ink-900);
+}
+
+
+/* ---- Tabs / pills -------------------------------------------- */
+html[class*="headercolor"] .nav-tabs {
+    border-bottom-color: var(--c-line);
+}
+
+html[class*="headercolor"] .nav-tabs .nav-link {
+    color: var(--c-ink-700);
+    border-color: transparent;
+}
+
+html[class*="headercolor"] .nav-tabs .nav-link.active {
+    color: var(--c-primary);
+    background-color: var(--c-surface);
+    border-color: var(--c-line) var(--c-line) var(--c-surface);
+}
+
+html[class*="headercolor"] .nav-pills .nav-link {
+    color: var(--c-ink-700);
+}
+
+html[class*="headercolor"] .nav-pills .nav-link.active {
+    background-color: var(--c-primary);
+    color: #fff;
+}
+
+
+/* ---- Pagination ---------------------------------------------- */
+html[class*="headercolor"] .pagination .page-link {
+    background-color: var(--c-surface);
+    border-color: var(--c-line);
+    color: var(--c-primary);
+}
+
+html[class*="headercolor"] .pagination .page-item.active .page-link {
+    background-color: var(--c-primary);
+    border-color: var(--c-primary);
+    color: #fff;
+}
+
+html[class*="headercolor"] .pagination .page-link:hover {
+    background-color: var(--c-primary-50);
+    color: var(--c-primary);
+}
+
+html[class*="headercolor"] .pagination .page-item.disabled .page-link {
+    color: var(--c-ink-300);
+    background-color: var(--c-surface);
+    border-color: var(--c-line);
+}
+
+
+/* ---- Badge ---------------------------------------------------- */
+html[class*="headercolor"] .badge.bg-primary {
+    background-color: var(--c-primary);
+}
+
+
+/* ---- Alert (genel + accent) ---------------------------------- */
+html[class*="headercolor"] .alert {
+    border-color: var(--c-line);
+    color: var(--c-ink-900);
+    background-color: var(--c-surface);
+}
+
+html[class*="headercolor"] .alert.alert-primary {
+    background-color: var(--c-primary-50);
+    border-color: var(--c-primary-soft);
+    color: var(--c-primary-700);
+}
+
+
+/* ---- Breadcrumb ---------------------------------------------- */
+html[class*="headercolor"] .breadcrumb {
+    background-color: transparent;
+}
+
+html[class*="headercolor"] .breadcrumb-item a {
+    color: var(--c-primary);
+}
+
+html[class*="headercolor"] .breadcrumb-item.active {
+    color: var(--c-ink-500);
+}
+
+html[class*="headercolor"] .breadcrumb-item + .breadcrumb-item::before {
+    color: var(--c-ink-300);
+}
+
+
+/* ---- Progress / spinner -------------------------------------- */
+html[class*="headercolor"] .progress {
+    background-color: var(--c-surface-2);
+}
+
+html[class*="headercolor"] .progress-bar {
+    background-color: var(--c-primary);
+}
+
+html[class*="headercolor"] .spinner-border,
+html[class*="headercolor"] .spinner-grow {
+    color: var(--c-primary);
+}
+
+
+/* ---- Tooltip / popover --------------------------------------- */
+html[class*="headercolor"] .tooltip-inner {
+    background-color: var(--c-ink-900);
+    color: var(--c-bg);
+}
+
+html[class*="headercolor"] .popover {
+    background-color: var(--c-surface);
+    border-color: var(--c-line);
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .popover-header {
+    background-color: var(--c-surface-2);
+    border-bottom-color: var(--c-line);
+    color: var(--c-ink-900);
+}
+
+
+
+html[class*="headercolor"] .apps-icon-box.bg-primary,
+html[class*="headercolor"] .apps-icon-box.bg-primary.bg-gradient {
+    background: color-mix(in srgb, #0d6efd 14%, var(--c-surface)) !important;
+    color: #0d6efd !important;
+}
+
+
+html[class*="headercolor"] .apps-icon-box.bg-danger,
+html[class*="headercolor"] .apps-icon-box.bg-danger.bg-gradient {
+    background: color-mix(in srgb, #dc3545 14%, var(--c-surface)) !important;
+    color: #dc3545 !important;
+}
+
+html[class*="headercolor"] .apps-icon-box.bg-success,
+html[class*="headercolor"] .apps-icon-box.bg-success.bg-gradient {
+    background: color-mix(in srgb, #198754 14%, var(--c-surface)) !important;
+    color: #198754 !important;
+}
+
+
+html[class*="headercolor"] .apps-icon-box.bg-orange,
+html[class*="headercolor"] .apps-icon-box.bg-orange.bg-gradient {
+    background: color-mix(in srgb, #fd7e14 14%, var(--c-surface)) !important;
+    color: #fd7e14 !important;
+}
+
+
+html[class*="headercolor"] .apps-icon-box.bg-purple,
+html[class*="headercolor"] .apps-icon-box.bg-purple.bg-gradient {
+    background: color-mix(in srgb, #7c3aed 14%, var(--c-surface)) !important;
+    color: #7c3aed !important;
+}
+
+html[class*="headercolor"] .apps-icon-box.bg-info,
+html[class*="headercolor"] .apps-icon-box.bg-info.bg-gradient {
+    background: color-mix(in srgb, #0891b2 14%, var(--c-surface)) !important;
+    color: #0891b2 !important;
+}
+
+
+html[class*="headercolor"] .apps-icon-box.bg-warning,
+html[class*="headercolor"] .apps-icon-box.bg-warning.bg-gradient {
+    background: color-mix(in srgb, #d97706 16%, var(--c-surface)) !important;
+    color: #d97706 !important;
+}
+
+
+
+/* ----------------------------------------------------------------
+   Bell notification dropdown (Güncel Duyurular) — extra polish
+   --------------------------------------------------------------
+   Premium dropdown container shadow + smooth item hover + tinted
+   icon badges for the bell message list items.
+   ---------------------------------------------------------------- */
+
+
+
+/* Bildirim list item — yumuşak hover slide + rounded corners */
+html[class*="headercolor"] .top-header .navbar .header-message-list .dropdown-item {
+    border-radius: 8px;
+    padding: 10px;
+    transition: background-color .15s ease-out, transform .12s ease-out;
+}
+
+html[class*="headercolor"] .top-header .navbar .header-message-list .dropdown-item:hover {
+    background-color: color-mix(in srgb, var(--c-primary) 10%, var(--c-surface));
+    transform: translateX(2px);
+}
+
+/* Bildirim ikonu — solid red icon yerine subtle tinted badge */
+html[class*="headercolor"] .header-message-list .setting-icon {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: color-mix(in srgb, #d23b3b 14%, var(--c-surface));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .15s, background-color .15s;
+}
+
+html[class*="headercolor"] .header-message-list .dropdown-item:hover .setting-icon {
+    transform: scale(1.06);
+    background: color-mix(in srgb, #d23b3b 22%, var(--c-surface));
+}
+
+html[class*="headercolor"] .header-message-list .setting-icon i {
+    color: #d23b3b;
+    font-size: 17px;
+}
+
+
+/* ---- List group ---------------------------------------------- */
+html[class*="headercolor"] .list-group-item {
+    background-color: var(--c-surface);
+    border-color: var(--c-line);
+    color: var(--c-ink-900);
+}
+
+html[class*="headercolor"] .list-group-item.bg-light {
+    background-color: var(--c-surface-2);
+}
+
+html[class*="headercolor"] .list-group-item-action:hover {
+    background-color: var(--c-primary-50);
+    color: var(--c-primary);
+}
+
+
+/* ---- Setting drawer ikonları (sağ sütun) --------------------- */
+html[class*="headercolor"] .setting-icon {
+    color: var(--c-primary);
+}
+
+
+html[class*="headercolor"] .udef-settings-drawer {
+    width: 380px;
+    max-width: 92vw;
+    background-color: var(--c-bg);
+    color: var(--c-ink-900);
+    box-shadow: -12px 0 32px color-mix(in srgb, var(--c-ink-900) 14%, transparent);
+    transition: transform .28s cubic-bezier(.32, .72, 0, 1);
+}
+
+html[class*="headercolor"] .udef-settings-drawer .offcanvas-header {
+    padding: 18px 20px;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--c-primary) 6%, var(--c-bg-elev)) 0%,
+        var(--c-bg-elev) 100%
+    );
+    border-bottom: 1px solid var(--c-line);
+}
+
+html[class*="headercolor"] .udef-settings-drawer .offcanvas-title {
+    font-size: var(--fs-16);
+    font-weight: 600;
+    color: var(--c-ink-900);
+    letter-spacing: -0.005em;
+}
+
+html[class*="headercolor"] .udef-settings-drawer .offcanvas-title i {
+    font-size: 18px;
+}
+
+html[class*="headercolor"] .udef-settings-drawer .btn-close {
+    background-color: transparent;
+    border-radius: 50%;
+    padding: 6px;
+    width: 28px;
+    height: 28px;
+    opacity: 0.7;
+    transition: opacity .15s, background-color .15s, transform .15s;
+}
+
+
+html[class*="headercolor"] .udef-settings-drawer .btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+html[class*="headercolor"] .udef-settings-drawer:not([data-theme="dark"]):not(.dark-theme) .btn-close:hover,
+html:not(.dark-theme):not([data-theme="dark"]) .udef-settings-drawer .btn-close:hover {
+    background-color: var(--c-surface-2);
+}
+
+html[class*="headercolor"] .udef-settings-drawer .offcanvas-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background-color: var(--c-bg);
+}
+
+
+html[class*="headercolor"] .offcanvas-backdrop.show {
+    background-color: color-mix(in srgb, var(--c-ink-900) 32%, transparent);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 1;
+}
+
+/* Section card */
+html[class*="headercolor"] .udef-settings-group {
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+html[class*="headercolor"] .udef-settings-group:hover {
+    border-color: color-mix(in srgb, var(--c-primary) 30%, var(--c-line));
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--c-ink-900) 5%, transparent);
+}
+
+html[class*="headercolor"] .udef-settings-group-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--c-ink-500);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+html[class*="headercolor"] .udef-settings-group-hint {
+    margin: -4px 0 10px;
+    font-size: var(--fs-12);
+    color: var(--c-ink-500);
+    line-height: 1.4;
+}
+
+html[class*="headercolor"] .udef-settings-group-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+}
+
+/* Tema/Sidebar radio'larını inline ama clickable label ile düzgün hizala */
+html[class*="headercolor"] .udef-settings-group-body .form-check-inline {
+    margin-right: 0;
+    margin-bottom: 2px;
+    padding-left: 24px; /* form-check default'unu koru */
+}
+
+html[class*="headercolor"] .udef-settings-group-body .form-check-label {
+    font-size: var(--fs-13);
+    color: var(--c-ink-700);
+    cursor: pointer;
+    user-select: none;
+}
+
+html[class*="headercolor"] .udef-settings-group-body .form-check-input:checked ~ .form-check-label {
+    color: var(--c-primary);
+    font-weight: 500;
+}
+
+/* Switch'ler (form-switch) için biraz daha sıkı dikey hizalama */
+html[class*="headercolor"] .udef-settings-group-body .form-switch {
+    margin-right: 16px;
+    padding-left: 38px;
+}
+
+html[class*="headercolor"] .udef-settings-group-body .form-switch .form-check-label {
+    font-size: var(--fs-13);
+}
+
+/* Font size butonları kompakt grid */
+html[class*="headercolor"] .udef-settings-group-body .font-size-btn {
+    min-width: 36px;
+    font-weight: 500;
+    border-color: var(--c-line);
+    color: var(--c-ink-700);
+    background-color: var(--c-surface);
+    transition: border-color .12s, background-color .12s, color .12s;
+}
+
+html[class*="headercolor"] .udef-settings-group-body .font-size-btn:hover {
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    background-color: var(--c-surface);
+}
+
+html[class*="headercolor"] .udef-settings-group-body .font-size-btn.active {
+    background-color: var(--c-primary);
+    border-color: var(--c-primary);
+    color: #ffffff;
+}
+
+.theme-set-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 4px;
+    width: 100%;
+    flex: 1;
+}
+
+.theme-set-card {
+    cursor: pointer;
+    background: var(--c-surface);
+    border: 1.5px solid var(--c-line);
+    border-radius: 10px;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color .15s, transform .12s, box-shadow .15s;
+    user-select: none;
+    position: relative;
+}
+
+.theme-set-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--c-ink-300);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--c-ink-900) 10%, transparent);
+}
+
+.theme-set-card.is-active {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 2px var(--c-primary-focus);
+}
+
+.theme-set-card.is-active::after {
+    content: "\F26B"; /* bi-check-lg */
+    font-family: "bootstrap-icons";
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--c-primary);
+    color: #ffffff;
+    border-radius: 50%;
+    font-size: 13px;
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--c-ink-900) 22%, transparent);
+    z-index: 2;
+}
+
+.theme-set-card .preview {
+    display: flex;
+    height: 60px;
+    border-radius: 0;
+    overflow: hidden;
+    border: 0;
+}
+
+.theme-set-card .preview > span {
+    flex: 1;
+    transition: flex .2s ease-out;
+}
+
+.theme-set-card:hover .preview > span:nth-child(2) {
+    flex: 1.3;
+}
+
+.theme-set-card .label {
+    padding: 7px 8px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--c-ink-900);
+    text-align: center;
+    letter-spacing: 0.01em;
+    background: var(--c-bg-elev);
+    border-top: 1px solid var(--c-line);
+    line-height: 1;
+}
+
+.theme-set-card.is-active .label {
+    color: var(--c-primary);
+    background: color-mix(in srgb, var(--c-primary) 6%, var(--c-bg-elev));
+}
+
+.udef-bulk-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    background: var(--c-ink-900);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 12px 16px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    z-index: 1050;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .28s cubic-bezier(.16, 1, .3, 1), opacity .2s;
+    font-family: var(--font-sans);
+    font-size: var(--fs-14);
+    max-width: calc(100vw - 24px);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.udef-bulk-bar.is-visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.udef-bulk-bar .udef-bulk-count {
+    background-color: var(--c-primary);
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: var(--fs-13);
+    min-width: 28px;
+    text-align: center;
+}
+
+.udef-bulk-bar .udef-bulk-label {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.udef-bulk-bar button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: var(--fs-13);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color .15s, border-color .15s;
+    font-family: inherit;
+}
+
+.udef-bulk-bar button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.udef-bulk-bar button.danger {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.udef-bulk-bar button.danger:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+}
+
+@media (max-width: 575.98px) {
+    .udef-bulk-bar {
+        left: 12px;
+        right: 12px;
+        transform: translateY(120px);
+        bottom: 12px;
+        padding: 10px 12px;
+    }
+    .udef-bulk-bar.is-visible {
+        transform: translateY(0);
+    }
+}
+
+html[class*="headercolor"] .top-header .navbar .searchbar {
+    position: relative;   /* ensure absolute dropdown anchors here */
+}
+
+.udef-header-search-results {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--c-ink-900) 18%, transparent);
+    z-index: 1060;
+    max-height: 420px;
+    overflow-y: auto;
+    display: none;
+    padding: 6px;
+    font-family: var(--font-sans);
+}
+
+.udef-header-search-results.is-open {
+    display: block;
+    animation: udef-search-fade-in .14s cubic-bezier(.16, 1, .3, 1);
+}
+
+@keyframes udef-search-fade-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.udef-header-search-results .udef-cmd-result {
+    margin: 1px 0;
+}
+
+.udef-header-search-results .udef-cmd-empty {
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--c-ink-500);
+    font-size: var(--fs-14);
+}
+
+.udef-header-search-results .udef-search-hint {
+    padding: 8px 12px;
+    font-size: var(--fs-11);
+    color: var(--c-ink-500);
+    border-top: 1px solid var(--c-line-soft);
+    margin-top: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.udef-header-search-results .udef-search-hint kbd {
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-line);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--c-ink-700);
+}
+
+.udef-cmd-palette {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 80px 16px 16px;
+}
+
+.udef-cmd-palette.is-open {
+    display: flex;
+    animation: udef-cmd-fade .12s ease-out;
+}
+
+@keyframes udef-cmd-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.udef-cmd-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    cursor: pointer;
+}
+
+.udef-cmd-panel {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-radius: 14px;
+    box-shadow: 0 24px 64px color-mix(in srgb, var(--c-ink-900) 28%, transparent);
+    overflow: hidden;
+    animation: udef-cmd-pop .22s cubic-bezier(.16, 1, .3, 1);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 96px);
+}
+
+@keyframes udef-cmd-pop {
+    from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.udef-cmd-search {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--c-line);
+}
+
+.udef-cmd-search > i {
+    font-size: 18px;
+    color: var(--c-ink-500);
+}
+
+.udef-cmd-search input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: var(--fs-16);
+    color: var(--c-ink-900);
+    outline: none;
+    padding: 4px 0;
+}
+
+.udef-cmd-search input::placeholder { color: var(--c-ink-300); }
+
+.udef-cmd-search .udef-cmd-hint {
+    font-size: var(--fs-11);
+    color: var(--c-ink-500);
+    background: var(--c-surface-2);
+    padding: 2px 7px;
+    border-radius: 5px;
+    border: 1px solid var(--c-line);
+}
+
+.udef-cmd-results {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    min-height: 60px;
+}
+
+.udef-cmd-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-ink-500);
+    padding: 8px 12px 4px;
+}
+
+.udef-cmd-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--c-ink-900);
+    text-decoration: none;
+    font-size: var(--fs-14);
+    transition: background-color .1s, color .1s;
+}
+
+.udef-cmd-result i {
+    color: var(--c-primary);
+    font-size: 17px;
+    width: 20px;
+    text-align: center;
+}
+
+.udef-cmd-result.is-selected,
+.udef-cmd-result:hover {
+    background-color: var(--c-primary-50);
+    color: var(--c-primary);
+}
+
+.udef-cmd-result .udef-cmd-group {
+    font-size: var(--fs-12);
+    color: var(--c-ink-500);
+    margin-left: auto;
+}
+
+.udef-cmd-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--c-ink-500);
+    font-size: var(--fs-14);
+}
+
+.udef-cmd-footer {
+    display: flex;
+    gap: 16px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--c-line);
+    font-size: var(--fs-11);
+    color: var(--c-ink-500);
+    background-color: var(--c-surface-2);
+}
+
+.udef-cmd-footer kbd {
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--c-ink-700);
+}
+
+@media (max-width: 575.98px) {
+    .udef-cmd-palette { padding-top: 24px; }
+    .udef-cmd-panel { max-height: calc(100vh - 40px); }
+    .udef-cmd-footer { display: none; }
+}
+
+
+/* ==============================================================
+   3.98 Inline form validation — themed Bootstrap is-valid/invalid
+   ============================================================== */
+
+html[class*="headercolor"] .form-control.is-valid,
+html[class*="headercolor"] .form-select.is-valid,
+html[class*="headercolor"] .was-validated .form-control:valid {
+    border-color: #16a34a;
+    padding-right: calc(0.75em + 2.5rem);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2316a34a' d='M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    background-size: 16px 16px;
+}
+
+html[class*="headercolor"] .form-control.is-valid:focus,
+html[class*="headercolor"] .form-select.is-valid:focus {
+    border-color: #16a34a;
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, #16a34a 25%, transparent);
+}
+
+html[class*="headercolor"] .form-control.is-invalid,
+html[class*="headercolor"] .form-select.is-invalid,
+html[class*="headercolor"] .was-validated .form-control:invalid {
+    border-color: #dc2626;
+    padding-right: calc(0.75em + 2.5rem);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%23dc2626' d='M5.8 3.6h.4L6 6.5z M5.4 8.2h1.2v1.2H5.4z'/%3E%3Ccircle fill='none' stroke='%23dc2626' stroke-width='1' cx='6' cy='6' r='5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    background-size: 14px 14px;
+}
+
+html[class*="headercolor"] .form-control.is-invalid:focus,
+html[class*="headercolor"] .form-select.is-invalid:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, #dc2626 25%, transparent);
+}
+
+html[class*="headercolor"] .invalid-feedback {
+    color: #dc2626;
+    font-size: var(--fs-12);
+    margin-top: 4px;
+    display: none;
+}
+
+html[class*="headercolor"] .form-control.is-invalid ~ .invalid-feedback,
+html[class*="headercolor"] .was-validated .form-control:invalid ~ .invalid-feedback {
+    display: block;
+}
+
+html[class*="headercolor"] .valid-feedback {
+    color: #16a34a;
+    font-size: var(--fs-12);
+    margin-top: 4px;
+    display: none;
+}
+
+html[class*="headercolor"] .form-control.is-valid ~ .valid-feedback,
+html[class*="headercolor"] .was-validated .form-control:valid ~ .valid-feedback {
+    display: block;
+}
+
+
+/* ==============================================================
+   3.99 Motion — subtle, consistent transitions
+   ----------------------------------------------------------------
+   Cubic bezier (.16, 1, .3, 1) — Apple-style "spring out" easing,
+   doğal hareket hissi. 120-200ms aralığında tutarak panel
+   ağır görünmüyor.
+   ============================================================== */
+
+/* ----------------------------------------------------------------
+   Animated Button — 21st.dev / bundui/button
+   Original: <motion.button whileTap={{ scale: 0.93 }} />
+            (Framer Motion spring physics + Tailwind h-12 px-6).
+   Bizde:    CSS transform + dual-timing.
+   Etki:     Tüm .btn elementleri (Kaydet, Sil, Onayla, modal Kapat,
+            pagination, filtre vs.) tıklanınca %7 küçülüp spring ile
+            zıplayarak geri döner. Sadece tıklama animasyonu;
+            boyut/renk değişmedi (mevcut sistem korunur).
+   ---------------------------------------------------------------- */
+
+html[class*="headercolor"] .btn,
+html[class*="headercolor"] .btn-primary,
+html[class*="headercolor"] .btn-outline-primary,
+html[class*="headercolor"] .btn-light,
+html[class*="headercolor"] .btn-info,
+html[class*="headercolor"] .btn-outline-info {
+    /* Release / bounce-back: spring-like overshoot easing */
+    transition:
+        transform .18s cubic-bezier(.16, 1.2, .3, 1),
+        background-color .15s,
+        border-color .15s,
+        box-shadow .15s,
+        color .15s;
+    transform-origin: center;
+    will-change: transform;
+}
+
+html[class*="headercolor"] .btn:active,
+html[class*="headercolor"] .btn-primary:active,
+html[class*="headercolor"] .btn-outline-primary:active,
+html[class*="headercolor"] .btn-info:active,
+html[class*="headercolor"] .btn-outline-info:active,
+html[class*="headercolor"] .btn-light:active {
+    transform: scale(0.93);
+    /* Press-down: snappy linear (Framer'in initial press hızı) */
+    transition: transform .07s ease-out;
+}
+
+/* Hareket kısıtlı tercih eden kullanıcılar için animasyonu kapat */
+@media (prefers-reduced-motion: reduce) {
+    html[class*="headercolor"] .btn:active,
+    html[class*="headercolor"] .btn-primary:active,
+    html[class*="headercolor"] .btn-outline-primary:active,
+    html[class*="headercolor"] .btn-info:active,
+    html[class*="headercolor"] .btn-outline-info:active,
+    html[class*="headercolor"] .btn-light:active {
+        transform: none;
+    }
+}
+
+
+/* ----------------------------------------------------------------
+   Rainbow Borders Button — 21st.dev / muhammad-binsalman
+   Original: dark button + iki pseudo-element ile animasyonlu
+            rainbow gradient border, ikincisi 50px blur ile halo.
+            background-size 400% + 20s linear infinite scroll.
+   Bizde:    .btn-rainbow opt-in modifier. .btn'in üstüne eklenir;
+            primary butonun zeminini ink-900 ile değiştirir,
+            iki pseudo-element ile rainbow halka + blur halo verir.
+            isolation:isolate ile parent stacking context'e taşmaz.
+   Kullanım:  <button class="btn btn-primary btn-rainbow">…</button>
+   Etki:     Dikkat çeken birincil eylemler için tek tek ekleyin
+            (login submit, empty-state CTA, "Yeni X" tipi vurgu).
+            Her butonda kullanmayın — özelliğini yitirir.
+   ---------------------------------------------------------------- */
+
+html[class*="headercolor"] .btn-rainbow {
+    position: relative;
+    isolation: isolate;
+    background-color: var(--c-ink-900);
+    color: #ffffff;
+    border: 0;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    overflow: visible;
+}
+
+html[class*="headercolor"] .btn-rainbow:hover,
+html[class*="headercolor"] .btn-rainbow:focus,
+html[class*="headercolor"] .btn-rainbow:active {
+    background-color: var(--c-ink-900);
+    color: #ffffff;
+    border: 0;
+}
+
+html[class*="headercolor"] .btn-rainbow::before,
+html[class*="headercolor"] .btn-rainbow::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(
+        45deg,
+        #fb0094, #0000ff, #00ff00, #ffff00, #ff0000,
+        #fb0094, #0000ff, #00ff00, #ffff00, #ff0000
+    );
+    background-size: 400% 400%;
+    z-index: -1;
+    animation: udef-rainbow 20s linear infinite;
+}
+
+html[class*="headercolor"] .btn-rainbow::after {
+    /* Halo — performans için 50px yerine 28px blur, opacity ile yumuşatıldı */
+    filter: blur(28px);
+    opacity: 0.65;
+}
+
+@keyframes udef-rainbow {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 400% 50%; }
+    100% { background-position:   0% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[class*="headercolor"] .btn-rainbow::before,
+    html[class*="headercolor"] .btn-rainbow::after {
+        animation: none;
+    }
+}
+
+html[class*="headercolor"] .top-header .navbar .navbar-nav .nav-link {
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+    height: 38px;
+    line-height: 1;
+}
+
+/* <li> wrapper'ları (bell, apps, user) için de line-box temizliği */
+html[class*="headercolor"] .top-header .navbar .navbar-nav .nav-item {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+}
+
+/* Toggle link — diğer header butonlarıyla aynı .messages konteyneri.
+   Sadece icon overlap için absolute pozisyon + smooth swap eklendi. */
+html[class*="headercolor"] .udef-theme-toggle-link {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+html[class*="headercolor"] .udef-theme-toggle-link .messages {
+    /* .messages base style'ı yukarıdaki "Üst bar" bölümünden geliyor;
+       sadece ikinci ikonu üst üste binirtmek için ek ayar. */
+    position: relative;
+}
+
+html[class*="headercolor"] .udef-theme-toggle-link:hover .messages,
+html[class*="headercolor"] .udef-theme-toggle-link:focus .messages {
+    background-color: var(--c-primary-50);
+}
+
+html[class*="headercolor"] .udef-theme-toggle-link .messages > i {
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    color: var(--c-ink-700);
+    transition:
+        opacity .25s ease-in-out,
+        transform .35s cubic-bezier(.16, 1, .3, 1),
+        color .15s;
+    line-height: 1;
+    margin: 0;
+}
+
+html[class*="headercolor"] .udef-theme-toggle-link:hover .messages > i {
+    color: var(--c-primary);
+}
+
+/* Light / Minimal mode: AY (Moon) görünür, kullanıcı tıklarsa karanlığa geçer */
+html.minimal-theme .toggle-icon-moon,
+html.light-theme .toggle-icon-moon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+html.minimal-theme .toggle-icon-sun,
+html.light-theme .toggle-icon-sun {
+    opacity: 0;
+    transform: rotate(45deg) scale(0.5);
+    pointer-events: none;
+}
+
+html.dark-theme .toggle-icon-sun,
+html.semi-dark .toggle-icon-sun {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+    color: #fbbf24;
+}
+
+html.dark-theme .udef-theme-toggle-link:hover .toggle-icon-sun,
+html.semi-dark .udef-theme-toggle-link:hover .toggle-icon-sun {
+    color: #fde68a;  /* hover'da daha açık sarı */
+}
+
+html.dark-theme .toggle-icon-moon,
+html.semi-dark .toggle-icon-moon {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.5);
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[class*="headercolor"] .udef-theme-toggle-link .messages > i {
+        transition: opacity .1s, color .15s;
+    }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.3s;
+    mix-blend-mode: normal;
+}
+
+/* Form input/select focus — smooth border + glow */
+html[class*="headercolor"] .form-control,
+html[class*="headercolor"] .form-select {
+    transition:
+        border-color .15s,
+        box-shadow .2s cubic-bezier(.16, 1, .3, 1),
+        background-color .15s;
+}
+
+
+/* Modal — yumuşak slide-up + fade */
+html[class*="headercolor"] .modal.fade .modal-dialog {
+    transition: transform .25s cubic-bezier(.16, 1, .3, 1), opacity .2s;
+    transform: translateY(20px);
+}
+
+html[class*="headercolor"] .modal.show .modal-dialog {
+    transform: translateY(0);
+}
+
+/* Offcanvas (ayarlar drawer) — Bootstrap'in kendisi animasyonlu */
+html[class*="headercolor"] .offcanvas.show {
+    animation: udef-offcanvas-in .28s cubic-bezier(.16, 1, .3, 1);
+}
+
+@keyframes udef-offcanvas-in {
+    from { box-shadow: none; }
+    to   { box-shadow: -20px 0 40px color-mix(in srgb, var(--c-ink-900) 12%, transparent); }
+}
+
+/* Theme set kartları — tıklama feedback */
+.theme-set-card {
+    transition:
+        border-color .15s,
+        transform .15s cubic-bezier(.16, 1, .3, 1),
+        box-shadow .18s;
+}
+
+.theme-set-card:active {
+    transform: scale(0.97);
+}
+
+/* Card hover — sadece "link-card" sınıfı olanlar için (opt-in) */
+html[class*="headercolor"] .card.card-link {
+    transition: transform .18s cubic-bezier(.16, 1, .3, 1), box-shadow .18s;
+    cursor: pointer;
+}
+
+html[class*="headercolor"] .card.card-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px color-mix(in srgb, var(--c-ink-900) 12%, transparent);
+}
+
+/* Tablo satırları — yumuşak hover */
+html[class*="headercolor"] .table tbody tr {
+    transition: background-color .12s;
+}
+
+/* Accordion — collapse animasyonu Bootstrap'inki kalır, sadece
+   buton ikonu yumuşat */
+html[class*="headercolor"] .accordion-button {
+    transition: background-color .15s, color .15s, box-shadow .15s;
+}
+
+html[class*="headercolor"] .accordion-button::after {
+    transition: transform .25s cubic-bezier(.16, 1, .3, 1);
+}
+
+/* Badge'lerin hover'i (link içinde olabilir) */
+html[class*="headercolor"] a .badge-status {
+    transition: transform .12s;
+}
+
+html[class*="headercolor"] a:hover .badge-status {
+    transform: scale(1.05);
+}
+
+/* Sidebar menü item hover — yumuşak slide-in highlight */
+html[class*="headercolor"] .sidebar-wrapper .metismenu a {
+    transition: background-color .15s, color .15s, padding-left .15s;
+}
+
+html[class*="headercolor"] .sidebar-wrapper .metismenu a:hover {
+    padding-left: 18px;
+}
+
+/* Notification badge — yeni count gelirse pulse */
+@keyframes udef-badge-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.12); }
+}
+
+html[class*="headercolor"] .notify-badge {
+    animation: udef-badge-pulse 2s ease-in-out infinite;
+    animation-iteration-count: 2;
+}
+
+/* Skeleton shimmer ve diğer kalıcı animasyonların yavaşlığını
+   reduced-motion kullanıcısı için kapat */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+.customer-preview-trigger {
+    cursor: pointer;
+    color: var(--c-ink-900);
+    font-weight: 500;
+    border-bottom: 1px dashed transparent;
+    transition: border-color .15s, color .15s;
+}
+
+.customer-preview-trigger:hover {
+    color: var(--c-primary);
+    border-bottom-color: var(--c-primary);
+}
+
+/* Bootstrap popover'ı temaya uyumla */
+html[class*="headercolor"] .popover.customer-preview-popover {
+    max-width: 320px;
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-line);
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--c-ink-900) 18%, transparent);
+    border-radius: 12px;
+    font-family: var(--font-sans);
+}
+
+html[class*="headercolor"] .popover.customer-preview-popover .popover-arrow::before,
+html[class*="headercolor"] .popover.customer-preview-popover .popover-arrow::after {
+    border-color: transparent;
+}
+
+html[class*="headercolor"] .popover.customer-preview-popover .popover-body {
+    padding: 0;
+    color: var(--c-ink-900);
+}
+
+.popover-preview {
+    padding: 0;
+}
+
+.popover-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 14px 10px;
+    border-bottom: 1px solid var(--c-line-soft);
+}
+
+.popover-preview-name {
+    font-weight: 600;
+    font-size: var(--fs-15);
+    color: var(--c-ink-900);
+    line-height: 1.2;
+}
+
+.popover-preview-meta {
+    font-size: var(--fs-12);
+    color: var(--c-ink-500);
+    margin-top: 2px;
+}
+
+.popover-preview-body {
+    padding: 10px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: var(--fs-13);
+    color: var(--c-ink-700);
+}
+
+.popover-preview-body > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.popover-preview-body i {
+    color: var(--c-primary);
+    width: 14px;
+    text-align: center;
+}
+
+.popover-preview-progress {
+    margin-top: 6px;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4px !important;
+}
+
+.popover-preview-progress .progress {
+    height: 6px;
+    background-color: var(--c-surface-2);
+    border-radius: 3px;
+}
+
+.popover-preview-progress .progress-bar {
+    background-color: var(--c-primary);
+}
+
+.popover-preview-progress small {
+    color: var(--c-ink-500);
+    font-size: var(--fs-11);
+}
+
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: var(--fs-12);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.badge-status i,
+.badge-status .bi {
+    font-size: 11px;
+    line-height: 1;
+}
+
+.badge-status-active {
+    background-color: color-mix(in srgb, #16a34a 16%, var(--c-surface));
+    color: #15803d;
+}
+
+.badge-status-pending {
+    background-color: color-mix(in srgb, #d97706 18%, var(--c-surface));
+    color: #b45309;
+}
+
+.badge-status-passive {
+    background-color: color-mix(in srgb, #71717a 14%, var(--c-surface));
+    color: #52525b;
+}
+
+.badge-status-graduated {
+    background-color: color-mix(in srgb, #0d6efd 14%, var(--c-surface));
+    color: #084298;
+}
+
+.badge-status-error,
+.badge-status-danger {
+    background-color: color-mix(in srgb, #dc2626 14%, var(--c-surface));
+    color: #b91c1c;
+}
+
+.badge-status-info {
+    background-color: color-mix(in srgb, #0891b2 14%, var(--c-surface));
+    color: #155e75;
+}
+
+html.dark-theme .badge-status-active   { color: #4ade80; }
+html.dark-theme .badge-status-pending  { color: #fbbf24; }
+html.dark-theme .badge-status-passive  { color: #a1a1aa; }
+html.dark-theme .badge-status-graduated{ color: #60a5fa; }
+html.dark-theme .badge-status-danger,
+html.dark-theme .badge-status-error    { color: #f87171; }
+html.dark-theme .badge-status-info     { color: #22d3ee; }
+
+html[class*="headercolor"] .accordion-body .btn-save,
+html[class*="headercolor"] .card-body > .text-end .btn-save {
+    position: sticky;
+    bottom: 16px;
+    z-index: 5;
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--c-primary) 28%, transparent);
+}
+
+/* Generic opt-in: <div class="form-actions-sticky"> ... </div> */
+html[class*="headercolor"] .form-actions-sticky {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--c-surface);
+    border-top: 1px solid var(--c-line);
+    padding: 12px 16px;
+    margin: 16px -16px 0;
+    z-index: 10;
+    box-shadow: 0 -4px 14px color-mix(in srgb, var(--c-ink-900) 10%, transparent);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Mobil — sticky bar tam genişlik, butonlar tam genişlik */
+@media (max-width: 575.98px) {
+    html[class*="headercolor"] .form-actions-sticky {
+        padding: 10px 12px;
+        margin: 12px -12px 0;
+    }
+
+    html[class*="headercolor"] .form-actions-sticky .btn {
+        flex: 1;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg,
+        var(--c-surface-2) 0%,
+        var(--c-line-soft) 50%,
+        var(--c-surface-2) 100%);
+    background-size: 200% 100%;
+    animation: udef-skeleton-shimmer 1.4s ease-in-out infinite;
+    border-radius: 6px;
+    display: block;
+}
+
+@keyframes udef-skeleton-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-text         { height: 12px; margin: 8px 0; }
+.skeleton-text.sm      { height: 10px; }
+.skeleton-text.lg      { height: 18px; }
+.skeleton-text.w-25    { width: 25%; }
+.skeleton-text.w-40    { width: 40%; }
+.skeleton-text.w-60    { width: 60%; }
+.skeleton-text.w-75    { width: 75%; }
+.skeleton-text.w-90    { width: 90%; }
+
+.skeleton-circle {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.skeleton-rect { height: 60px; }
+
+.skeleton-card {
+    padding: 18px;
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-radius: 10px;
+}
+
+.skeleton-card .skeleton-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.skeleton-card .skeleton-row + .skeleton-row {
+    border-top: 1px solid var(--c-line-soft);
+}
+
+.skeleton-card .skeleton-row > div {
+    flex: 1;
+}
+
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 56px 24px;
+    color: var(--c-ink-500);
+    background-color: transparent;
+}
+
+.empty-state-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--c-primary-50);
+    color: var(--c-primary);
+    font-size: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.empty-state-title {
+    margin: 0 0 6px;
+    color: var(--c-ink-900);
+    font-size: var(--fs-16);
+    font-weight: 600;
+}
+
+.empty-state-desc {
+    margin: 0 0 18px;
+    max-width: 360px;
+    font-size: var(--fs-14);
+    line-height: 1.5;
+    color: var(--c-ink-500);
+}
+
+.empty-state .btn {
+    padding: 8px 18px;
+}
+
+/* Tablo içine konunca da düzgün göründüğünden emin ol */
+td > .empty-state {
+    padding: 40px 16px;
+}
+
+.avatar {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    text-transform: uppercase;
+    overflow: hidden;
+    flex-shrink: 0;
+    background-color: var(--c-ink-500);    /* JS overrides per-name */
+    line-height: 1;
+    user-select: none;
+}
+
+.avatar img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.avatar .avatar-initials {
+    position: relative;
+    z-index: 0;
+}
+
+.avatar-24 { width: 24px; height: 24px; font-size: 10px; }
+.avatar-30 { width: 30px; height: 30px; font-size: 11px; }
+.avatar-36 { width: 36px; height: 36px; font-size: 13px; }
+.avatar-44 { width: 44px; height: 44px; font-size: 16px; }
+.avatar-60 { width: 60px; height: 60px; font-size: 22px; }
+.avatar-80 { width: 80px; height: 80px; font-size: 28px; }

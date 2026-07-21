@@ -1,0 +1,518 @@
+{{ header }}{{ column_left }}
+<main id="page-basvuru" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+      
+         <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success btn-sm"><i class="bi bi-download"></i></a>
+         <a href="{{ cancel }}" data-toggle="tooltip" title="{{ "Geri Dön" }}" class="btn btn-light border border-dark shadow-sm btn-sm bg-white"><i class="bi bi-arrow-counterclockwise"></i></a>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="{{ "Öğrenci Adı" }}" id="filter-name" class="form-control ps-4 auto-filter">
+                                <input type="hidden"  name="filter_customer_id" value="{{ filter_customer_id }}" placeholder="{{ "Öğrenci Adı" }}" id="filter-customer-id"  class="form-control auto-complate auto-filter" style="font-size:11px;"/>
+                            </div>
+                        </div>
+
+                       
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select name="filter_store" class="form-select auto-filter">
+                                <option value="">{{text_select}}</option>
+                                {% for store in stores %}
+                                <option value="{{ store.store_id }}" {% if filter_store == store.store_id %} selected="selected" {% endif %}>{{store.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-lg-1 co1-6 col-md-3">
+                            <select name="filter_status" class="form-select auto-filter">
+                               <option value="" key == filter_status>{{ text_all }}</option>
+                                {% for key,value in statuses %}
+                                  <option value="{{ key }}"  {% if key == filter_status and key != 0 %} selected="selected" {% endif %}>{{ value }}</option>
+                                {% endfor %}   	
+                            </select>
+                        </div>
+
+                        <div class="col-lg-1 co1-6 col-md-3">
+                            <select name="limit" class="form-select auto-filter">
+                                {% for key,value in limits %}
+                                <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-basvuru">
+                    <div class="card-body">
+
+                        <div class="table-responsive-sm">
+                            <table class="table table-bordered table-striped table-sm align-middle table-hover ">
+                                <thead class="bg-light">
+                                  <tr>
+                                    <th style="width: 1px;" class="text-center">S.N</th>
+                                    <th class="text-start">{{ "Öğrenci Adı" }}</th>
+                                    <th class="text-start">{{ "Telefon" }}</th>
+                                    <th class="text-start">{{ "E-Posta" }}</th>
+                                    <th class="text-start">{{ "Derneği" }}</th>
+                                    <th class="text-start">{{ "Başvuru Tarihi" }}</th>
+                                    <th class="text-center">{{ column_status }}</th>
+                                    <th class="text-center" colspan="3" style="width:1%;">{{ column_action }}</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% if customers %}
+                                  {% for customer in customers %}
+                                  {% if duyuru.store_id == 0 %}
+                                  <tr>
+                                    <td class="text-center">{{customer.row}} </td>
+                                    <td class="text-left"><a href="{{customer.edit}}">{{ customer.name }}</a></td>
+                                    <td class="text-left">{{ customer.telephone }}</td>
+                                    <td class="text-left">{{ customer.email}}</td>
+                                    <td class="text-left">
+                                    <div class="border rounded p-2 bg-light">
+                                       {{ customer.store.name}}
+                                      </div>
+                                    </td>
+                                    <td class="text-left">{{ customer.date_added}}</td>
+                                    <td class="text-center">
+                                     
+                                     <div class="font-13"><i class="bi bi-circle-fill {{customer.color}}"></i><span class="ms-1">{{customer.status}}</span></div>
+                                     {% if customer.update %}
+                                      <span class="badge bg-primary">Güncellendi</span>
+                                    {% endif %}
+
+
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                    <button type="button" id="button-view"  data-toggle="tooltip" title="{{ text_view }}" onclick="edit('{{ customer.customer_id }}','{{ customer.burs_basvuru_ogrenci_id }}')" class="btn btn-info btn-sm text-dark"> <i class="bi bi-clock-history"></i></button>
+                                    </td>
+
+                                    <td class="text-center" >
+                                    <a href="{{customer.pdf}}" data-toggle="tooltip"  target="_blank" title="{{ "Pdf olarak görüntüle" }}" class="btn btn-warning text-dark btn-sm" ><i class="bi bi-file-earmark-pdf"></i></a>
+                                    </td>
+                                    {% if customer.download %}
+                                    <td class="text-center" >
+                                  
+                                    <a href="{{customer.download}}" data-toggle="tooltip"  title="{{ "Dosyaları Zip olarak indir" }}" class="btn btn-outline-danger btn-sm" ><i class="bi bi-archive-fill"></i></a>
+                                    </td>
+                                    {% endif %}
+                                  </tr>
+                                  {% endif %}
+                                  {% endfor %}
+                                
+                                  {% else %}
+                                  <tr>
+                                    <td class="text-center" colspan="5">{{ text_no_results }}</td>
+                                  </tr>
+                                  {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                         <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+    {# REVİZYON MODAL #}
+<div id="modal-revizyon" class="modal fade" tabindex="-1">
+  <div class="modal-dialog" style="width:33%;">
+    <div class="modal-content">
+      
+      <form id="form-revizyon">
+        <input type="hidden" name="customer_id" id="input-customer-id" value="">
+        <input type="hidden" name="burs_basvuru_ogrenci_id" id="input-basvuru-id" value="">
+        
+        <div class="modal-body">
+          <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" href="#tab-1" id="modal-tab-1" data-bs-toggle="tab">{{ "Genel" }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#tab-3" id="modal-tab-3" data-bs-toggle="tab">{{ "Değerlendirme" }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#tab-4" id="modal-tab-4" data-bs-toggle="tab" style="display:none;">{{ "Banka Bilgileri" }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#tab-2" id="modal-tab-2" data-bs-toggle="tab">{{ "İşlemler" }}</a>
+            </li>
+          </ul>
+
+          <div class="tab-content mt-3">
+            
+            <div class="tab-pane fade show active" id="tab-1">
+              <div class="alert alert-warning" id="total-burs" style="color:#000000;"></div>
+              <ul class="list-group"></ul>
+              <div class="description"></div>
+              
+              <div class="mb-3">
+                <label class="form-label"><strong>{{ "Durumu" }}</strong></label>
+                <select name="status" class="form-select status" onchange="statusChange();">
+                  {% for key,value in statuses %}
+                    {% if key != 2 %}
+                      <option value="{{key}}">{{value}}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="mb-3" id="destek-secenekleri" style="display:none;">
+                <label class="form-label"><strong>Destek Seçenekleri</strong></label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="destek-1" name="destek[]" value="1">
+                  <label class="form-check-label" for="destek-1">Tam Burs</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="destek-2" name="destek[]" value="2">
+                  <label class="form-check-label" for="destek-2">%50</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="destek-3" name="destek[]" value="3">
+                  <label class="form-check-label" for="destek-3">%25</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="destek-4" name="destek[]" value="4">
+                  <label class="form-check-label" for="destek-4">Market Desteği</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="destek-5" name="destek[]" value="5">
+                  <label class="form-check-label" for="destek-5">Diğer</label>
+                </div>
+              </div>
+
+              <div class="mb-3" id="bolum-secenekleri" style="display:none;">
+                <label class="form-label fw-bold">Bölüm Seçenekleri</label>
+                
+                <div class="border rounded p-2 bg-white" style="height: 150px; overflow-y: scroll;">
+                    {% for key,value in bolumler %}
+                        <div class="form-check mb-1">
+                            <input class="form-check-input border-secondary {{key}}" 
+                                  type="checkbox" 
+                                  id="bolum-{{key}}" 
+                                  name="bolum[]" 
+                                  value="{{key}}">
+                            <label class="form-check-label" for="bolum-{{key}}">
+                                {{value}}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="form-text text-muted mt-1">
+                    <i class="bi bi-info-circle"></i> Not: Başvuru formunda açmak istediğiniz bölümü seçebilirsiniz.
+                </div>
+            </div>
+
+              <div class="mb-3" id="text" style="display:none;">
+                <label class="form-label"><strong>{{ "Açıklama" }}</strong></label>
+                <textarea name="text" rows="5" placeholder="Kısaca açıklama yazabilirsiniz" class="form-control"></textarea>
+              </div>
+
+              <div class="alert alert-info d-none" id="alert-message">
+                <i class="bi bi-exclamation-circle"></i> Bu öğrenci hakkında değerlendirme eklemek için değerlendirme tabının altında bulunan formu doldurunuz.
+              </div>
+            </div>
+
+            <div class="tab-pane fade history-data" id="tab-2"></div>
+
+            <div class="tab-pane fade" id="tab-3">
+              <div class="mb-3">
+                <label class="form-label"><strong>{{ "Değerlendiren Kişi" }}</strong></label>
+                <input type="text" name="adsoyad" placeholder="Değerlendiren Kişi" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label class="form-label"><strong>{{ "Değerlendirme Metni" }}</strong></label>
+                <textarea rows="5" name="description" placeholder="Kısaca açıklama yazabilirsiniz" class="form-control"></textarea>
+              </div>
+              <div class="list bg-light"></div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-4"></div>
+          </div>
+        </div>
+      </form>
+
+      <div class="modal-footer">
+        <div class="float-end">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+          <button type="button" id="button-modal-save" class="btn btn-primary btn-save">
+            <i class="bi bi-save"></i> {{ button_save }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+    {{footer}}
+</main>
+<script type="text/javascript"><!--
+$('.auto-filter').on('change', function() {
+   $('#cover-spin').show(0);
+  url = 'index.php?route=localisation/basvuru_burs/view&user_token={{ user_token }}&burs_basvuru_id={{ burs_basvuru_id }}';
+
+  if ($('input[name=\'filter_name\']').val()) {
+		url += '&filter_name=' + encodeURIComponent($('input[name=\'filter_name\']').val());
+	}
+
+  if ($('select[name=\'filter_store\']').val()) {
+		url += '&filter_store=' + encodeURIComponent($('select[name=\'filter_store\']').val());
+	}
+
+
+	if ($('select[name=\'filter_status\']').val()) {
+		url += '&filter_status=' + encodeURIComponent($('select[name=\'filter_status\']').val());
+	}
+
+	if ($('select[name=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name=\'limit\']').val());
+	}
+
+	location = url;
+});
+
+$('#button-clear').on('click', function() {
+	url = 'index.php?route=localisation/basvuru_burs/view&user_token={{ user_token }}';
+	location = url;
+});
+//--></script>
+
+<script type="text/javascript"><!--
+$('input[name=\'filter_name\']').autocomplete({
+	 
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=setting/autocomplete/customerautocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['customer_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		 $('input[name=\'filter_name\']').val(item['label']);
+     $('input[name=\'filter_customer_id\']').val(item['value']);
+     $('input[name=\'filter_customer_id\']').trigger('change');
+	}
+
+	
+});
+//--></script>
+<script>
+$('#button-modal-save').on('click', function() {
+  $.ajax({
+    url: 'index.php?route=localisation/basvuru_burs/revizyon&user_token={{ user_token }}',
+		 type: 'post',
+     dataType: 'json',
+     data : $('#form-revizyon').serialize(),
+
+    beforeSend: function() {
+			$('#button-modal-save').button('loading');
+		},
+
+    complete: function() {
+      $('#button-modal-save').button('reset');
+    },
+
+		success: function(json) {
+    
+      if (json.error.warning) {
+       $('#alert').prepend(
+              '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+          );
+     }		
+
+     if (json.success) {
+        $('#modal-revizyon').modal('hide');
+        location.reload();
+        $('#alert').append(
+              '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + json.success + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );  
+     }		
+      
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+	});
+});
+</script>
+
+<script>
+function edit(customer_id,burs_basvuru_ogrenci_id) {
+  	$('#modal-revizyon').modal('show');
+    $('#input-customer-id').val(customer_id);
+    $('#input-basvuru-id').val(burs_basvuru_ogrenci_id);
+   
+
+    $.ajax({
+    url: 'index.php?route=localisation/basvuru_burs/dataview&user_token={{ user_token }}&customer_id='  + customer_id + '&burs_basvuru_ogrenci_id=' + burs_basvuru_ogrenci_id,
+		dataType: 'json',
+    type: 'post',
+
+		success: function(json) {
+     $('.alert-dismissible').remove();
+      $('.list-group-item').remove();
+      $('#tab-2 .alert-info').remove();
+      $('#modal-tab-4').hide();
+      $('#tab-4 .form-group').remove();
+      $('#tab-3 .list').find('.form-group').remove();
+      $('#modal-tab-1').click();
+      $('#bolum-secenekleri .check-ek-belge').remove();
+    
+      if (json['html']) {
+       $('.list-group').html(json['html']);
+       $('#modal-revizyon select[name^=\'status\']').val(json['status']);
+       $('#modal-revizyon select[name^=\'status\']').val(json['status']);
+       $('#modal-revizyon textarea[name^=\'text\']').prop('placeholder',json['placeholder']);
+       $('#tab-2').append(json['history']);
+       $('#modal-revizyon textarea[name^=\'text\']').val(json['status_text']);
+       $('#modal-revizyon select[name^="status"]').trigger('change');
+       $('#modal-revizyon .form-check-input').prop('checked', false);
+     }
+
+     if (json['ek_belge_html']) {
+       $('#bolum-secenekleri .form-check').append(json['ek_belge_html']);
+      }
+
+     if (json['bolum']) {
+       $('#bolum-secenekleri .' + json['bolum']).prop('checked', true);
+     }
+
+     if (json['html_total']) {
+       $('#total-burs').html(json['html_total']);
+     }  
+
+     if(json['destek_turu']) {
+      $(json['destek_turu']).prop('checked', true);
+     }
+
+     if (json['html_bank']) {
+       $('#tab-4').append(json['html_bank']);
+       $('#modal-tab-4').show();
+     }
+
+     if (json['html_degerlendirme']) {
+       $('#tab-3 .list').append(json['html_degerlendirme']);
+       //$('#modal-tab-4').show();
+     }						
+      
+		},
+		
+    error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+    }
+	});
+
+}
+
+</script>
+
+<script>
+function statusChange() {
+  const status = $('#modal-revizyon select[name^="status"]').val();
+  $('#bolum-secenekleri,#destek-secenekleri,#alert-message,#bolum-secenekleri').hide();
+
+  if(status === '1') {
+    $('#destek-secenekleri,#modal-tab-3,#alert-message').show();
+  } else if(status === '4') {
+    $('#modal-tab-3,#alert-message').show();
+  } else if(status == 3) {
+    $('#bolum-secenekleri').show();
+  }
+
+  $('#text').show();
+  const placeholders = {
+      '0': 'Kısa açıklama yazabilirsiniz',
+      '1': 'Kısa açıklama yazabilirsiniz',
+      '2': 'Kısa açıklama yazabilirsiniz',
+      '3': 'Revize notu yazılmalı (örneğin: "Belge eksik", "Eksik bilgi var" gibi)',
+      '4': 'Açıklama: Neden uygun görülmediğini belirtineniz',
+      '5': 'Özel açıklama yapabilirsiniz...'
+  };
+
+
+const placeholder = placeholders[status] || 'Lütfen açıklama giriniz';
+$('#modal-revizyon textarea[name^="text"]').attr('placeholder', placeholder);
+}
+
+</script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      $('#alert').prepend(
+              '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + error_warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );
+     }
+
+     if (success) {
+	      $('#alert').append(
+              '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + success + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );  
+    }
+});
+</script>

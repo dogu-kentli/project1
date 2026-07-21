@@ -1,0 +1,860 @@
+
+<div id="cover-spin" style="display:none;"></div>
+<div align="center">{{ text_footer }}<br />{{ text_version }}</div>
+<div class="modal fade" id="modal-store" tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="modal-body" class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="switcher-body">
+
+    <div class="offcanvas offcanvas-end shadow border-start-0 p-0" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Görüntü Ayarları</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" onclick="$('.offcanvas').removeClass('show');"></button>
+        </div>
+        <div id="offcanvas-popover" class="offcanvas-body">
+
+            <div class="form-check form-check-inline">
+                <input class="form-check-input form-check-input-theme" type="radio" for="#018bd3" name="inlineRadioOptions" id="MinimalTheme" value="minimal-theme" {% if theme == 'minimal-theme' %} checked {% endif %}>
+                <label class="form-check-label" for="MinimalTheme">Açık Renk</label>
+            </div>
+            
+            <div class="form-check form-check-inline">
+                <input class="form-check-input form-check-input-theme" type="radio" for="#fff" name="inlineRadioOptions" id="DarkTheme" value="dark-theme" {% if theme == 'dark-theme' %} checked {% endif %}>
+                <label class="form-check-label" for="DarkTheme">Koyu</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input form-check-input-theme" type="radio" for="#fff" name="inlineRadioOptions" id="SemiDarkTheme" value="semi-dark" {% if theme == 'semi-dark' %} checked {% endif %}>
+                <label class="form-check-label" for="SemiDarkTheme">Yarı koyu</label>
+            </div>
+
+            <hr />
+
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Sol Menü Ayarları</h5>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input input-sidebar" type="radio" name="menu_sidebar" id="inpu-sidebar1" value="1" {% if sidebar  == 1 %} checked {% endif %}>
+                <label class="form-check-label" for="acik">Kapalı Menü</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input input-sidebar" type="radio" name="menu_sidebar" id="inpu-sidebar12" value="2" {% if sidebar == 2 %} checked {% endif %}>
+                <label class="form-check-label" for="kapali">Açık Menü</label>
+            </div>
+           
+            <hr />
+            {% if level %}
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Geliştirici Ayarlarıı</h5>
+            <hr />
+            <div class="form-check form-switch">
+                <input class="form-check-input form-check-developer" data-toggle="tooltip" title="Tema önbelleği kapatırsanız sayfa yüklenmesi yavaşlar. Geliştirme durumlarında kapatılması önerilir" data-for="theme" name="developer_theme" value="1" type="checkbox" id="developer-theme" {% if developer_theme %} checked {% endif %}>
+                <label class="form-check-label" for="flexSwitchCheckDefault">Tema Önebbeleği</label>
+            </div>
+           
+            <div class="form-check form-switch">
+                <input class="form-check-input form-check-developer" data-toggle="tooltip" title="Dinamik css ön işlemcisi için açık kalması önerilir." name="developer_sass" value="1" type="checkbox" data-for="sass" id="developer-sass" {% if developer_sass %} checked {% endif %}>
+                <label class="form-check-label" for="flexSwitchCheckDefault">SASS</label>
+            </div>
+            
+            <hr />
+            {% endif %}
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Font Boyutu</h5>
+            <hr />
+            <div class="d-flex align-items-center gap-2 my-3">
+                <button type="button" class="btn btn-outline-info btn-sm font-size-btn {% if font_setting == 10 %} active {% endif %}" data-size="10">10</button>
+                <button type="button" class="btn btn-outline-info btn-sm font-size-btn {% if font_setting == 12 %} active {% endif %}" data-size="12">12</button>
+                <button type="button" class="btn btn-outline-info btn-sm font-size-btn {% if font_setting == 14 %} active {% endif %}" data-size="14">14</button>
+                <button type="button" class="btn btn-outline-info btn-sm font-size-btn {% if font_setting == 16 %} active {% endif %}" data-size="16">16</button>
+                <button type="button" class="btn btn-outline-info btn-sm font-size-btn {% if font_setting == 18 %} active {% endif %}" data-size="18">18</button>
+                <button type="button" class="btn btn-outline-info btn-sm font-size-btn {% if font_setting == 20 %} active {% endif %}" data-size="20">20</button>
+            </div>
+
+            <hr />
+            <h6 class="mb-0">Tema Seti Renk Ayarları</h6>
+            <hr />
+            <div class="header-colors-indigators">
+                <div class="row row-cols-auto g-1">
+                    <!-- Renk kutuları -->
+                    <div class="col"><div style="width:40px;height:40px;" class="indigator headercolor1" data-class="headercolor1" data-color="#0d6efd"></div></div> <!-- Mavi -->
+                    <div class="col"><div style="width:40px;height:40px;" class="indigator headercolor2" data-class="headercolor2" data-color="#0891b2"></div></div> <!-- Yeşil -->
+                    <div class="col"><div style="width:40px;height:40px;" class="indigator headercolor3" data-class="headercolor3" data-color="#dc3545"></div></div> <!-- Kırmızı -->
+                    <div class="col"><div style="width:40px;height:40px;" class="indigator headercolor4" data-class="headercolor4" data-color="#fd7e14"></div></div> <!-- Turuncu -->
+                    <div class="col"><div style="width:40px;height:40px;" class="indigator headercolor5" data-class="headercolor5" data-color="#ffc107"></div></div> <!-- Sarı -->
+                    <div class="col"><div style="width:40px;height:40px;" class="indigator headercolor6" data-class="headercolor6" data-color="#20c997"></div></div> <!-- Turkuaz -->                   
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-dogrulama" tabindex="-1" aria-labelledby="emailVerifyLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="emailVerifyLabel">
+          <i class="bi bi-envelope-check-fill text-primary me-2"></i> E-posta Doğrulama
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      
+      <!-- Body -->
+      <div class="modal-body">
+        <p class="mb-3">E-posta adresinize bir doğrulama kodu gönderildi. Lütfen aşağıya giriniz:</p>
+        <form id="verifyForm">
+          <div class="mb-3">
+            <label for="verificationCode" class="form-label fw-bold">Doğrulama Kodu</label>
+            <input type="text" name="code" class="form-control" id="input-dogrulama-code" placeholder="123456" disabled>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button type="button" id="button-dogrulama" class="btn btn-sm btn-info">Doğrula</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="modal-feedback" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered"> 
+    <div class="modal-content shadow">
+      
+      
+      <form id="form-modal-feedback">
+
+        <div class="modal-header border-bottom-0">
+          <h4 class="modal-title fw-bold " id="exampleModalLabel">Geri Bildirim Formu</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        
+        <div class="modal-body">
+           <input type="hidden" name="feedback_id" value="0">
+          
+          <div class="alert alert-secondary mb-4" style="max-height:180px; overflow-y:auto;">
+            <h6 class="fw-bold border-bottom pb-2 mb-3">
+                <i class="bi bi-info-circle me-2"></i> Geri Bildirim Bilgilendirmesi
+            </h6>
+            <p class="mb-2 small">
+                Değerli kullanıcı,<br>
+                Geri bildirimleriniz bizim için değerlidir. Sürecin daha hızlı ve sağlıklı ilerleyebilmesi için lütfen geri bildirimlerinizi açık ve anlaşılır şekilde iletiniz.
+            </p>
+            <ol class="small ps-3 mb-2">
+                <li>Sorun veya talebinizi kısa ve net bir şekilde açıklayınız.</li>
+                <li>Hata bildirimi yapıyorsanız, mümkünse ekran görüntüsü veya fotoğraf ekleyiniz.</li>
+                <li>Yeni bir fonksiyon,özellik veya değişiklik için,öneri seçeneğini seçiniz.</li>
+                <li>Gerekli durumlarda ek bilgi ve görseller paylaşınız.</li>
+                <li>Geri bildirimlerinizin durumunu aynı bölüm üzerinden takip edebilirsiniz.</li>
+                <li>Kullanım mecrası (Sosyal medya, baskı vb.)</li>
+            </ol>
+            <p class="small mb-0">
+                Göstermiş olduğunuz ilgi ve katkılarınız için teşekkür ederiz. Paylaştığınız her geri bildirim, hizmetlerimizin ve sistemimizin daha da geliştirilmesine katkı sağlayacaktır.
+            </p>
+          </div>
+          
+          <div class="alert bg bg-light-danger mb-4 note" style="display:none"></div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Geri Bildirim Seçenekleri:</label>
+            <div class="d-flex flex-wrap gap-3 p-3 border border-secondary-subtle rounded bg-light-subtle">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="bildirim_tipi" value="1" checked="checked">
+                <label class="form-check-label fw-medium">Şikâyet</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="bildirim_tipi" value="2">
+                <label class="form-check-label fw-medium">Öneri / Yeni Özellik </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="bildirim_tipi" value="3">
+                <label class="form-check-label fw-medium">Hata Bildirimi</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="bildirim_tipi" value="4">
+                <label class="form-check-label fw-medium">Diğer</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">İlgili Bölüm</label>
+            <select class="form-select border-secondary-subtle" id="feedbackSection" name="bolum">
+                <option value="">Seçiniz...</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label for="oncelikRange" class="form-label fw-bold">Öncelik Seviyesi</label>
+            <div class="px-2">
+              <input type="range" class="form-range slider-success" min="1" max="3" step="1" id="oncelikRange" name="oncelik" value="1">
+              <div class="row text-center mt-1 fs-7 text-muted">
+                <div id="lbl-dusuk" class="col-4 text-start text-success fw-bold opacity-100">🟢 Düşük</div>
+                <div id="lbl-orta" class="col-4 text-warning opacity-50">🟡 Orta</div>
+                <div id="lbl-yuksek" class="col-4 text-end text-danger opacity-50">🔴 Yüksek</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Detaylı Açıklama</label>
+            <textarea name="description" rows="4" placeholder="Şikayet, öneri, hata bildirimi veya yeni taleplerinizi buraya detaylı şekilde yazınız..." class="form-control border-secondary-subtle" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Görsel Ekle</label>
+            <div class="input-group">
+              <input type="text" name="filename[filename]" class="form-control filename" placeholder="Seçilen dosya yok" readonly>
+              <input type="hidden" name="filename[code]" class="form-control code" placeholder="Seçilen dosya yok" readonly>
+              <button type="button" id="button-upload-feedback" class="btn btn-outline-info">
+                <i class="bi bi-cloud-arrow-up me-2"></i> Gözat
+              </button>
+            </div>
+            <div class="form-text"><strong>Not :</strong> İzin verilen dosya tipleri {{filetype}}</div>
+          </div>
+        </div>
+        
+        <div class="modal-footer bg-light border-top-0">
+          <button type="button" id="button-modal-feedback" class="btn btn-primary px-4 fw-semibold">Kaydet</button>
+        </div>
+
+      </form> <!-- FORM ETİKETİNİ BURADA KAPATIYORUZ -->
+
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="view/javascript/bootstrap.bundle.min.js?v=12587777"></script>
+<script src="view/javascript/jquery.min.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/simplebar/js/simplebar.min.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/metismenu/js/metisMenu.min.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/easyPieChart/jquery.easypiechart.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/peity/jquery.peity.min.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/perfect-scrollbar/js/perfect-scrollbar.js?v=12587777"></script>
+<script src="view/javascript/pace.min.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/vectormap/jquery-jvectormap-2.0.2.min.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/vectormap/jquery-jvectormap-world-mill-en.js?v=12587777"></script>
+
+<!-- notification js -->
+<script src="view/stylesheet/plugins/notifications/js/lobibox.min.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/notifications/js/notifications.min.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/notifications/js/notification-custom-script.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/select2/js/select2.min.js?v=12587777"></script>
+<script src="view/javascript/form-select2.js?v=12587777"></script>
+<script src="view/javascript/app.js?v=12587777"></script>
+<script src="view/javascript/component-popovers-tooltips.js?v=12587777"></script>
+<script src="view/javascript/common.js?v=12587777"></script>
+
+<link rel="stylesheet" href="view/javascript/editor/richtexteditor/rte_theme_default.css?v=12587777" />
+<script src="view/javascript/editor/richtexteditor/rte.js?v=12587777"></script>
+<script src="view/javascript/editor/richtexteditor/lang/rte-lang-tr.js?v=12587777"></script>
+<script src="view/javascript/editor/richtexteditor/plugins/all_plugins.js?v=12587777"></script>
+<script src="view/stylesheet/plugins/apexcharts-bundle/js/apexcharts.min.js?v=12587777"></script>
+
+<script src="view/javascript/data-widgets.js?v=12587777"></script>
+<script src="view/javascript/jsuites.js?v=12587777"></script>
+
+</body>
+
+<script>
+    function epostaDogrulama() {
+        
+        $.ajax({
+            url: 'index.php?route=common/dashboard/emailCode&user_token={{user_token}}',
+            dataType: 'json',
+
+            success: function(json) {
+                if (json.error.warning) {
+                    alerterror(json.error.warning);
+                }
+
+                if (json.success) {
+                    alertsuccess(json.success);
+                    $('#modal-dogrulama input[name=\'code\']').prop('disabled',false);
+                    $('#modal-dogrulama').modal('show');
+                }
+            },
+
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+
+        });
+    }
+  </script>
+  <script>
+    $('#button-dogrulama').on('click', function() {
+        $.ajax({
+             url: 'index.php?route=common/dashboard/dogrulama&user_token={{user_token}}',
+            type: 'post',
+            data: 'code=' + $('#modal-dogrulama input[name=\'code\']').val(),
+            dataType: 'json',
+
+            beforeSend: function() {
+                $('#button-dogrulama').buttonanimate('loading');
+            },
+
+            complete: function() {
+                $('#button-dogrulama').buttonanimate('reset');
+            },
+
+            success: function(json) {
+                if (json.error.warning) {
+                  alerterror(json.error.warning);
+                }
+
+                if (json.success) {
+                     $('#modal-dogrulama').modal('hide');
+                    location = json.success;
+                }
+
+            },
+
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+
+        });
+
+    });
+</script>
+<script>
+$(document).ready(function() {
+	 $('#alert').observe(function() {
+        window.setTimeout(function() {
+            $('#alert .alert-dismissible').fadeTo(3000, 0, function() {
+                $(this).remove();
+            });
+        }, 3000);
+    });
+ });
+
+ +function($) {
+    $.fn.observe = function(callback) {
+        observer = new MutationObserver(callback);
+
+        observer.observe($(this)[0], {
+            characterData: false,
+            childList: true,
+            attributes: false
+        });
+    };
+}(jQuery);
+
+</script>
+
+<script>
+$(document).ready(function () {
+    // Açılışta mobilde menüyü kapalı başlat
+   
+    $(".sidebar-wrapper").hover(
+        function () {
+            if ($(".wrapper").hasClass("toggled")) {
+                $(".wrapper").addClass("sidebar-hovered");
+            }
+        },
+        function () {
+            $(".wrapper").removeClass("sidebar-hovered");
+        }
+    );
+
+});
+</script>
+
+<script>
+$('.toggle-icon').on('click', function() {
+  $(this).find('i')
+    .toggleClass('bi-chevron-double-left bi-chevron-double-right');
+});
+
+$('.button-setting').on('click', function() {
+  $('.offcanvas ').addClass('show');
+});
+
+</script>
+
+<script>
+$("#offcanvas-popover .form-check-input-theme").on("click", function() {
+    var color = $(this).attr('for');
+    $.ajax({
+		url: 'index.php?route=common/dashboard/theme&user_token={{ user_token }}',		
+		type: 'post',
+        data: 'theme=' + $(this).val(),
+		dataType: 'json',
+		
+		success: function(json) {
+           
+        if (json.success) {
+            $('.sidebar-wrapper i').css('color', color);
+            $('html').attr('class',json['theme']);
+			$('html').attr('class',json['theme']);
+			}			
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});	
+});
+</script>
+
+<script>
+$("#offcanvas-popover .input-sidebar").on("click", function() {
+    $.ajax({
+        url: 'index.php?route=common/dashboard/theme&user_token={{ user_token }}',
+        type: 'post',
+        data: 'sidebar=' + $(this).val(),
+        dataType: 'json',
+        success: function(json) {
+            if (json['sidebar_toggled']) {
+                $('.wrapper').addClass('toggled');
+            }else{
+                $('.wrapper').removeClass('toggled');
+            }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+</script>
+<script type="text/javascript">
+$('input[name="developer_theme"], input[name="developer_sass"]').on('change', function() {
+    $.ajax({
+        url: 'index.php?route=common/developer/edit&user_token={{ user_token }}',
+        type: 'post',
+        data: $('input[name=\'developer_theme\']:checked, input[name=\'developer_sass\']:checked'),
+		dataType: 'json',
+        success: function(json) {
+
+            if (json.error) {
+                alerterror(json.error);
+            }
+
+            if (json.success) {
+                alertsuccess(json.success);
+            }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+
+$('.form-check-developer').on('click', function() {
+    $.ajax({
+        url: 'index.php?route=common/developer/' + $(this).data('for') + '&user_token={{ user_token }}',
+		dataType: 'json',
+        success: function(json) {
+        $('.alert-dismissible').remove();
+
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+</script>
+
+
+<script>
+$("#offcanvas-popover .font-size-btn").on("click", function() {
+    var $btn = $(this); // tıklanan butonu sakla
+
+    $.ajax({
+        url: 'index.php?route=common/dashboard/theme&user_token={{ user_token }}',
+        type: 'post',
+        data: '&font_setting=' + $btn.attr('data-size'),
+        dataType: 'json',
+        success: function(json) {
+            $('#offcanvas-popover .font-size-btn').removeClass('active');
+            $('body').css('font-size', $btn.attr('data-size') + 'px');
+            
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+
+$("#offcanvas-popover .indigator").on("click", function() {
+    var $btn = $(this); // tıklanan butonu sakla
+    $('html').removeClass('color-header headercolor1 headercolor2 headercolor3 headercolor4 headercolor5 headercolor6 headercolor7 headercolor8 headercolor9');
+   
+   $.ajax({
+        url: 'index.php?route=common/dashboard/theme&user_token={{ user_token }}',
+        type: 'post',
+        data: '&header_color=' + $btn.attr('data-class'),
+        dataType: 'json',
+        success: function(json) {
+         $('html').addClass(json.color);           
+        },
+
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+</script>
+
+<script>
+$(document).ready(function(){
+  $("#menu > li").each(function(){
+    let parentTitle = $(this).find(".menu-title").first().text().trim();
+    let children = $(this).find("ul li a");
+
+    if(children.length > 0){
+      let $optgroup = $("<optgroup>", { label: parentTitle });
+
+      children.each(function(){
+        let childName = $(this).text().trim();
+        $optgroup.append($("<option>", { 
+          text: childName, 
+          value: childName
+        }));
+      });
+
+      // Select içine ekle
+      $("#feedbackSection").append($optgroup);
+    }
+  });
+});
+
+</script>
+
+<script>
+$('#button-modal-feedback').on('click', function() {
+    $('.text-danger').find('span').remove();
+    var bildirim_tipi = $('input[name=\'bildirim_tipi\']:checked').val();
+    $.ajax({
+      url: 'index.php?route=setting/user_feedback/savefeedback&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-modal-feedback').serialize() + '&bildirim_tipi=' + encodeURIComponent(bildirim_tipi),
+
+      beforeSend: function() {
+            $('#button-modal-feedback').buttonanimate('loading');
+       },
+
+        complete: function() {
+            $('#button-modal-feedback').buttonanimate('reset');
+        },
+        success: function(json) {
+
+       if (json.error.warning) {
+          alerterror(json.error.warning);
+       }
+       
+       if (json.success) {
+        $('#feedback-data').load('index.php?route=setting/user_feedback/dataFeedback&user_token={{ user_token }}');
+         $('#modal-feedback').modal('hide');
+          Swal.fire({     
+            text: 'Geri Bildiriminiz başarıyla kayıt edildi. En kısa zamanda incelenip geri dönüş yapılacaktır.',
+            icon: 'success',
+            confirmButtonText: 'Tamam',
+            width: '400px', // kutu genişliğini küçült
+            customClass: {
+                popup: 'small-swal-popup',
+                title: 'small-swal-title',
+                confirmButton: 'btn-sm'
+            }
+            });
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ });
+</script>
+<script type="text/javascript"><!--
+$('#button-upload-feedback').on('click', function() {
+	$('#form-upload').remove();
+
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+
+			$.ajax({
+				url: 'index.php?route=catalog/download/upload&user_token={{ user_token }}&bolum="bildirim"',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				beforeSend: function() {
+					$('#button-upload-feedback').buttonanimate('loading');
+				},
+				complete: function() {
+					$('#button-upload-feedback').buttonanimate('reset');
+				},
+				success: function(json) {
+                 $('.alert-dismissible').remove();
+					if (json.error) {
+                      alerterror(json.error);
+					}
+
+					if (json.success) {
+						$('#modal-feedback .filename').val(json['filename']);
+                        $('#modal-feedback .code').val(json['code']);
+                        alertsuccess(json.success);
+        
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+//--></script>
+<style>
+/* Bootstrap form-control placeholder font boyutu */
+.form-control::placeholder {
+  font-size: 16px;   /* istediğin boyutu yaz */   /* opsiyonel: placeholder rengi */
+}
+
+.form-select option  {
+  font-size: 14px;   /* istediğin boyutu yaz */   /* opsiyonel: placeholder rengi */
+}
+
+.bg-light-danger {
+  background-color: rgba(245, 177, 183, 0.7) !important; /* 0.8 opacity */
+  font-size:15px;
+}
+
+.bg-light-success {
+  background-color: rgba(145, 227, 189, 0.7) !important; /* Bootstrap success yeşili (#198754), %85 opak */
+  font-size:15px;
+}
+
+.table-striped {
+  --bs-table-striped-bg: #f9f9f9; /* beyaza çok yakın hafif gri */
+}
+
+td {
+  position: relative;
+}
+
+.indigator {
+    width: 6px;
+    height:6px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #fff;
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+
+.indigator[data-color] {
+    background-color: var(--color);
+}
+
+/* Normal seçenekler */
+.dropdown-menu li {
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.dropdown-menu li:last-child {
+    border-bottom: none;
+}
+
+/* Tıklanabilir alan */
+.dropdown-menu li > a {
+    display: block;
+    padding: 8px 12px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Hover efekti */
+.dropdown-menu li > a:hover {
+    background: #f5f5f5;
+    color: #000;
+}
+
+/* Kategori başlıkları */
+.dropdown-header {
+    padding: 8px 12px;
+    font-weight: bold;
+    background: #fafafa;
+    font-size: 13px;
+    color: #555;
+    border-bottom: 1px solid #e6e6e6;
+    cursor: default;
+}
+
+/* Kategorideki alt maddeler */
+.dropdown-menu li[data-value] > a {
+    padding-left: 20px;
+}
+
+/* Scroll bar özelleştirme */
+.dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.alert-popup {
+  position: fixed;       /* sayfaya sabitle */
+  top: 50%;              /* dikey ortalama */
+  left: 50%;             /* yatay ortalama */
+  transform: translate(-50%, -50%); /* tam ortada */
+  z-index: 9999;         /* diğer öğelerin üstünde */
+}
+
+#textarea-editor {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Soft arka plan parlama efekti (Mevcut olanı hafifçe koruyoruz) */
+@keyframes glow-pulse {
+  0% { box-shadow: 0 6px 18px rgba(11, 48, 172, 0.3); }
+  50% { box-shadow: 0 10px 25px rgba(11, 48, 172, 0.5); }
+  100% { box-shadow: 0 6px 18px rgba(11, 48, 172, 0.3); }
+}
+
+
+@keyframes opencartPulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8); /* Dışarıya doğru büyüme oranı */
+    opacity: 0;            /* Büyürken tamamen şeffaflaşma */
+  }
+}
+
+/* MİKRO ANA KAPSÜL */
+.feedback-container {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, #1d2b9a, #0541a8);
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+  overflow: visible; /* DALGALARIN DIŞARI TAŞMASI İÇİN BURA 'visible' OLMALI */
+  cursor: pointer;
+  border: none;
+  z-index: 9999;
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.3s ease;
+  animation: glow-pulse 3s infinite ease-in-out;
+}
+
+/* MİKRO PARLAYAN İÇ DAİRE */
+.feedback-container .inner-circle {
+  position: relative; /* Dalga efekti konumlandırması için şart */
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #25a3ff, #0066ff);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.6), 
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    2px 0 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 2;
+}
+
+/* OPENCART HALKA EFEKTİ (YENİ EKLENDİ) */
+.feedback-container .inner-circle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #25a3ff; /* Dalga rengi */
+  border-radius: 50%;
+  z-index: -1; /* Butonun arkasında kalması için */
+  animation: opencartPulse 2s infinite ease-out; /* Sonsuz döngü dalga */
+}
+
+.feedback-container .inner-circle i {
+  font-size: 1.15rem;
+  color: #ffffff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+}
+
+/* MİKRO YAZI ALANI */
+.feedback-container .text-label {
+  color: #ffffff;
+  font-size: 0.95rem; 
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(12px);
+  transition: opacity 0.2s ease, transform 0.3s ease;
+  margin-left: 10px;
+  margin-right: 16px; 
+}
+
+.feedback-container:hover {
+  width: 165px;
+  transform: translateY(-2px);
+}
+
+.feedback-container:hover .text-label {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.08s;
+}
+
+/* Hover anında dalga efekti gizlensin ve ikon dönsün */
+.feedback-container:hover .inner-circle {
+  transform: scale(0.92) rotate(360deg);
+}
+.feedback-container:hover .inner-circle::before {
+  animation: none; /* Hover olunca göz yormasın diye dalgayı durduruyoruz */
+  opacity: 0;
+}
+
+/* Tıklama Anı */
+.feedback-container:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+</style>
+
+</html>

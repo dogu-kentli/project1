@@ -1,0 +1,93 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">Yüklenen Belgeler Listesi</h5>
+            <div class="ms-auto">
+               <a href="{{download_all}}" data-toggle="tooltip"  title="{{ "Tüm dosyaları Zip olarak indir" }}" class="btn btn-info btn-sm" ><i class="bi bi-archive"></i></a>
+                
+              </a>
+             <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm bg-white btn-sm">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-information">
+                    
+
+                        <div class="table-responsive-sm">
+                            <table class="table table-striped align-middle mb-0">
+                                   <thead class="table-light">
+                                    <tr class="text-center">
+                    <th style="width: 1%;">#</th>
+                    <th class="text-start" style="width: 20%;">Öğrenci Adı</th>
+                    <th class="text-start" style="width: 25%;">Derneği</th>
+                    <th class="text-center" style="width: 5%;">Belge Sayısı</th>
+                    <th style="width: 1%;">Dosya</th>
+                </tr>
+                 </thead>
+                 <tbody id="belgeAlanlariKapsayici">
+                          {% for upload in uploads %}
+                              <tr>
+                                  <td class="text-center">{{ loop.index }}</td>
+                                  <td>{{ upload.ogrenci }}</td>
+                                  <td>{{ upload.store }}</td>
+                                  <td class="text-center">{{ upload.total }}</td>
+                                  <td class="text-center">
+                                  <a href="{{upload.download}}" data-toggle="tooltip"  title="{{ "Dosyaları Zip olarak indir" }}" class="btn btn-outline-warning btn-sm text-dark" ><i class="bi bi-archive"></i></a>
+                                  </td>
+                              </tr>
+                          {% endfor %}
+                      </tbody>
+                                 </table>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-sm-12 col-md-5">
+                                <div class="dataTables_info">{{results}}</div>
+                            </div>
+                            <div class="col-sm-12 col-md-7">
+                                <div class="float-end" id="example2_paginate">
+                                    {{pagination}}
+                                </div>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+    {{footer}}
+</main>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+    if(error_warning) {
+    $('#alert').prepend(
+            '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+              '<div class="d-flex align-items-center">' +
+                '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                '<div class="ms-3"><div class="text-dynamic">' + error_warning + '</div></div>' +
+              '</div>' +
+              '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>'
+          );
+    }
+
+    if (success) {
+      $('#alert').append(
+            '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+              '<div class="d-flex align-items-center">' +
+                '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+                '<div class="ms-3"><div class="text-dynamic">' + success + '</div></div>' +
+              '</div>' +
+              '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>'
+          );  
+  }
+});
+</script>

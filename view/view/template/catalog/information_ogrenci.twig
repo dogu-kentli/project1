@@ -1,0 +1,135 @@
+<div class="alert alert-info d-flex align-items-center">
+    <small>Bu etkinliğe katılan öğrencileri eklemek için <strong>öğrenci ismini</strong> yazınız.
+        Topluca eklemek için <strong>Başvuru ID numarasını</strong> kullanınız.</small>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-sm-6">
+        <input type="text" name="filter_name" class="form-control" placeholder="Bir isim yazınız">
+    </div>
+    <div class="col-sm-6">
+        <input type="text" name="filter_id" class="form-control" placeholder="ID Numarasını yazınız.">
+    </div>
+</div>
+<form id="form-katilim">
+<table class="table table-bordered table-sm align-middle">
+    <thead class="table-light">
+        <tr>
+        <th class="text-center" style="width:1%;">#</th>
+            <th class="text-start" >{{ column_customer }}</th>
+            <th class="text-start" style="width:12%;">{{ column_telephone }}</th>
+            <th class="text-start">{{ column_email }}</th>
+            <th class="text-start" style="width:1%;">{{ column_action }}</th>
+        </tr>
+    </thead>
+    <tbody id="customer">
+        {% if customer_etkinlik %}
+        {% set row = 1 %}
+        {% for customer in customer_etkinlik %}
+        <tr id="customer-list{{customer.customer_id}}">
+            <td>{{ row }}</td>
+            <td>{{ customer.name }}</td>
+            <td>{{ customer.telephone|replace({' ': ''}) }}</td>
+
+            <td>{{ customer.email }}</td>
+            <td>
+                <button type="button" onclick="$('#customer-list{{customer.customer_id}}').remove();" class="btn btn-danger btn-sm">
+                    <i class="bi bi-dash-circle"></i>
+                </button>
+            </td>
+            <input type="hidden" name="customers[]" value="{{customer.customer_id}}">
+            <input type="hidden" name="tarih" value="{{ date_added }}">
+        </tr>
+         {% set row = row + 1 %}
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+</form>
+<script type="text/javascript"><!--
+var tarih = '{{date_added}}';
+$('input[name=\'filter_name\']').autocomplete({
+    'source': function(request, response) {
+        $.ajax({
+            url: 'index.php?route=setting/autocomplete/customerautocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+            dataType: 'json',
+            success: function(json) {
+                response($.map(json, function(item) {
+                    return {
+                        label: item['name'],
+                        label2: item['telephone'],
+                        label3: item['email'],
+                        value: item['customer_id']
+                    }
+                }));
+            }
+        });
+    },
+    'select': function(item) {
+        // mevcut satır sayısını bul
+        var rowCount = $('#customer tr').length + 1; // mevcut satır sayısı +1
+
+        $('#customer-list' + item['value']).remove();
+        $('#customer').append(
+            '<tr id="customer-list' + item['value'] + '">' +
+                '<td>' + rowCount + '</td>' + // satır numarası
+                '<td>' + item['label'] + '</td>' +
+                '<td>' + item['label2'] + '</td>' +
+                '<td>' + item['label3'] + '</td>' +
+                '<td>' +
+                    '<button type="button" onclick="$(\'#customer-list' + item['value'] + '\').remove();" class="btn btn-danger btn-sm">' +
+                        '<i class="bi bi-dash-circle"></i>' +
+                    '</button>' +
+                '</td>' +
+                '<td style="display:none;">' +
+                    '<input type="hidden" name="customers[]" value="' + item['value'] + '"/>' +
+                    '<input type="hidden" name="tarih" value="' + tarih + '"/>' +
+                '</td>' +
+            '</tr>'
+        );
+    }
+});
+
+
+$('input[name="filter_id"]').on('blur', function() {
+  let filter_id = $(this).val().trim();
+
+  if (filter_id === '') {
+    return;
+  }
+
+  $.ajax({
+    url: 'index.php?route=setting/autocomplete/ogrencifiltresibasvuru&user_token={{ user_token }}&filter_id=' + filter_id,
+    dataType: 'json',
+    success: function(json) {
+      if (json.error && json.error.warning) {
+        alerterror(json.error.warning);
+      } else {
+        $('#customer tr').remove();
+        let rowCount = 0; // sıfırdan başlat
+
+        $.each(json, function(index, item) {
+          $('#customer').append(
+            '<tr id="customer-list' + item['customer_id'] + '">' +
+              '<td>' + (rowCount + index + 1) + '</td>' +
+              '<td>' + item['name'] + '</td>' +
+              '<td>' + item['telephone'] + '</td>' +
+              '<td>' + item['email'] + '</td>' +
+              '<td>' +
+                '<button type="button" onclick="$(\'#customer-list' + item['customer_id'] + '\').remove();" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i></button>' +
+              '</td>' +
+              '<td style="display:none;">' +
+                '<input type="hidden" name="customers[]" value="' + item['customer_id'] + '"/>' +
+                '<input type="hidden" name="tarih" value="' + (typeof tarih !== "undefined" ? tarih : "") + '"/>' +
+              '</td>' +
+            '</tr>'
+          );
+        });
+
+        $('input[name="filter_id"]').val('');
+      }
+    }
+  });
+});
+
+</script>

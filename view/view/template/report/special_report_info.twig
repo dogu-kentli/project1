@@ -1,0 +1,138 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      
+      <div class="pull-right">
+		    <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success" {{disabled}}><i class="fa fa-download"></i></a>
+
+      </div>
+      <h1><img src="view/image/ogrenciler.png" width="40" hegiht="40"></h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-bar-chart"></i> {{ heading_title }}</h3>
+        <div class="pull-right">
+         <select name="filter_special" id="select-special" class="form-control input-sm" disabled>
+            <option value="">{{ "--SEÇİM YAPIN--" }}</option>
+            <option value="day" {% if filter_special == 'day' %} selected="selected" {% endif %}>{{ text_day }}</option>
+            <option value="week" {% if filter_special == 'week' %} selected="selected" {% endif %}>{{ text_week }}</option>
+            <option value="month" {% if filter_special == 'month' %} selected="selected" {% endif %}>{{text_month }}</option>
+            <option value="year" {% if filter_special == 'year' %} selected="selected" {% endif %}>{{ text_year }}</option>
+         </select>
+         </div>
+      </div>
+      <div class="panel-body">
+        <div class="table-responsive">
+        <div class="col-sm-6 well well-sm" style="height: 350px; overflow: auto;">
+          <table id="bolge-list" class="table table-bordered">
+            <thead>
+             <tr style="color:#000000; background:#d6d7d8; font-weight:bold;">
+                <td class="text-left">{{ column_bolge }}</td>
+                <td class="text-center">{{ column_customer }}</td>
+                 <td class="text-center">{{ column_percent }}</td>
+                <td class="text-left">{{ column_country1 }}</td>			  
+              </tr>
+            </thead>
+            <tbody>
+      
+            {% if customers_report %}
+            {% for report in customers_report %}
+             {% set percent = (report.total_ogrenci * 100 / total)  %}
+            <tr>
+              <td class="text-left"><span style="color:#000000; font-weight:bold;">{{ report.name }}</span></td>
+              <td class="text-center"><span class="label label-info">{{ report.total_ogrenci }}</span></td>
+              <td class="text-center">% {{ percent | round(1, 'ceil')  }} </td>
+              <td class="text-left"><button type="button" id="button-country" name="{{report.bolge_id}}" class="btn btn-default btn-sm"><i class="fa fa-bar-chart"></i> {{button_country}}</button></td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+             <tr class="bg-light">
+              <td colspan="4" class="text-right"><h4><strong>Toplam Öğrenci : {{ total }}</strong></h4></td>
+            </tr>
+            </tbody>
+            
+          </table>
+           </div>
+
+          <div class="col-sm-6 well well-sm" style="height: 350px; overflow: auto;">
+           <table class="table table-bordered">
+            <thead>
+             <tr style="color:#000000; background:#d6d7d8; font-weight:bold;">
+                <td class="text-left">{{ column_row }}</td>
+                <td class="text-left">{{ column_country2 }}</td>
+                <td class="text-center">{{ column_customer }}</td>			  
+              </tr>
+            </thead>
+            <tbody>
+            {% set row = 1 %}
+            {% for report in customers_report %}
+			      {% for country in report.country %}
+            <tr class="country{{report.bolge_id}} country-list" style="display:none;">
+              <td class="text-left">{{row}}</td>
+              <td class="text-left"><span style="color:#000000; font-weight:bold;">{{ country.name }}</span></td>
+              <td class="text-center"><span class="label label-info">{{ country.total }}</span></td>
+            </tr>
+						 {% set row =  row + 1 %}
+             {% endfor %}
+             {% set row = 1 %}
+            {% endfor %}
+           
+            </tbody>
+            
+          </table>
+           </div>
+        </div>
+        <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript"><!--
+$('select[name=\'filter_special\']').on('change', function() {
+  var url = '';
+	var filter_special = $(this).val();
+	
+	if (filter_special) {
+		url += '&filter_special=' + encodeURIComponent(filter_special);
+	}
+		
+	location = 'index.php?route=report/special_transaction&user_token={{ user_token }}' + url;
+});
+//--></script> 
+
+<script type="text/javascript"><!--
+$('button[id=\'button-country\']').on('click', function() {
+  $('#bolge-list').find('button').attr('class','btn btn-light btn-sm');
+  $('#bolge-list').find('button').html('Göster');
+
+  $(this).html('Göster <i class="fa-solid fa-arrow-right"></i>');
+  $(this).attr('class','btn btn-info btn-sm');
+ 
+	var id = $(this).attr('name');
+  $('.country-list').hide();
+  $('.country' + id).show();
+	
+});
+
+$('button[id=\'button-country\']:first').click();
+//--></script> 
+
+{{ footer }} 

@@ -1,0 +1,673 @@
+<div id="modal-gorev-detay" class="modal" tabindex="-1" aria-labelledby="modalMessageLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      
+       <div class="modal-body">
+       <form id="form-odeme-edit">
+        <main class="form-main-aesthetic">
+        <div class="left-column">
+            <article class="card-aesthetic task-details-card">
+                <header class="card-header-aesthetic">Görev Detayları <span ><strong># {{ID}}</strong></span></header>
+                <section class="card-body-aesthetic">
+                    <div class="form-group-aesthetic">
+                        <label for="department">Birim</label>
+                        <select id="department" name="personel_birim_id" class="form-input-aesthetic " {{birim_status}}>
+                        {% for birim in kurumlar %}
+                         <option value="{{birim.personel_birim_id}}" {% if birim.personel_birim_id == personel_birim_id %} selected {% endif %} >{{birim.name}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group-aesthetic">
+                        <label for="subject">Görevin Konusu</label>
+                        <input id="input-konu" name="konu" type="text" value="{{konu}}" class="form-input-aesthetic" {{gorev_konusu_status}}/>
+                    </div>
+                    <div class="form-group-aesthetic">
+                        <label for="purpose">Görevin Amacı</label>
+                        <textarea id="input-description" name="description" rows="2" class="form-input-aesthetic" {{description_status}}>{{description}}</textarea>
+                    </div>
+                    <div class="form-group-aesthetic">
+                        <label for="purpose">Proje/Faaliyet</label>
+                        <input id="input-proje" name="proje" type="text" value="{{proje}}" data-for="7" class="form-input-aesthetic auto-filter"/>
+                        <input type="hidden" name="proje_id" id="proje-input-id" value="{{proje_id}}" class="input-hidden"/>
+                    </div>
+                    <div class="form-group-aesthetic" id="gorev-raporu" style="display:none;">
+                        <label for="purpose">Görev Raporu</label>
+                        <textarea id="input-rapor" name="rapor" rows="2" class="form-input-aesthetic" >{{rapor}}</textarea>
+                    </div>
+                </section>
+            </article>
+
+            <article class="card-aesthetic time-fund-card">
+                <header class="card-header-aesthetic">Süre & Fon Bilgileri</header>
+                <section class="card-body-aesthetic form-grid-two-col">
+                    <div class="form-group-aesthetic">
+                        <label>Başlama Zamanı</label>
+                        <input name="input_date_start" type="date" value="{{date_start}}" class="form-input-aesthetic datetime-input" {{ disabled_zaman }}/>
+                    </div>
+                    <div class="form-group-aesthetic">
+                        <label>Bitiş Zamanı </label>
+                        <input name="input_date_end" type="date" value="{{date_end}}" class="form-input-aesthetic datetime-input" {{ disabled_zaman }}/>
+                    </div>
+
+                    <div class="form-group-aesthetic">
+                        <label>Avans Süresi</label>
+                        <select name="day" class="form-input-aesthetic" {{ disabled_zaman }}>
+                        <option selected value="{{gun_farki}}">{{gun_farki}} Gün</option>
+                        </select>
+                    </div>
+                </section>
+            </article>
+            
+            <article class="card-aesthetic transport-card">
+                <header class="card-header-aesthetic">Kullanılacak Ulaşım Araçları</header>
+                <section class="card-body-aesthetic">
+                    <div class="transport-grid-aesthetic">
+                        <div class="transport-item">
+                            <input name="araclar[]" value="1" id="transport0e" type="checkbox" {% if '1' in araclar %} checked {% endif %} {{ disabled_arac }}/><label for="transport0e">Kurum Aracı</label>
+                        </div>
+                        <div class="transport-item">
+                            <input name="araclar[]" value="2" id="transport1e" type="checkbox" {% if '2' in araclar %} checked {% endif %} {{ disabled_arac }}/><label for="transport1e">Gönüllü Aracı</label>
+                        </div>
+                        <div class="transport-item">
+                            <input name="araclar[]" value="3" id="transport2e" type="checkbox" {% if '3' in araclar %} checked {% endif %} {{ disabled_arac }}/><label for="transport2e">Personel Aracı</label>
+                        </div>
+                        <div class="transport-item">
+                            <input name="araclar[]" value="4" id="transport3e" type="checkbox" {% if '4' in araclar %} checked {% endif %} {{ disabled_arac }}/><label for="transport3e">Kiralık Araç</label>
+                        </div>
+                        <div class="transport-item">
+                            <input name="araclar[]" value="5" id="transport4e" type="checkbox" {% if '5' in araclar %} checked {% endif %} {{ disabled_arac }}/><label for="transport4e">Toplu Taşıma</label>
+                        </div>
+                        <div class="transport-item">
+                            <input name="araclar[]" value="6" id="transport5e" type="checkbox" {% if '6' in araclar %} checked {% endif %} {{ disabled_arac }}/><label for="transport5e">Otobüs Firması</label>
+                        </div>
+                        <div class="transport-item">
+                            <input name="araclar[]" value="7" id="transport6e" type="checkbox" {% if '7' in araclar %} checked {% endif %} {{ disabled_arac }}/><label for="transport6e">Uçak</label>
+                        </div>
+                        <div class="transport-item">
+                            <input name="araclar[]" value="8" id="transport10e" type="checkbox" {% if '8' in araclar %} checked {% endif %} {{ disabled_arac }}/><label for="transport10e">Yok</label>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="form-group-aesthetic">
+                        <label for="transport_note">Diğer Ulaşım Bilgileri & Araç Plakaları</label>
+                        <input id="transport_note" name="diger_ulasim" type="text" value="{{diger_ulasim}}" class="form-input-aesthetic" {{ disabled_arac }}/>
+                    </div>
+                </section>
+            </article>
+
+
+        </div> 
+        <div class="right-column">
+            
+            <article class="card-aesthetic advance-card">
+                <header class="card-header-aesthetic">Avans ve Mali Bilgiler</header>
+                <section class="card-body-aesthetic">
+                    <div class="amount-boxes-aesthetic">
+                       
+                        <div class="amount-box">
+                            <label>Avans Bakiyesi</label>
+                            <input type="text" name="harcirah_tutari" class="form-control" data-mask="#.##,00" value="{{harcirah_tutari}} ₺" {{ disabled_avans }} style="background-color:#e9fce1;font-weight:bold;">
+                        </div>
+                        <div class="amount-box">
+                            <label>Top Kullanım</label>
+                            <input type="text" name="harcama_tutari" class="form-control" value="{{harcama_tutari}} ₺" {{ disabled_avans }} style="background-color:#fcf9d9;font-weight:bold;">
+                        </div>
+
+                         <div class="amount-box">
+                            <label>İade Alacak</label>
+                            <input type="text" name="kalan" class="form-control" value="{{kalan}} ₺" {{ disabled_avans }} style="background-color:#ff817a;font-weight:bold;">
+                        </div>
+                       
+                    </div>
+
+                </section>
+            </article>
+
+             <article class="card-aesthetic action-card">
+                <header class="card-header-aesthetic">Bağlantılı Kayıtlar & İşlemler</header>
+                <nav class="action-nav-aesthetic">
+                    <button type="button" data-id="dokuman" onclick="dokumanDosya();" data-toggle="tooltip" title="{{button_dokuman_title}}" class="action-btn-aesthetic" {{ disabled_action_dokuman }}><i class="fa fa-file-o"></i> {{" Döküman"}}</button>
+                    <button type="button" data-id="harcama" onclick="dokumanHarcama();" data-toggle="tooltip" title="{{button_harcama_title}}" class="action-btn-aesthetic " {{ disabled_action_harcama }}><i class="fa-solid fa-coins"></i> {{" Harcama"}}</button>
+                    <button type="button" data-id="button-gorev-raporu" onclick="dokumanRapor();" data-toggle="tooltip" title="{{button_gorev_raporu_title}}" class="action-btn-aesthetic" {{ disabled_action_rapor }}><i class="fa-solid fa-chart-pie"></i>{{" Rapor"}}</button>
+                    <button type="button" onclick="dokumanSurec('{{log_href}}');" target="_blank" data-toggle="tooltip" title="{{button_surec_title}}" data-id="button-surec" class="action-btn-aesthetic" {{ disabled_action_surec }}><i class="fa-solid fa-times-circle"></i> {{" Süreç"}}</button>
+                    <button type="button" data-id="button-gorevli" onclick="dokumanGorevli();" data-toggle="tooltip" title="{{button_gorevli_kisiler_title}}" class="action-btn-aesthetic" {{ disabled_action_gorevli }}><i class="fa-solid fa-user-group"></i> {{" Görevli Kişiler"}}</button>
+                    <button type="button" data-id="button-gorevli" onclick="dokumanGeriodeme();" data-toggle="tooltip" title="{{button_geri_odeme_title}}" class="action-btn-aesthetic" {{ disabled_action_geriodeme }}><i class="fa-solid fa-rotate-left"></i> {{" Geri Ödeme"}}</button>
+                    <a href="{{belge_print}}" target="_blank" data-toggle="tooltip" title="{{"Belgeyi Yazdır"}}" class="action-btn-aesthetic {% if status < 2 %} disabled {% endif %}" ><i class="fa-solid fa-print"></i> {{" Görevlendirme Formu"}} </a>
+                     <a href="{{harcama_print}}" target="_blank" data-toggle="tooltip" title="{{"Harcama Dökümü"}}" class="action-btn-aesthetic {% if status < 2 %} disabled {% endif %}" ><i class="fa-solid fa-print"></i> {{" Harcama Dökümü"}} </a>
+                    
+                </nav>
+            </article>
+
+            <article class="card-aesthetic responsible-card">
+                <header class="card-header-aesthetic">Sorumlular & Süreç</header>
+                <section class="card-body-aesthetic">
+                   
+                    <div class="form-group-aesthetic">
+                        <label>Kaydı Oluşturan</label>
+                        <input readonly type="text" value="{{sorumlu}}" class="form-input-aesthetic read-only-aesthetic" />
+                    </div>
+
+                    <div id="gorevli-kisiler" class="form-group-aesthetic gorevli-kisiler" style="display:none;">
+                        <label>Görevli Kişiler</label>
+                        <input type="text" value="" name="filter_personel" id="input-personel-name" placeholder="Kişi Ekle (Otomatik Tamamlama)" class="form-input-aesthetic read-only-aesthetic"/>
+                    </div>
+
+                     <div id="personel-filter" class="well well-sm gorevli-kisiler border" style=" height:100px; overflow: auto;display:none;">
+                        {% for diger in diger_gorevliler %}
+                          <div id="personel-filter{{ loop.index }}">
+                            <i class="fa fa-minus-circle"></i> {{diger}}
+                            <input type="hidden" name="diger_gorevliler[]" value="{{diger}}" />
+                          </div>
+                        {% endfor %}
+                        
+                    </div>
+
+                    <div class="divider"></div>
+                    <header class="card-header-aesthetic">Görev Formu İmzacıları</header>
+                    <div class="transport-grid-aesthetic">
+                       {% for imzaci in personel_imzacilar %}
+                            <div class="transport-item bg-light-info">
+                                <input name="imzacilar[]" value="{{ imzaci.personel_id }}" 
+                                    id="transport{{ loop.index }}" type="checkbox" 
+                                    checked="checked" style="background-color:#9ed498;pointer-events: none;">
+                                <label for="transport{{ loop.index }}">{{ imzaci.name }}</label>
+                            </div>
+                        {% endfor %}
+
+              
+                    </div>
+                    <div class="divider"></div>
+                    <div class="form-group-aesthetic">
+                    <label for="status">
+                        <h5>
+                           {% if status < 3 %} 
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                            {% endif %}
+
+                            {% if status == 3 %} 
+                                <i class="bi bi-dash-circle text-info"></i> 
+                            {% endif %}
+
+                            {% if status == 4 %} 
+                                <i class="bi bi-check-circle-fill text-success"></i> 
+                            {% endif %}
+
+                            Durum & Aşama
+                        </h5> 
+                    </label>
+                        <select id="status" name="status" class="form-input-aesthetic" {{ disabled_status }}>
+                        {% for key,value in status_array %}
+                         
+                          <option value="{{key}}" {% if key == status %} selected {% endif %} {{disabled_option_status[key]}}>{{value}} </option>
+                        {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group-aesthetic" id="gorev-surec-text" style="display:none;">
+                        <label for="purpose">Süreç / Aşama Gerekçesi</label>
+                        <textarea id="input-surec-text" name="surec_text" rows="2" class="form-input-aesthetic" >{{surec_text}}</textarea>
+                    </div>
+                    
+                    {% if history_text %}
+                    <div class="alert alert-warning" id="alert-info" >
+                     <i class="fas fa-question-circle"></i> Not  : {{history_text}}
+                    </div>
+                    {% endif %}
+                </section>
+            </article>
+            
+            </form>
+
+
+            
+        </div> 
+      
+     </main>
+     
+   </div>  
+     <div class="modal-footer ">
+       <article class="card-aesthetic ">
+                <header class="card-header-aesthetic text-left">
+                Kontrol Listesi<br>
+                <span class="text-muted">{{text_control_detay}}</span>
+                </header>
+                 
+                <section class="card-body-aesthetic">
+               
+                <div class="stepper-wrapper">
+                    <div class="step-item {% if '1' in steps %} completed {% endif %}" onclick="toggle(this,1)">
+                        <div class="step-counter"></div>
+                        <div class="step-name">Harcamalar kontrol edildi.</div>
+                        <input type="checkbox" name="steps[]" id="steps1" value="1" {% if '1' in steps %} checked {% endif %} style="display:none;">
+                    </div>
+                    <div class="step-item {% if '2' in steps %} completed {% endif %}" onclick="toggle(this,2)">
+                        <div class="step-counter"></div>
+                        <div class="step-name">Harcama belgeleri eksiksiz bir şekilde yüklendi.</div>
+                        <input type="checkbox" name="steps[]" id="steps2" value="2" {% if '2' in steps %} checked {% endif %} style="display:none;">
+                    </div>
+                    <div class="step-item {% if '3' in steps %} completed {% endif %}" onclick="toggle(this,3)">
+                        <div class="step-counter"></div>
+                        <div class="step-name">Görevlendirme evrakları çıktı alınarak gerekli imzalar attırıldı.</div>
+                        <input type="checkbox" name="steps[]" id="steps3" value="3" {% if '3' in steps %} checked {% endif %} style="display:none;">
+                    </div>
+                    <div class="step-item {% if '4' in steps %} completed {% endif %}" onclick="toggle(this,4)">
+                        <div class="step-counter"></div>
+                        <div class="step-name">Harcama belgeleri, fişler ve fiş fotokopileri hazırlandı.</div>
+                        <input type="checkbox" name="steps[]" id="steps4" value="4" {% if '4' in steps %} checked {% endif %} style="display:none;">
+                    </div>
+                    <div class="step-item {% if '5' in steps %} completed {% endif %}" onclick="toggle(this,5)">
+                        <div class="step-counter"></div>
+                        <div class="step-name">Kalan tutar ilgili hesaba ilgili açıklama ile aktarıldı.</div>
+                        <input type="checkbox" name="steps[]" id="steps5" value="5" {% if '5' in steps %} checked {% endif %} style="display:none;">
+                    </div>
+                    <div class="step-item {% if '6' in steps %} completed {% endif %}" onclick="toggle(this,6)">
+                        <div class="step-counter"></div>
+                        <div class="step-name">Geri ödeme dekontu dokümanlara eklendi.</div>
+                        <input type="checkbox" name="steps[]" id="steps6" value="6" {% if '6' in steps %} checked {% endif %} style="display:none;">
+                    </div>
+                    <div class="step-item {% if '7' in steps %} completed {% endif %}" onclick="toggle(this,7)">
+                        <div class="step-counter"></div>
+                        <div class="step-name">Görev raporu yazıldı.</div>
+                        <input type="checkbox" name="steps[]" id="steps7" value="7" {% if '7' in steps %} checked {% endif %} style="display:none;">
+                    </div>
+                </div>
+                    
+                    
+                </section>
+            </article>
+     </div> 
+      
+      <div class="modal-footer">
+
+          <div class="text-end">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+           <button type="button" id="button-gorev-update" name="{{ isler.gorev_yonetimi_id }}"  data-toggle="tooltip" title="Güncelleme İşlemi"  class="btn btn-primary" {{disabled_gorev_update}}> <i class="fa fa-save"></i> {{"Kaydet"}}</button>
+           </div>
+      </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ONAY MESAJI MODALI -->
+<div class="modal fade" id="modal-geriodeme" tabindex="-1" aria-labelledby="geriOdemeLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width:35%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="geriOdemeLabel">Onay Mesajı</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        <h4>{{text_geri_odeme}}</h4>
+        <p>{{text_bank_detay}}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+ function dokumanHarcama() { 
+     $('#harcamalar-tablosu').html('');
+     $.ajax({
+      url: 'index.php?route=personeller/gorev_yonetimi/harcamaTablosu&user_token={{ user_token }}&gorev_yonetimi_id=' + $('#form-gorev_yonetimi_id').val(),
+      dataType: 'html',
+      success: function(html) {
+        //$('#modal-gorev-detay').modal('hide');
+        $('#harcamalar-tablosu').html(html);
+        $('#modal-harcamalar').modal('show');
+      },       
+      
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });  
+}
+
+function dokumanRapor() { 
+   $('#gorev-raporu').toggle();
+   $('#gorev-raporu textarea').css('background-color', '#dff7f7');
+   //$('#modal-rapor').modal('show');
+}
+
+function dokumanGorevli() { 
+   $('.gorevli-kisiler').toggle();
+}
+
+function dokumanSurec(url) {
+   window.open(url, '_blank');
+}
+
+function dokumanDosya(link) { 
+   var url = 'index.php?route=personeller/gorev_yonetimi/dokumanlar&user_token={{ user_token }}&gorev_yonetimi_id=' + $('#form-gorev_yonetimi_id').val();
+    if (link) {
+        url = link;
+    }
+   $.ajax({
+      url: url,
+      dataType: 'html',
+      success: function(html) {
+        $('#dokumanlar-listesi').html(html);
+        $('#modal-dokuman').modal('show');
+
+      },       
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });  
+}
+
+function dokumanGeriodeme() { 
+   $('#modal-geriodeme').modal('show');
+}
+</script>
+
+<script>
+$('#button-gorev-update').on('click', function() {
+    var gorev_yonetimi_id = $('#form-gorev_yonetimi_id').val();
+
+    $.ajax({
+      url: 'index.php?route=personeller/gorev_yonetimi/save&user_token={{ user_token }}&gorev_yonetimi_id=' + gorev_yonetimi_id,
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-odeme-edit').serialize(),
+      success: function(json) {
+       
+       if (json.error.warning) {      
+          alerterror(json.error.warning);
+       }
+
+       if (json.error.rapor) {
+          $('#gorev-raporu').show(); 
+          $('#gorev-raporu textarea').css('border-color', '#fa7a6b'); 
+           alerterror(json.error.rapor);
+       }
+
+       if (json.error.surec_text) {
+          $('#gorev-surec-text').show(); 
+          $('#gorev-surec-text textarea').css('border-color', '#fa7a6b'); 
+          alerterror(json.error.surec_text);
+
+       }
+       
+       if (json.success) { 
+         $('#gorev-detay-html').find('.modal').modal('hide');
+         $('#gorev-data').load('index.php?route=personeller/gorev_yonetimi/dataGorev&user_token={{ user_token }}');
+         alertsuccess(json.success);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ });
+</script>
+
+<script>
+$('#modal-gorev-detay input[name=\'filter_personel\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/autocompletePersoneller&user_token={{ user_token }}&filter_personel=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['personel_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+     //$('#modal-gorev-detay input[name=\'filter_personel\']').val(item['label']);
+     $('#gorevli-personel-listesi').show();
+     $('#personel-filter' + item.value).remove();
+     $('#personel-filter').append('<div id="personel-filter' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="diger_gorevliler[]" value="' + item['label'] + '" /></div>');
+    }
+  });
+
+  $('#personel-filter').delegate('.fa-minus-circle', 'click', function() {
+	$(this).parent().remove();
+});
+</script>
+
+<script>
+var status = {{status}};
+$('#modal-gorev-detay select[name=\'status\']').on('change', function() {
+    $('#gorev-surec-text').hide();
+    
+    var new_status = $('#modal-gorev-detay select[name=\'status\']').val();
+    if(new_status < status) {
+        $('#gorev-surec-text').show();
+        $('#gorev-surec-text textarea').css('border-color', '#fa7a6b');
+        $('#gorev-surec-text textarea').attr('placeholder', 'Geriye doğru aşama değişikliğinde gerekçe yazmak zorunludur');
+    }
+
+});
+</script>
+
+<script>
+$('#modal-gorev-detay .auto-filter').autocomplete({
+    source: function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/gelirgroupautocomplete&user_token={{ user_token }}&bolum=' + $(this).attr('data-for') + '&filter_name=' + encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item.name,
+              value: item.id
+            };
+          }));
+        }
+      });
+    },
+    select: function(item) {
+      $(this).val(item.label);
+      $('#modal-gorev-detay  input[name=\'proje_id\']').val(item.value);
+    }
+  });
+</script>
+
+<script>
+function toggle(el, id) {
+    el.classList.toggle('completed');
+    let checkbox = document.getElementById('steps' + id);
+    checkbox.checked = !checkbox.checked; // seçiliyse kaldır, değilse seç
+    checkbox.dispatchEvent(new Event('change')); // change eventini tetikle
+}
+
+$('#modal-gorev-detay .stepper-wrapper input[type="checkbox"]').on('change', function() {
+    var gorev_yonetimi_id = $('#form-gorev_yonetimi_id').val();
+
+    // Tüm seçili checkbox değerlerini al
+    var steps = [];
+    $('#modal-gorev-detay .stepper-wrapper input[name="steps[]"]:checked').each(function(){
+        steps.push($(this).val());
+    });
+
+    $.ajax({
+      url: 'index.php?route=personeller/gorev_yonetimi/stepsUpdate&user_token={{ user_token }}&gorev_yonetimi_id=' + gorev_yonetimi_id,
+      type: 'post',
+      dataType: 'json',
+      data: { steps: steps }, // array olarak gönder
+      success: function(json) {
+        if (json.error && json.error.warning) {      
+          alerterror(json.error.warning);
+        }
+
+        if (json.success) { 
+          alertsuccess(json.success);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+});
+
+
+</script>
+
+<style>
+
+.tooltip-inner {
+  max-width: 600px;
+  padding: 3px 8px;
+  font-size:12px;
+  color: #000000;
+  text-align: left;
+  opacity:1;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 3px; 
+  }
+
+  .btn.disabled {
+  pointer-events: none;   /* tıklamayı engeller */
+  opacity: 0.5;           /* görsel olarak pasif gösterir */
+  cursor: not-allowed;    /* fare imlecini yasak işareti yapar */
+  }
+  </style>
+
+ <style>
+        :root {
+            --done-color: #2ecc71;
+            --border-color: #e0e0e0;
+        }
+
+        .stepper-wrapper {
+            display: flex;
+            justify-content:间;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .step-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* Bağlantı Çizgisi */
+        .step-item::before {
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: -50%;
+            width: 100%;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 1;
+        }
+
+        .step-item:first-child::before { content: none; }
+
+        /* Yuvarlaklar */
+        .step-counter {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid var(--border-color);
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            color: transparent;
+        }
+
+        /* Açıklama Metni */
+        .step-name {
+            font-size: 12px;
+            color: #666;
+            padding: 0 5px;
+            line-height: 1.2;
+        }
+
+        /* Aktif/Tamamlanmış Durumu */
+        .step-item.completed .step-counter {
+            background-color: var(--done-color);
+            border-color: var(--done-color);
+            color: white;
+        }
+
+        .step-item.completed .step-counter::after {
+            content: '✓';
+        }
+
+        .step-item.completed .step-name {
+            color: #333;
+            font-weight: bold;
+        }
+
+      @media (max-width: 768px) {
+    .stepper-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-left: 0;
+    }
+
+    .step-item {
+        position: relative;
+        flex-direction: row;
+        align-items: flex-start;
+        padding-left: 40px; 
+        margin-bottom: 24px;
+        width: 100%;
+        /* EKLENENLER: */
+        text-align: left; 
+        justify-content: flex-start;
+    }
+
+    /* Dikey çizgi */
+    .step-item::before {
+        content: "";
+        position: absolute;
+        top: 28px;
+        left: 11px;
+        width: 2px;
+        height: calc(100% + 24px); /* Çizginin bir sonraki adıma tam yetişmesi için */
+        background: var(--border-color);
+        z-index: 1;
+    }
+
+    .step-item:last-child::before {
+        display: none;
+    }
+
+    .step-counter {
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin: 0;
+        z-index: 2;
+    }
+
+    .step-name {
+        padding: 0;
+        font-size: 14px;
+        line-height: 1.4;
+        /* EKLENEN: */
+        text-align: left;
+    }
+   }
+
+    </style>
+
+

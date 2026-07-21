@@ -1,0 +1,224 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+
+            <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+             
+              <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb mb-0 p-0">
+				            {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+					         {% endfor %}
+                  </ol>
+                </nav>
+              </div>
+			  
+              <div class="ms-auto text-end">
+               
+                  {% if store_id == 0  %}
+                  
+                      <button type="button" id="button-add-help" data-toggle="tooltip" title="{{ "Yardım Ekle" }}" class="btn btn-sm btn-primary" title="{{ button_add }}"><i class="bi bi-plus-lg"></i> Ekle</button>
+                      <button type="button" onclick="confirm('{{ text_confirm }}') ? $('#form-delete-help').submit() : false;" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i> Sil</button>
+                  {% endif %}
+               
+              </div>
+            </div>
+            <!--end breadcrumb-->
+  
+           <div class="row">
+              <div class="col col-lg-12 mx-auto">
+               <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-delete-help"> 
+                <div class="card radius-10">
+                  <div class="card-body">
+                    <div class="accordion" id="accordionExample">
+
+                       {% if helps %}
+                       {% for help in helps %}
+                      <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ help.help_id }}">
+                          
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ help.help_id }}" aria-expanded="false" aria-controls="collapse{{ help.help_id }}">
+                           <input class="form-check-input" type="checkbox" name="selected[]" value="{{ help.help_id }}" />&nbsp; {{ help.title }} 
+                          </button>
+                        </h2>
+                        <div id="collapse{{ help.help_id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ help.help_id }}" data-bs-parent="#accordionExample">
+                          <div class="accordion-body">
+                           <div class="text-end">
+                            <button type="button" id="button-view" onclick="functionView('{{ help.help_id }}');" data-toggle="tooltip" title="{{ "Düzenle" }}" class="btn btn-sm btn-outline-primary ms-2"><i class="bi bi-pencil me-0"></i></button>
+                           </div>
+                           <div class="table-responsive-sm">
+                            {{ help.description }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                       {% endfor %}
+                       {% endif %}
+                      
+                    </div>
+                  </div>
+                </div>
+                </form>
+               
+          </div>
+
+{{footer}}
+</main>
+<div class="modal fade" id="modal-help" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+          <form id="form-help" class="form-horizontal">
+            <input type="hidden" name="help_id" value="0"> 
+            <div class="form-group">
+              <label for="recipient-name" class="col-form-label">Konu Başlığı:</label>
+              <input type="text" name="title" placeholder="{{"Konu Başlığı" }}" value="" id="input-title" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="message-text" class="col-form-label">Message:</label>
+              <textarea class="form-control" name="description" id="textarea-editor" style=" max-height: 400px;overflow-y: auto; "></textarea>
+            </div>
+         </form>
+          </div>
+          <div class="modal-footer">
+        
+            <button type="button" id="button-modal-save" class="btn btn-primary">Kaydet</button>
+          </div>
+        </div>
+      </div>
+ </div>
+
+<script type="text/javascript"><!--
+function functionView(help_id) {
+  $.ajax({
+	url: 'index.php?route=setting/help/infoHelp&user_token={{ user_token }}&help_id=' + help_id,
+    dataType: 'json',
+    success: function(json) {
+     $('.alert-dismissible').remove();
+      
+      if (json['title']) {
+        $('#input-title').val(json['title']);
+        $('#modal-help input[name=\'help_id\']').val(json['help_id']);
+       
+        editor1.setHTMLCode(json['description']);
+
+
+        $('#modal-help').modal('show');
+      }
+
+		 },
+      
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+		
+	});
+}
+//--></script>
+
+<script type="text/javascript"><!--
+$('#button-add-help').on('click', function() {
+   $('#modal-help').modal('show');
+   $('#modal-help input,textarea').val('');
+   editor1.setHTMLCode('');
+   $('.alert-dismissible').remove();
+});
+//--></script>
+
+
+<script type="text/javascript"><!--
+//yeni ekleme
+$('#button-modal-save').on('click', function() {
+   var action = 'add';
+  $.ajax({
+		url: 'index.php?route=setting/help/save&user_token={{ user_token }}&action=' + action,
+		type: 'post',
+    data: $('#form-help').serialize(),
+    dataType: 'json',
+		
+    success: function(json) {
+		  $('.alert-dismissible').remove();
+		  
+		  if (json.error.warning) {
+	      $('#alert').prepend(
+          '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+            '<div class="d-flex align-items-center">' +
+              '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+              '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+            '</div>' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+          '</div>'
+        );
+      }
+
+      if (json.success) {
+        $('#modal-help').hide();
+			  location = json.success;
+		  }
+
+		 },
+
+    error: function(xhr, ajaxOptions, thrownError) {
+      alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+    }
+	});
+});
+//--></script>
+<script>
+$(document).ready(function () {
+	$("rte-toolbar-button[rte-cmd-name='togglemore']").css({"pointer-events": "none","opacity": "0.4"});
+	$("rte-toolbar-button[rte-tooltip='Emoji Ekle']").css({ "pointer-events": "none", "opacity": "0.4" });
+});
+</script>
+
+<script>
+	var editor1cfg = {};
+	editor1cfg.toolbar = "basic";
+	editor1cfg.lang = "tr"; // Türkçe dil ayarı
+	editor1cfg.removeButtons = ["images", "video"];
+  editorResizeMode: "none";
+	var editor1 = new RichTextEditor("#textarea-editor", editor1cfg);
+</script>
+
+<script>
+$(document).ready(function() {
+   var error_warning = '{{error_warning}}';
+   var success = '{{success}}';
+
+   if (success) {
+     Lobibox.notify('success', {
+       size: 'mini',          // mini, normal, large
+       rounded: true,           // köşeleri yuvarlat
+       delay: 5000,             // otomatik kaybolma süresi (ms)
+       position: 'top center',   // top left, top right, bottom left, bottom right
+       icon: 'bi bi-check-circle', // Bootstrap ikon sınıfı
+       msg: success,
+
+     });
+   }
+
+   if (error_warning) {
+     Lobibox.notify('error', {
+       size: 'mini',          // mini, normal, large
+       rounded: true,           // köşeleri yuvarlat
+       delay: 5000,             // otomatik kaybolma süresi (ms)
+       position: 'top center',   // top left, top right, bottom left, bottom right
+       icon: 'bi bi-exclamation-triangle-fill', // Bootstrap ikon sınıfı
+       msg: error_warning
+     });
+   }
+});
+</script>
+
+<style>
+.accordion-body {
+  max-height: 600px;   /* istediğin yüksekliği ayarla */
+  overflow-y: auto;    /* dikey scroll açılır */
+}
+
+</style>

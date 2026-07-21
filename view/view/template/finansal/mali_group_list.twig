@@ -1,0 +1,414 @@
+{{ header }}{{ column_left }}
+<main id="finansal" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end">
+        <button type="button" id="button-add" data-toggle="tooltip" title="{{ "Yeni Kategori Ekle" }}" class="btn btn-primary button-add btn-sm"/><i class="bi bi-plus-lg"></i>{{" Ekle"}}</button>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+
+            <div class="card-header py-3">
+                    <div class="row g-3 ">
+                       <div class="col-lg-3 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input name="filter_name" value="{{filter_name}}" class="form-control auto-filter px-4" placeholder="Bir isim yazınız"> 
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-6 me-auto"></div>
+                        <div class="col-lg-1 col-6 me-auto"></div>
+                       <div class="col-lg-1 col-6 me-auto"></div>
+                        <div class="col-lg-2 co1-6 col-md-3">
+                          <select name="filter_category" placeholder="Bir ülke seçiniz" class="form-select auto-filter">
+                          <option value="">{{ "--Tümü--" }}</option>
+                          {% for key,value in categories %}
+                            <option value="{{ key }}" {% if filter_category == key %} selected {% endif %}>{{ value }}</option>
+                          {% endfor %}
+                        </select>
+                        </div>
+
+                       <div class="col-lg-1 col-6 me-auto"></div>
+                       
+                       <div class="col-lg-1 co1-6 col-md-3">
+                          <select name="limit" class="form-select auto-filter" id="select-limit">
+                          {% for key,value in limits %}
+						               <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+						               {% endfor %}
+                         </select>
+                        </div>
+                    </div>
+                </div>
+                 
+                 
+          <div class="card-body" id="tab-data"></div>
+        </div>
+        </div>
+
+
+    </div>
+
+  {{footer}}  
+</main>
+
+
+{# MALİ GROUP EKLEME MODAL #}
+<div class="modal fade" id="modal-gelir-group" tabindex="-1" aria-labelledby="modalGelirGroupLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalGelirGroupLabel">Grup Ekle/Düzenle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-modal-group">
+          <input type="hidden" name="mali_group_id" value="0" />
+          
+          <div class="mb-3">
+            <label for="select-category" class="form-label">Bölüm:</label>
+            <select name="category" class="form-select" id="select-category">
+              <option value="">{{"--Seçim Yapın--"}}</option>
+              <option value="1">{{"Kasa/Hesap"}}</option>
+              <option value="2">{{"Tür (Gelir)"}}</option>
+              <option value="3">{{"Tür (Gider)"}}</option>
+              <option value="4">{{"Fon"}}</option>
+              <option value="5">{{"Gelir/Gider Şekli"}}</option>
+              <option value="6">{{"Gider Kategorisi"}}</option>
+              <option value="7">{{"Proje/Faaliyet"}}</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="input-name" class="form-label">Kategori Başlığı:</label>
+            <input type="text" name="name" value="" placeholder="Kategori Başlığı / Tanımı" class="form-control" id="input-name">
+          </div>
+
+          <div id="alt-cateory" style="display:none;" class="mb-3">
+            <fieldset id="yonetim" class="border p-2" style="height: 150px; overflow-y: auto;">
+              <legend class="float-none w-auto ps-2 pe-2 fs-6 fw-bold">Alt Kategoriler</legend>
+              <table class="table table-sm table-striped" id="table-category">
+                <tbody>
+                  </tbody>
+              </table>
+              <div class="text-end px-2">
+                <button type="button" onclick="addCategory()" class="btn btn-info btn-sm text-white">
+                  <i class="bi bi-plus-lg"></i>
+                </button>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="p-3 mb-3 bg-light border rounded banka" id="banka-adi" style="display:none;">
+            <h6 class="mb-3 border-bottom pb-2"><strong>Banka Bilgileri</strong></h6>
+
+            <div class="mb-2">
+              <select name="banka[banka]" class="form-select form-select-sm" id="select-bank">
+                <option value="udef">{{"UDEF"}}</option>
+                {% for key,value in bankalar %}
+                <option value="{{key}}">{{value}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-2">
+              <input type="text" name="banka[hesap_no]" value="" placeholder="Hesap No" class="form-control form-control-sm" id="input-hesap-no">
+            </div>
+
+            <div class="mb-0">
+              <input type="text" name="banka[sube]" value="" placeholder="Şube" class="form-control form-control-sm" id="input-sube">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="modal-button-save" class="btn btn-primary">Kaydet</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+var url  = '{{mali_group_link}}';
+$('#tab-data').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+	$('#tab-data').load(this.href);
+});
+
+$('#tab-data').load(url);
+
+$('.auto-filter').on('change', function(e) {
+  e.preventDefault();
+
+  if ($('input[name=\'filter_name\']').val()) {
+		url += '&filter_name=' + encodeURIComponent($('input[name=\'filter_name\']').val());
+	}
+
+  if ($('select[name=\'filter_category\']').val()) {
+		url += '&filter_category=' + encodeURIComponent($('select[name=\'filter_category\']').val());
+	}
+
+	if ($('select[name=\'filter_status\']').val()) {
+		url += '&filter_status=' + encodeURIComponent($('select[name=\'filter_status\']').val());
+	}
+
+  if ($('select[name=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name=\'limit\']').val());
+	}
+
+	$('#cover-spin').show();
+
+	$('#tab-data').load(url);
+
+});
+</script>
+<script>
+$('#button-add').on('click', function() {
+	 $('#modal-gelir-group').modal('show');
+   $('#modal-gelir-group input').val('');
+   $('#select-category').trigger('change');
+});
+
+$('#modal-button-save').on('click', function() {
+    var url  = '{{mali_group_link}}';
+    $.ajax({
+      url: 'index.php?route=finansal/mali_group/save&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-modal-group').serialize(),
+      success: function(json) {
+        $('.text-danger').remove();
+        
+
+        if (json.error.warning) {
+           $('#alert').prepend(
+                '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                '</div>'
+            ); 
+        }
+       
+        if (json.error['name']) {
+         $('input[name^=\'name\']').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error['name'] + '</span>');
+        }
+
+        if (json.error['category']) {
+         $('select[name^=\'category\']').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error['category'] +'</span>');
+        }
+
+       
+      if (json.success) {
+        $('#modal-gelir-group').modal('hide'); 
+        $('#tab-data').load(url + '&category=' + json['category']);  
+        $('#alert').append(
+            '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+            '<div class="d-flex align-items-center">' +
+            '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+            '<div class="ms-3"><div class="text-dynamic">' + json.success + '</div></div>' +
+            '</div>' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>'
+          );    
+      }
+
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ });
+</script>
+
+<script>
+ function editCategory(mali_group_id) {
+     $('#modal-gelir-group').modal('show');
+     $('#modal-gelir-group').find('input,select').val('');
+     $('input[name="mali_group_id"]').val(mali_group_id);
+     $('#table-category tbody tr').remove();
+     
+     $.ajax({
+      url: 'index.php?route=finansal/mali_group/edit&user_token={{ user_token }}&mali_group_id='  + mali_group_id,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+         
+        if (json['name']) {
+           $('#input-name').val(json['name']);
+        }
+
+        if (json['category']) {
+           $('#select-category').val(json['category']);
+           $('#select-category').trigger('change');
+        }
+
+         if (json['categories']) {
+           $('#table-category tbody').html(json['categories']);
+         }
+
+        if (json['banka']) {
+           $('#select-bank').val(json['banka']);
+           $('#input-hesap-no').val(json['hesap_no']);
+           $('#input-sube').val(json['sube']);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  }
+
+
+ function removeCategory(mali_group_id,category) {
+  var url  = '{{mali_group_link}}';
+    if (confirm('Dikkat : Bu işlem geri alınamaz. Bu kategoriyi silmek istediğinize emin misiniz?') == false) {    
+        exit();
+    }
+
+    $('#cover-spin').show(0);
+   
+     $.ajax({
+      url: 'index.php?route=finansal/mali_group/delete&user_token={{ user_token }}&mali_group_id='  + mali_group_id + '&category=' + category,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        if (json.error.warning) {
+           $('#alert').prepend(
+                '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                '</div>'
+            );
+          $('#cover-spin').hide();
+        }
+         
+        if (json.success) {
+          $('#alert').append(
+            '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+            '<div class="d-flex align-items-center">' +
+            '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+            '<div class="ms-3"><div class="text-dynamic">' + json.success + '</div></div>' +
+            '</div>' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>'
+          );    
+          $('#tab-data').load(url);
+          $('#cover-spin').hide();         
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  }
+
+//--></script>
+<script>
+function changeStatus(mali_group_id,category,tab) {
+  $('#cover-spin').show(0); 
+    $.ajax({
+      url: 'index.php?route=finansal/mali_group/changeStatus&user_token={{ user_token }}&mali_group_id='  + mali_group_id,
+      type: 'post',
+      dataType: 'json',
+  
+      success: function(json) {
+ 
+        if (json.error.warning) {
+           $('#alert').prepend(
+                '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                '</div>'
+            );
+          $('#cover-spin').hide(); 
+        }
+       
+      if (json.success) {
+        $('#tab-data').load('index.php?route=finansal/mali_group/dataGroup&user_token={{ user_token }}');  
+        $('#alert').append(
+            '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+            '<div class="d-flex align-items-center">' +
+            '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+            '<div class="ms-3"><div class="text-dynamic">' + json.success + '</div></div>' +
+            '</div>' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>'
+          );    
+        $('#cover-spin').hide(); 
+      }
+
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ }
+</script>
+<script>
+$('#select-category').on('change', function() {
+  $('.banka').hide();
+   $('#alt-cateory').hide();
+	
+  if($(this).val() == '1') {
+    $('.banka').show();
+  }
+
+  if($(this).val() == '6') {
+    $('#alt-cateory').show();
+  }
+  
+});
+
+</script>
+
+<script type="text/javascript">
+  var category_row = $('#table-category tbody tr').length;
+  function addCategory() {
+	  html = '<tr id="category-row' + category_row + '">';
+    html += ' <td class="text-start">';
+    html += '  <input type="text" name="categories[]" for="adsoyad" value="" placeholder="{{ "Alt Kategori Başlığı" }}" class="form-control input-sm"/>';
+    html += ' </td>';
+
+    html += ' <td class="text-center" style="width:1%">';
+    html += '   <button type="button" onclick="$(\'#category-row' + category_row + '\').remove()" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i></button>';
+    html += ' </td>';
+        
+	 $('#table-category tbody').append(html);
+    category_row++;
+  }
+ </script>
+<style>
+  .category-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px solid;
+    border-radius: 3px;
+    font-weight: 500;
+    font-size: 0.9em;
+  }
+</style>

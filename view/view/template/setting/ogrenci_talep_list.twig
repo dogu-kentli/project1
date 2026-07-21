@@ -1,0 +1,556 @@
+{{ header }}{{ column_left }}
+<main id="talepler" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+         <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success btn-sm"><i class="bi bi-download"></i></a>
+		     {% if store_id ==0 %}
+		     <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm" onclick="confirm('{{ text_confirm }}') ? $('#form-talep').submit() : false;"><i class="bi bi-trash"></i> Sil</button>
+         {% endif %}
+         </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-lg-2 col-6 ">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text"  name="filter_name" value="{{filter_name}}" placeholder="{{entry_customer}}"  class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 ">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_konu" id="input-filter-konu" value="{{filter_konu}}" placeholder="Konusu" class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                      
+
+                        <div class="col-lg-3 col-6 ">
+                           {% for custom_field in custom_fields %}
+                            {% if custom_field.location_sort == 'account16' %}
+                            <select name="filter_category" class="form-select auto-filter">
+                              <option value="">{{text_select}}</option>
+                                {% for custom_field_value in custom_field.custom_field_value %}
+                                {% if custom_field_value.group == 'ogrenci' and custom_field_value.status == 1 %}
+                                <option value="{{ custom_field_value.custom_field_value_id }}" {% if custom_field_value.custom_field_value_id == filter_category %} selected {% endif %}>{{ custom_field_value.name }}</option>
+                                {% endif %}
+                                  {% endfor %}
+                                
+                            </select>
+                            {% endif %} 
+                            {% endfor %}       
+                        </div>
+
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select name="filter_store" class="form-select auto-filter" style="border-color:#018bd3;">
+                                <option value="">{{text_all}}</option>
+                                {% for store in stores %}
+                                <option value="{{ store.store_id }}" {% if filter_store == store.store_id %} selected="selected" {% endif %}>{{store.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2 col-6 col-md-3">
+                           <select name="filter_status" class="form-select auto-filter">
+                              <option value="">{{text_select}}</option>
+                              <option value="0" {% if filter_status == 0 and filter_status !='' %} selected {% endif %}>{{text_wait}}</option>
+                              <option value="1" {% if filter_status == 1 %} selected {% endif %}>{{text_olumlu}}</option>
+                              <option value="2" {% if filter_status == 2 %} selected {% endif %}>{{text_olumsuz}}</option>
+                              <option value="3" {% if filter_status == 3 %} selected {% endif %}>{{text_islem}}</option>
+                              <option value="4" {% if filter_status == 4 %} selected {% endif %}>{{"Çözüm Merkezinde"}}</option>
+                              <option value="5" {% if filter_status == 5 %} selected {% endif %}>{{"Belge Bekleniyor"}}</option>
+                            </select> 
+                        </div>
+
+                        <div class="col-lg-1 co1-6 col-md-3">
+                            <select name="limit" class="form-select auto-filter">
+                                {% for key,value in limits %}
+                                <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-information">
+                <div class="card-body">
+
+                <div class="table-responsive-sm">
+                <table class="table table-bordered table-striped table-sm align-middle">
+
+
+                 <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                  <tr>
+                    
+                    <th colspan="2" class="text-center">
+                      {{ column_store2 }}
+                    </th>
+                    <th class="text-center">
+                      {{ column_konu }}
+                    </th>
+                    <th scope="col" class="text-center">
+                      {{ column_country }}
+                    </th>
+                    <th class="text-center">
+                      {{ column_date_added }}
+                    </th>
+                    <th class="text-center">
+                      {{ column_category }}
+                    </th>
+                    <th class="text-center">
+                      {{ column_description }}
+                    </th>
+                    <th class="text-center">
+                      {{ column_store1 }}
+                    </th>
+                    <th class="text-center">
+                      {{ column_status }}
+                    </th>
+                    <th class="text-center">
+                      {{ column_action }}
+                    </th>
+                  </tr>
+              </thead>
+              <tbody>
+                {% if talepler_ogrenci %}
+                {% for talep in talepler_ogrenci %}
+                <tr>
+                  <td class="text-center">
+                    <input type="checkbox" class="form-check-input" name="selected[]" value="{{ talep.talep_id }}" />
+				          </td>
+                  <td class="text-start fw-bold"> {{ talep.name}}</td>                
+                  <td class="text-start">{{ talep.konu }}</td>
+                  <td class="text-start">{{ talep.bolge['country'] }} <br> {{ talep.bolge['bolge'] }}</td>
+                  <td class="text-start">{{ talep.date_added}}</td>
+                  <td class="text-start">
+                   <span class="text-dark"><i class="fas fa-angle-double-right"></i> {{ talep.category }}</span>
+                  </td>
+                  <td class="text-start">{{ talep.text }}</td>
+                  <td class="text-center">
+                   <div class="border rounded p-2 bg-light">
+                  {{ talep.store.name }}
+                  </div>
+                  </td>
+                  <td class="text-center">
+
+                  {% if talep.status == 0 %}
+                    <span class="badge bg-warning">{{text_wait }}</span>
+                  {% endif %}
+
+                  {% if talep.status == 1 %}
+                   <span class="badge bg-success">{{ text_olumlu }}</span>
+                  {% endif %}
+
+                  {% if talep.status == 2 %}
+                    <span class="badge bg-danger">{{ text_olumsuz }}</span>
+                  {% endif %}
+
+                  {% if talep.status == 3 %}
+                    <span class="badge bg-info">{{ text_islem }}</span>
+                  {% endif %}
+
+                  {% if talep.status == 4 %}
+                   <span class="badge bg-info">{{ text_islem }}</span>
+                  {% endif %}
+
+                  {% if talep.status == 5 %}
+                    <span class="badge bg-warning">{{ "Belge bekleniyor" }}</span>
+                  {% endif %}
+
+                  {% if talep.status == 6 %}
+                   <span class="badge bg-success">{{ "Belge Yüklendi" }}</span>
+                  {% endif %}
+                  </td>
+                  <td class="text-center">
+                     <button type="button" id="button-view" data-toggle="tooltip" title="{{ text_view }}" onclick="talepinfo('{{talep.talep_id}}')"; class="btn btn-sm" style="background-color:#018bd3;"><i class="bi bi-eye" style="color:#fff;"></i></button>
+                  </td>
+          
+                </tr>
+                
+                {% endfor %}
+                
+                {% else %}
+                <tr>
+                  <td class="text-center" colspan="5">{{ text_no_results }}</td>
+                </tr>
+                {% endif %}
+              </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+<div id="modal-talep-view" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header bg-light">
+        <div id="modal-header" class="modal-title h5">
+          </div>
+        <button type="button" id="button-close" class="btn-close" data-bs-dismiss="modal" data-bs-toggle="tooltip" title="{{ button_close }}" aria-label="Close"></button>
+      </div>
+
+      <div id="modal-view-body1" class="modal-body" style="font-size:14px;">
+        </div>
+
+      <div id="modal-view-body" class="modal-body">
+        <form id="form-modal-talepler">
+          
+          {% for custom_field in custom_fields %}
+          {% if custom_field.location_sort == 'account16' %}
+          <div class="mb-3">
+            <label class="form-label text-dark fw-bold">Seçilen Kategori : </label>
+            <div class="input-group">
+              <select name="category" class="form-select" id="category-select" disabled>
+                {% for custom_field_value in custom_field.custom_field_value %}
+                {% if custom_field_value.group == 'ogrenci' %}
+                <option value="{{ custom_field_value.custom_field_value_id }}">{{ custom_field_value.name }}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+              <span class="input-group-text"><i class="bi bi-pencil"></i></span>
+            </div>
+          </div>
+          {% endif %}
+          {% endfor %}
+
+          <div id="form-islemleri">
+            <div class="mb-3">
+              <select name="islem" class="form-select" id="select-islem">
+                <option value="" selected>--İşlem Seçin--</option>
+                <option value="1">{{ "Olumlu" }}</option>
+                <option value="2">{{ "Olumsuz" }}</option>
+                <option value="3">{{"İşleme Alındı"}}</option>
+                <option value="4">{{ "Çözüm Merkezine İlet" }}</option>
+                <option value="5">{{ "Dosya Talep Et" }}</option>
+              </select>
+              <div class="error-islem text-danger small"></div>
+            </div>
+
+            <div id="body-file" class="row mb-3" style="display:none;">
+              <div class="col-12">
+                <div class="form-check">
+                  <input type="checkbox" name="file_name[f1]" value="İkamet İzin Belgesi" id="f1" class="form-check-input input-checkbox">
+                  <label class="form-check-label" for="f1">{{ "İkamet İzin Belgesi" }}</label>
+                </div>
+                <div class="form-check">
+                  <input type="checkbox" name="file_name[f2]" value="Öğrenci Belgesi" id="f2" class="form-check-input input-checkbox">
+                  <label class="form-check-label" for="f2">{{ "Öğrenci Belgesi" }}</label>
+                </div>
+                <div class="form-check">
+                  <input type="checkbox" name="file_name[f3]" value="Transkrip" id="f3" class="form-check-input input-checkbox">
+                  <label class="form-check-label" for="f3">{{ "Transkrip" }}</label>
+                </div>
+                <div class="form-check">
+                  <input type="checkbox" name="file_name[f4]" value="Pasaport" id="f4" class="form-check-input input-checkbox">
+                  <label class="form-check-label" for="f4">{{ "Pasaport" }}</label>
+                </div>
+              </div>
+            </div>
+            <div class="error-filename text-danger small"></div>
+
+            <div class="mb-3" id="body-filename-diger" style="display:none;">
+              <input name="file_name_diger" id="input-filename-diger" placeholder="İstenen dosya adını yazınız." class="form-control">
+              <div class="error-filename-diger text-danger small"></div>
+            </div>
+
+            <div class="mb-3">
+              <textarea name="gerekce" id="input-gerekce" rows="3" placeholder="Olumlu veya olumsuz ise kısaca gerekçe yazınız." class="form-control" disabled></textarea>
+              <div class="error-gerekce text-danger small"></div>
+            </div>
+          </div>
+
+          <div id="sonuc-alani" class="alert alert-info text-center" style="display:none; font-size:18px;"></div>
+          <div id="talep-udload-list" class="alert alert-info text-center" style="display:none;"></div>
+
+        </form>
+      </div>
+
+      <div id="modal-view-footer" class="modal-footer">
+        <button type="button" id="button-islem-edit" class="btn btn-info" data-bs-toggle="tooltip" title="{{ 'FORMU DÜZENLE' }}">
+          <i class="bi bi-pencil-square"></i> {{ "DÜZENLE" }}
+        </button>
+        <button type="button" id="button-islem" class="btn btn-success" data-bs-toggle="tooltip" title="{{ 'Kaydet' }}" disabled>
+          <i class="bi bi-check-lg"></i> {{ "KAYDET" }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+   
+{{footer}}
+</main>
+ 
+<script type="text/javascript"><!--
+$('#button-islem').on('click', function() {
+  $.ajax({
+	url: 'index.php?route=setting/ogrenci_talep/updatetalepStatus&user_token={{ user_token }}',
+	type: 'post',
+   data: $("#form-modal-talepler").serialize(),
+    dataType: 'json',
+    beforeSend: function() {
+        $('#button-islem').buttonanimate('loading');
+    },
+    complete: function() {
+        $('#button-islem').buttonanimate('reset');
+    },
+		
+    success: function(json) {
+	   $('#modal-view-body .text-danger').remove(); 
+
+      if (json.error.warning) {
+	      $('#alert').prepend(
+              '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+           ); 
+      }
+		  
+
+      if (json.success) {      
+		 location = json.success;
+	  }
+
+	},
+
+     error: function (xhr, ajaxOptions, thrownError) {
+        console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+     }
+		
+	});
+});
+
+//DÜZENLEME İŞLEMİ
+$('#button-islem-edit').on('click', function() {
+    $('#form-islemleri').show();
+    $('#sonuc-alani').hide();
+    $('#button-islem').prop('disabled',false);
+    $('#button-islem-edit').prop('disabled',true);
+    $('#talep-udload-list').hide();
+});
+//--></script>
+
+<script type="text/javascript"><!--
+function talepinfo(talep_id) {
+   $('#modal-view-body #category-select').prop('disabled',true); 
+   $('#modal-view-body .text-danger').remove();
+   $('#body-filename-diger').hide();
+   $('#modal-view-body #body-file').hide();
+   $('select[name=\'islem\']').val('');
+   $('#talep-udload-list').hide();
+   
+   $.ajax({
+	 url: 'index.php?route=setting/ogrenci_talep/gettalepInfo&user_token={{ user_token }}&talep_id=' + talep_id,
+    dataType: 'json',
+    success: function(json) {
+      $('#button-islem-edit').prop('disabled',true);
+      $('#button-islem').prop('disabled',false);
+      $('#input-gerekce').prop('disabled',true);
+      $('#modal-talep-view').show(400).modal('show');    
+      $('#form-islemleri').show();
+      $('#sonuc-alani').hide();
+      if (json['metin']) {
+		   $('#modal-view-body1').html(json['metin']);
+      }
+
+      if (json['status_text']) {
+        $('#form-islemleri').hide();
+         $('#sonuc-alani').show();
+         $('#sonuc-alani').html('<strong>' + json['status_text'] + '</strong>');
+      }
+
+       if (json['status'] != 0) {
+	      $('#button-islem-edit').prop('disabled',false);
+        $('#button-islem').prop('disabled',true);
+       }
+
+        if (json['file_upload']) {
+	        $('#talep-udload-list').html(json['file_upload']);
+          $('#talep-udload-list').show();
+        
+        }
+
+      if (json['category']) {
+	     $('select[name=\'category\'] option').each(function(){
+        if ($(this).val() == json['category']) 
+          $(this).attr('selected','selected');
+        
+        });
+      }
+
+	},
+
+     error: function (xhr, ajaxOptions, thrownError) {
+            console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+     }
+		
+	});
+}
+
+//--></script>
+
+
+<script type="text/javascript"><!--
+
+$('#talepler .auto-filter').on('change', function() {
+  $('#cover-spin').show(0);
+  url = 'index.php?route=setting/ogrenci_talep&user_token={{ user_token }}';
+
+	if ($('input[name=\'filter_name\']').val()) {
+		url += '&filter_name=' + encodeURIComponent($('input[name=\'filter_name\']').val());
+	}
+
+  if ($('input[name=\'filter_konu\']').val()) {
+		url += '&filter_konu=' + encodeURIComponent($('input[name=\'filter_konu\']').val());
+	}
+
+  if ($('select[name=\'filter_category\']').val()) {
+		url += '&filter_category=' + encodeURIComponent($('select[name=\'filter_category\']').val());
+	}
+
+  if ($('select[name=\'filter_store\']').val()) {
+		url += '&filter_store=' + encodeURIComponent($('select[name=\'filter_store\']').val());
+	}
+
+  if ($('select[name=\'filter_status\']').val()) {
+		url += '&filter_status=' + encodeURIComponent($('select[name=\'filter_status\']').val());
+	}
+
+  if ($('select[name=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name=\'limit\']').val());
+	}
+
+	location = url;
+});
+
+$('#button-clear').on('click', function() {
+	url = 'index.php?route=setting/ogrenci_talep&user_token={{ user_token }}';
+	location = url;
+});
+//--></script>
+
+<script type="text/javascript"><!--
+$('.modalpopup').on('click', function() {
+		  var store_id = $(this).attr('id');
+      $.ajax({
+		  url: 'index.php?route=setting/ogrenci_talep/storeId&user_token={{ user_token }}&store_id=' + store_id,
+		  type: 'post',
+			dataType: 'json',
+				
+			success: function(json) {
+        $('#modal-body .col').remove();
+				var row = 1;
+				var html = '';
+				if (json['name']) {
+				$('#modal-store').toggle(1000);
+				
+        html = '<div class="col">';
+				html += '<span class="list-group-item text-center">' + '<img src="' +  json['logo'] + '" class="img-thumbnail"></span>';
+				html += '<span class="list-group-item bg-primary text-white"><strong>' + json['name'] + '</strong> | <a href="' + json['in_url'] + '" target="_blank"><i class="fab fa-instagram" style="color:white;font-size:14px;"></i></a><a href="' + json['fb_url'] + '" target="_blank"> <i class="fab fa-facebook" style="color:white;font-size:14px;"></i></a><a href="' + json['tw_url'] + '" target="_blank"> <i class="fab fa-twitter" style="color:white;font-size:14px;"></i></a><a href="' + json['yt_url'] + '" target="_blank"> <i class="fab fa-youtube" style="color:white;font-size:14px;"></i></a></span>';
+				html += '<span class="list-group-item"><strong>Dernek Başkanı:</strong> ' + json['baskan'] + '</span>';
+				html += '<span class="list-group-item"><strong>Dernek Tlf:</strong> ' + json['telephone2'] + '</span>';
+				html += '<span class="list-group-item"><strong>Web:</strong> ' + '<a href="' + json['web'] + '" target="_blank">' + json['web'] + '</a></span>'
+				html += '<span class="list-group-item"><i class="fa fa-envelope" style="color:blue"></i> ' + json['email'] + '</span>';
+                html += '<span class="list-group-item"><i class="fa fa-map-marker" style="color:blue"></i> ' + json['address'] + '</span>';				
+			    html += '</div>';
+              
+				 $('#modal-body').append(html);
+    				 
+				}
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+			}
+		});
+});
+
+$('#button-close,div').on('click', function() {
+ $('#modal-store').hide(); 
+});
+
+$('#modal-view-body1,#button-more').on('click', function() {
+ $('.text-more').show(); 
+ $('.text-more2').hide();
+ $('#button-more').hide();
+});
+
+$('.input-group-text').on('click', function() {
+$('#modal-view-body select').prop('disabled',false); 
+});
+
+$('select[name=\'islem\']').on('change', function() {
+  $('#modal-view-body .text-danger').remove();
+  $('#modal-view-body #body-file').hide(); 
+  $('#modal-view-body').find(':checkbox').prop('checked',false);
+  var value = $('select[name=\'islem\']').val();
+  $('#modal-view-body #input-gerekce').prop('disabled',false);
+
+ if(value == 3 || value == 4 || value == 5 || value == '') {
+   $('#modal-view-body #input-gerekce').prop('disabled',true); 
+ }
+
+ if(value == 5) {
+   $('#modal-view-body #body-file').show(); 
+ }
+
+ });
+
+ $('input[type=\'checkbox\']').on('click', function() {
+  $('#body-filename-diger').hide();
+  if($('#input-checkbox-diger').is(':checked')) {
+    $('.input-checkbox').prop('checked',false);
+    $('#body-filename-diger').show();
+  }
+ });
+
+//--></script>
+
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

@@ -1,0 +1,468 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+        <div class="ms-auto">
+            <button type="submit" form="form-setting" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-save"></i>
+            </button>
+            <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm bg-white btn-sm">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </a>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 mx-auto">
+            <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-setting" class="form-horizontal">
+                <div class="card">
+                    <div class="card-body">
+
+                        <input type="hidden" name="customer_group_id" value="6" class="form-control" />
+                        <ul class="nav nav-tabs nav-primary" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#tab-genel" role="tab" aria-selected="true">
+                                    <div class="d-flex align-items-center">
+                                        <div class="tab-icon"><i class="bx bx-cog font-18 me-1"></i>
+                                        </div>
+                                        <div class="tab-title">{{ "Genel Ayarlar" }}</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" data-bs-toggle="tab" href="#tab-sms" role="tab" aria-selected="false" tabindex="-1">
+                                    <div class="d-flex align-items-center">
+                                        <div class="tab-icon"><i class="bx bx-book-reader font-18 me-1"></i>
+                                        </div>
+                                        <div class="tab-title">{{ "SMS Ayarları" }}</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" data-bs-toggle="tab" href="#tab-mail" role="tab" aria-selected="false" tabindex="-1">
+                                    <div class="d-flex align-items-center">
+                                        <div class="tab-icon"><i class="bx bx-envelope font-18 me-1"></i>
+                                        </div>
+                                        <div class="tab-title">{{ "E-Posta Ayarları" }}</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" data-bs-toggle="tab" href="#tab-server" role="tab" aria-selected="false" tabindex="-1">
+                                    <div class="d-flex align-items-center">
+                                        <div class="tab-icon"><i class="bx bx-server font-18 me-1"></i>
+                                        </div>
+                                        <div class="tab-title">{{ "Sunucu" }}</div>
+                                    </div>
+                                </a>
+                            </li>
+
+
+                        </ul>
+                        <div class="tab-content py-3">
+                            <div class="tab-pane fade show active" id="tab-genel" role="tabpanel">
+                                <fieldset id="yonetim" class="border rounded p-3 mb-4">
+
+                                    <!-- Öğrenci Adı -->
+                                    <div class="row mb-3">
+                                        <label for="input-firstname" class="col-sm-2 col-form-label">{{ "Kurum Adı" }}</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" name="config_name" value="{{config_name}}" class="form-control" />
+
+                                        </div>
+                                    </div>
+
+                                    <!-- Soyadı -->
+                                    <div class="row mb-3">
+                                        <label for="input-lastname" class="col-sm-2 col-form-label">{{ "Telefon Numarası" }}</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" name="config_telephone" value="{{config_telephone}}" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Kimlik No -->
+                                    <div class="row mb-3">
+                                        <label for="input-kimlik_no" class="col-sm-2 col-form-label">{{ "E-Mail" }}</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" name="config_email" value="{{config_email}}" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Telefon -->
+                                    <div class="row mb-3">
+                                        <label for="input-telephone" class="col-sm-2 col-form-label">{{ "Afiş" }}</label>
+                                        <div class="col-sm-4">
+                                            <div class="profile-avatar text-start">
+                                                <a href="javascript:void(0);" id="button-thumb-image" class="btn-thumbnail">
+                                                    <img src="{{thumb}}" class="border border-primary border-primary rounded-lg shadow" width="120" height="120" title="Resim eklemek için tıklayın" class="rounded-circle"></a>
+                                                <input type="hidden" name="config_login_image" value="{{ config_login_image }}" id="input-image">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <label for="input-login-image-width" class="col-sm-2 col-form-label">Genişlik/Yükseklik</label>
+                                        <div class="col-sm-1">
+                                            <input type="text" name="config_login_image_width" value="{{ config_login_image_width }}" id="input-login-image-width" placeholder="Width" class="form-control" />
+                                        </div>
+
+                                        <div class="col-sm-1">
+                                            <input type="text" name="config_login_image_height" value="{{ config_login_image_height }}" id="input-login-image-height" placeholder="Height" class="form-control" />
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row mb-3">
+                                        <label class="col-sm-2 col-form-label">{{ "Popup Afiş" }}</label>
+                                        <div class="col-sm-4">
+                                            <div class="form-check form-switch">
+                                                {% if config_popup_afis_status %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                                                <input class="form-check-input" type="checkbox" {{ checked }} name="config_popup_afis_status" value="1" id="statusSwitch" style="width:3rem;height:1.5rem;">
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <label class="col-sm-2 col-form-label">{{ "Popup Video" }}</label>
+                                        <div class="col-sm-4">
+                                            <div class="form-check form-switch">
+                                                {% if config_popup_video_status %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                                                <input class="form-check-input" type="checkbox" {{ checked }} name="config_popup_video_status" value="1" id="statusSwitch" style="width:3rem;height:1.5rem;">
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3" id="video-url" style="display:none;">
+                                        <label for="input-telephone" class="col-sm-2 col-form-label">{{ "Video Url" }}</label>
+                                        <div class="col-sm-8">
+                                            <textarea type="text" name="config_popup_video_code" placeholder="{{ "Video Url" }}" rows="4" id="input-address" class="form-control" />{{config_popup_video_code}}</textarea>
+                                        </div>
+                                    </div>
+
+
+                                </fieldset>
+
+
+                                <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                                    <legend class="fw-bold">Sosyal Ağlar</legend>
+
+                                    <div class="col-12">
+                                        <div class="d-flex gap-3 flex-wrap">
+
+                                            <!-- Facebook -->
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-primary toggle-input">
+                                                    <i class="bi bi-facebook"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+                                                    <input type="text" name="config_facebook" value="{{ config_facebook }}" class="form-control" placeholder="Facebook linki">
+                                                </div>
+                                            </div>
+
+                                            <!-- Twitter -->
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-info toggle-input">
+                                                    <i class="bi bi-twitter"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+                                                    <input type="text" class="form-control" name="config_twitter" value="{{ config_twitter }}" placeholder="{{ entry_twitter }}">
+                                                </div>
+                                            </div>
+
+                                            <!-- Instagram -->
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-primary toggle-input">
+                                                    <i class="bi bi-instagram"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+
+                                                    <input type="text" class="form-control" name="config_instagram" value="{{ config_instagram }}" placeholder="{{ entry_instagram }}">
+                                                </div>
+                                            </div>
+
+                                            <!-- YouTube -->
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-danger toggle-input">
+                                                    <i class="bi bi-youtube"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+
+                                                    <input type="text" class="form-control" name="config_youtube" value="{{ config_youtube }}" placeholder="{{ entry_youtube }}" </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Linkedin -->
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-primary toggle-input">
+                                                    <i class="bi bi-linkedin"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+
+                                                    <input type="text" class="form-control" name="config_linkedin" value="{{ config_linkedin }}" placeholder="{{ "Linkedin" }}" </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-success toggle-input">
+                                                    <i class="bi bi-whatsapp"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+
+                                                    <input type="text" class="form-control" name="config_whatsapp" value="{{ config_whatsapp }}" placeholder="{{ "WHatsapp" }}" </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                </fieldset>
+                            </div>
+
+                            <div class="tab-pane fade" id="tab-sms" role="tabpanel">
+                                <fieldset id="yonetim" class="border rounded p-3 mb-4">
+
+
+                                    <!-- Okulu -->
+                                    <div class="row mb-3">
+                                        <label for="select-lise" class="col-sm-2 col-form-label">{{ "Api Url" }}</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" name="config_api_url" value="{{ config_api_url }}" placeholder="{{ "Api url" }}" id="input-name" class="form-control" />
+                                            {% if error_api_url %}
+                                            <div class="text-danger">{{ error_api_url }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Okulu -->
+                                    <div class="row mb-3">
+                                        <label for="select-lise" class="col-sm-2 col-form-label">{{ "İşyeri No" }}</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" name="config_api_userno" value="{{ config_api_userno }}" placeholder="{{ "İşyeri No" }}" id="input-owner" class="form-control" />
+                                            {% if error_api_userno %}
+                                            <div class="text-danger">{{ error_api_userno }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Okulu -->
+                                    <div class="row mb-3">
+                                        <label for="select-lise" class="col-sm-2 col-form-label">{{ "Kullanıcı Adı" }}</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" name="config_api_username" value="{{ config_api_username }}" placeholder="{{ "Kullanıcı Adı" }}" id="input-owner" class="form-control" />
+                                            {% if error_api_username %}
+                                            <div class="text-danger">{{ error_api_username }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Okulu -->
+                                    <div class="row mb-3">
+                                        <label for="select-lise" class="col-sm-2 col-form-label">{{ "Parola" }}</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" name="config_api_password" value="{{ config_api_password }}" placeholder="{{ "Parola" }}" id="input-owner" class="form-control" />
+                                            {% if error_api_password %}
+                                            <div class="text-danger">{{ error_api_password }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Okulu -->
+                                    <div class="row mb-3">
+                                        <label for="select-lise" class="col-sm-2 col-form-label">{{ "Zaman Aşımı" }}</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" name="config_api_timeout" value="{{ config_api_timeout }}" placeholder="{{ "Zaman Aşımı" }}" id="input-owner" class="form-control" />
+                                            {{"<strong>Not :</strong> Zaman aşımı saat cinsinden heasplanır 1 ile 12 saat aralığında bir sayı giriniz."}}
+                                        </div>
+                                    </div>
+
+                                    <!-- Okulu -->
+                                    <div class="row mb-3">
+                                        <label for="select-lise" class="col-sm-2 col-form-label">{{ "Organizator" }}</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" name="config_api_organizator" value="{{ config_api_organizator }}" placeholder="{{ "Orginazitor" }}" id="input-name" class="form-control" />
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+
+
+                            </div>
+
+                            <div class="tab-pane fade" id="tab-mail" role="tabpanel">
+                            <fieldset>
+                                
+                                <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-mail-engine">
+                                    <span data-toggle="tooltip" title="{{ help_mail_engine }}">{{ entry_mail_engine }}</span>
+                                </label>
+                                <div class="col-sm-4">
+                                    <select name="config_mail_engine" id="input-mail-engine" class="form-select">
+                                    {% if config_mail_engine == 'mail' %}
+                                    <option value="mail" selected="selected">{{ text_mail }}</option>
+                                    {% else %}
+                                    <option value="mail">{{ text_mail }}</option>
+                                    {% endif %}
+                                    {% if config_mail_engine == 'smtp' %}
+                                    <option value="smtp" selected="selected">{{ text_smtp }}</option>
+                                    {% else %}
+                                    <option value="smtp">{{ text_smtp }}</option>
+                                    {% endif %}
+                                    </select>
+                                </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-mail-parameter">
+                                    <span data-toggle="tooltip" title="{{ help_mail_parameter }}">{{ entry_mail_parameter }}</span>
+                                </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="config_mail_parameter" value="{{ config_mail_parameter }}" placeholder="{{ entry_mail_parameter }}" id="input-mail-parameter" class="form-control" />
+                                </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-mail-smtp-hostname">
+                                    <span data-toggle="tooltip" title="{{ help_mail_smtp_hostname }}">{{ entry_mail_smtp_hostname }}</span>
+                                </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="config_mail_smtp_hostname" value="{{ config_mail_smtp_hostname }}" placeholder="{{ entry_mail_smtp_hostname }}" id="input-mail-smtp-hostname" class="form-control" />
+                                </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-mail-smtp-username">{{ entry_mail_smtp_username }}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="config_mail_smtp_username" value="{{ config_mail_smtp_username }}" placeholder="{{ entry_mail_smtp_username }}" id="input-mail-smtp-username" class="form-control" />
+                                </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-mail-smtp-password">
+                                    <span data-toggle="tooltip" title="{{ help_mail_smtp_password }}">{{ entry_mail_smtp_password }}</span>
+                                </label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="config_mail_smtp_password" value="{{ config_mail_smtp_password }}" placeholder="{{ entry_mail_smtp_password }}" id="input-mail-smtp-password" class="form-control" />
+                                </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-mail-smtp-port">{{ entry_mail_smtp_port }}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="config_mail_smtp_port" value="{{ config_mail_smtp_port }}" placeholder="{{ entry_mail_smtp_port }}" id="input-mail-smtp-port" class="form-control" />
+                                </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-mail-smtp-timeout">{{ entry_mail_smtp_timeout }}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="config_mail_smtp_timeout" value="{{ config_mail_smtp_timeout }}" placeholder="{{ entry_mail_smtp_timeout }}" id="input-mail-smtp-timeout" class="form-control" />
+                                </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset>
+                                
+                                
+
+                                <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-alert-email">
+                                    <span data-toggle="tooltip" title="{{ help_mail_alert_email }}">{{ entry_mail_alert_email }}</span>
+                                </label>
+                                <div class="col-sm-4">
+                                    <textarea name="config_mail_alert_email" rows="5" placeholder="{{ entry_mail_alert_email }}" id="input-alert-email" class="form-control">{{ config_mail_alert_email }}</textarea>
+                                </div>
+                                </div>
+                            </fieldset>
+                            </div>
+
+
+
+                            <div class="tab-pane fade" id="tab-server" role="tabpanel">
+                                <!-- Kimlik No -->
+                                <div class="row mb-3">
+                                    <label for="input-kimlik_no" class="col-sm-2 col-form-label">{{ "Dosya Boyutu (MB)" }}</label>
+                                    <div class="col-sm-4">
+                                        <select name="config_file_max_size_select" id="input-sehir" class="form-select">
+                                            <option value="">{{"--Seçim Yapın--"}}</option>
+                                            <option value="5" {% if config_file_max_size_select == 5 %} selected="selected" {% endif %}>{{"5 MB"}}</option>
+                                            <option value="10" {% if config_file_max_size_select == 10 %} selected="selected" {% endif %}>{{"10 MB"}}</option>
+                                            <option value="25" {% if config_file_max_size_select == 25 %} selected="selected" {% endif %}>{{"25 MB"}}</option>
+                                            <option value="50" {% if config_file_max_size_select == 50 %} selected="selected" {% endif %}>{{"50 MB"}}</option>
+                                            <option value="100" {% if config_file_max_size_select == 100 %} selected="selected" {% endif %}>{{"100 MB"}}</option>
+                                        </select>
+                                        <small>{{"Not : Sisteme yüklenecek maksimum dosya boyutunu seçiniz."}}</small>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    {{footer}}
+</main>
+<script>
+    $(document).ready(function() {
+        $('input[name=\'config_popup_video_status\']').change(function() {
+            if ($(this).is(':checked')) {
+                $('#video-url').show(); // Checkbox işaretlendiğinde göster
+            } else {
+                $('#video-url').hide(); // Checkbox işaretlenmediğinde gizle
+            }
+        });
+
+        // Sayfa yüklendiğinde checkbox durumu kontrolü
+        $('input[name=\'config_popup_video_status\']').trigger('change');
+    });
+
+    $('select[name="config_file_max_size_select"]').on('change', function() {
+        var bayt_degeri = 1048576; // Noktasız yazım daha yaygındır
+        var input = parseFloat($(this).val()); // Sayıya çevir
+        var sonuc = input * bayt_degeri;
+        $('input[name="config_file_max_size"]').val(sonuc);
+
+    });
+</script>
+<script>
+    document.querySelectorAll('.toggle-input').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const inputGroup = this.nextElementSibling;
+            inputGroup.classList.toggle('d-none');
+        });
+    });
+</script>
+<script>
+    var error_warning = '{{error_warning}}';
+    var success = '{{success}}';
+    $(document).ready(function() {
+        if (error_warning) {
+            alerterror(error_warning);
+        }
+
+        if (success) {
+            alertsuccess(success);
+        }
+    });
+</script>

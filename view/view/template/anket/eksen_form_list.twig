@@ -1,0 +1,211 @@
+{{ header }}{{ column_left }}
+<main id="anketler" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+          <a href="{{add}}" id="button-add" data-toggle="tooltip" title="{{ "Yeni Anket Ekle" }}"  class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> {{" Ekle"}}</a>
+         <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm" onclick="confirm('{{ text_confirm }}') ? $('#form-eksen').submit() : false;"><i class="bi bi-trash"></i> Sil</button>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-12 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="{{ "Arama için başlık yazınız." }}" id="input-name" class="form-control auto-filter form-control-lg ps-4">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-eksen">
+                    <div class="card-body">
+
+                        <div class="table-responsive-sm">
+                          <table id="table-odeme" class="table table-bordered align-middle mb-0">
+                          <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                     <tr>
+                                        <th colspan="2" class="text-start" style="width:20%">{{ "Başlık" }}</th>
+                                        <th class="text-start">{{ "Oluşturan" }}</th>
+                                        <th class="text-start">{{ "Açıklama" }}</th>
+                                         <th class="text-center">{{ "Kişi Sayısı" }}</th>
+                                         <th class="text-start">{{ "Baş/Bit Tarihi" }}</th>
+                                        <th class="text-start">{{ "Ekleme Tarihi" }}</th>
+                                        <th class="text-center" colspan="2" style="width:1%">{{ "Eylem" }}</th>
+                                      </tr>
+                                   </thead>
+                                   <tbody class="data-list">
+                                    {% if formlar %}
+                                    {% set row = 1 %}
+                                    {% for form in formlar %}
+
+                                    <tr id="data-list{{form.eksen_form_id}}">
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input" name="selected[]" value="{{ form.eksen_form_id }}" class="input-selected" />
+                                    </td>
+                                    <td class="text-left">{{ form.name }}</td>
+                                    <td class="text-left item">{{ form.user_name }}</td>
+                                    <td class="text-left item">{{ form.description }}</td>
+                                    <td class="text-center item">{{ form.total }}</td>
+                                    <td class="text-left item">{{ form.date_start }}<br>{{ form.date_end }}</td>
+                                    <td class="text-left item">{{ form.date_added }}</td>
+                                    <td class="text-center">
+                                      <a href="{{form.edit}}" data-toggle="tooltip" title="Düzenle" class="btn btn-sm btn-info"> <i class="bi bi-pencil"></i> </a>
+                                    </td> 
+                                  
+                                    <td class="text-center" >
+                                      {% if form.total %}
+                                      <a href="{{ form.report }}" data-toggle="tooltip" title="{{ "Anket verilerini görüntüle" }}" class="btn btn-warning btn-sm" ><i class="bi bi-person"></i></a>
+                                      {% else %}
+                                      <a href="javascript:void(0)" data-toggle="tooltip" title="{{ "Anket verilerini görüntüle" }}" class="btn btn-warning btn-sm" disabled><i class="bi bi-person"></i></a>
+                                      {% endif %}
+                                    </tr>
+                                  
+                                  {% set row = row + 1 %}
+                                  {% endfor %}
+                                  {% else %}
+                                      <tr>
+                                      <td class="text-center" colspan="6">{{"Sonuç bulunamadı"}}</td>
+                                    </tr>
+                                    {% endif %}
+                                    </tbody>
+                                 </table>
+                        </div>
+
+                        <div class="row mt-3">
+                        <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+                            {{ pagination }}
+                        </div>
+                        <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+                            {{ results }}
+                        </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="modal fade" id="modal-duyuru-udef" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Duyuru Formu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div id="modal-body-form" class="modal-body" style="display:none;">
+              <form id="form-duyuru" class="form-horizontal">
+                <input type="hidden" name="duyuru_id" value="0"> 
+                
+                <div class="form-group mb-3">
+                  <label for="recipient-name" class="col-form-label fw-bold">Konu Başlığı:</label>
+                  <input type="text" name="name" placeholder="{{"Konu Başlığı" }}" value="" id="input-title" class="form-control">
+                </div>
+
+                <div class="form-group mb-3">
+                  <label for="message-text" class="col-form-label fw-bold">Açıklama:</label>
+                  <textarea class="form-control" name="text" placeholder="{{ entry_text }}" id="textarea-editor" style="height: 300px;overflow-y: auto; "></textarea>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group mb-3">
+                      <input type="text" class="form-control" name="filename" value="" placeholder="{{ entry_filename }}" id="input-filename"  readonly>
+                      <input type="hidden" class="form-control" name="code" value="" placeholder="{{ entry_filename }}" id="input-code"  readonly>
+                      <button class="btn btn-info" id="button-upload" type="button" id="button-addon2"><i class="bi bi-upload"></i> {{ button_file_upload }}</button>
+                    </div>
+                </div>
+
+                 <div class="form-group ">
+                  <div class="border bg-light bildirim" style="height: 150px; overflow: auto;display:none;">
+                  <div class="form-check">             
+                      <input class="form-check-input" type="checkbox"  onchange="$('input[name^=\'store_id\']').prop('checked', $(this).prop('checked'));">
+                      <label class="form-check-label fw-bold" for="flexCheckChecked">{{ "Tümünü Seç" }}</label>
+                   </div>
+                 {% for store in stores %}
+                    <div class="form-check">             
+                      <input class="form-check-input" type="checkbox" name="store_id[]" value="{{ store.store_id }}">
+                      <label class="form-check-label" for="flexCheckChecked">{{ store.name }}</label>
+                   </div>
+                 {% endfor %}
+                  </div>
+                </div>
+            </form>
+          </div>
+
+          <div id="modal-body-info" class="modal-body"></div>
+
+
+          <div class="modal-footer d-flex justify-content-between">
+            <div class="form-check mb-3 text-start">             
+                 <input class="form-check-input" type="checkbox" name="config_bildirim" value="1" onclick="$('.bildirim').toggle();">
+                 <label class="form-check-label" for="flexCheckChecked">Toplu Bildirim Gönder</label>
+              </div>
+            <button type="button" id="button-modal-edit" class="btn btn-info" onclick="$('#modal-body-info').hide();$('#modal-body-form').show();$('#button-modal-save').show();$('#button-modal-edit').hide();"><i class="bi bi-pencil"></i> {{ " Düzenle" }}</button>
+            <button type="button" id="button-modal-save" class="btn btn-primary" style="display:none;"><i class="bi bi-save"></i> {{ " Kaydet" }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{footer}}
+</main>
+<script>
+$('.auto-filter').on('change', function() {  
+    var url = 'index.php?route=anket/anket&user_token={{ user_token }}';
+    
+    if ($('input[name="filter_name"]').val()) {
+        url += '&filter_name=' + encodeURIComponent($('input[name="filter_name"]').val());
+    }
+
+    location = url;
+});
+</script>
+
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+  if(error_warning) {
+    $('#alert').prepend(
+      '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+        '<div class="d-flex align-items-center">' +
+          '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+          '<div class="ms-3"><div class="text-dynamic">' + error_warning + '</div></div>' +
+        '</div>' +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+      '</div>'
+    );
+  }
+
+  if (success) {
+    $('#alert').append(
+        '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+          '<div class="d-flex align-items-center">' +
+            '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+            '<div class="ms-3"><div class="text-dynamic">' + success + '</div></div>' +
+          '</div>' +
+          '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        '</div>'
+      );  
+  }
+});
+</script>

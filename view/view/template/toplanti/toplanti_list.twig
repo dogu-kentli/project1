@@ -1,0 +1,256 @@
+{{ header }}{{ column_left }}
+<main id="toplantilar" class="page-content">
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div id="buttons" class="ms-auto text-end me-3">
+            <button id="button-toplanti-add" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Ekle</button>
+            <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm" onclick="confirm('{{ text_confirm }}') ? $('#form-universite').submit() : false;"><i class="bi bi-trash"></i> Sil</button>
+        </div>
+    </div>
+    <div class="row" id="step-1">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-3 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="Arama yapmak için bir kelime yazınız." id="input-name" class="form-control auto-complete ps-4">
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                          <div class="d-flex flex-wrap justify-content-left gap-1">
+                            <div class="d-flex align-items-center rounded bg-light px-2 py-1">
+                              <i class="bi bi-circle-fill text-primary"></i>
+                              <span class="ms-2 fw-bold">DEK: {{total_dek}}</span>
+                            </div>
+                            <div class="d-flex align-items-center rounded bg-light px-2 py-1">
+                              <i class="bi bi-circle-fill text-warning"></i>
+                              <span class="ms-2 fw-bold">DK: {{total_dk}}</span>
+                            </div>
+                            <div class="d-flex align-items-center rounded bg-light px-2 py-1">
+                              <i class="bi bi-circle-fill text-success"></i>
+                              <span class="ms-2 fw-bold">TK: {{total_tk}}</span>
+                            </div>
+                            <div class="d-flex align-items-center rounded bg-light px-2 py-1">
+                              <i class="bi bi-circle-fill text-danger"></i>
+                              <span class="ms-2 fw-bold">İK: {{total_ik}}</span>
+                            </div>
+                            <div class="d-flex align-items-center rounded bg-light px-2 py-1">
+                              <i class="bi bi-circle-fill text-danger"></i>
+                              <span class="ms-2 fw-bold">Dilek & Temenni: {{total_temenni}}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select name="filter_category" class="form-select auto-filter">
+                                <option value="">{{ text_all }}</option>
+                                {% for key, value in categories %}
+                                <option value="{{ key }}" {% if filter_category == key %} selected="selected" {% endif %}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-universite">
+                    <div class="card-body">
+                        <div class="table-responsive-sm">
+                            <table class="table table-striped align-middle mb-0">
+                                <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                    <tr>
+                                        <th style="width: 1px;" class="text-center">
+                                            <input type="checkbox" class="form-check-input" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);">
+                                        </th>
+                                        <th class="text-start">Toplantı Adı</th>
+                                        <th class="text-start" style="width: 8%;">Toplantı No</th>
+                                        <th class="text-start">Toplantı Yeri</th>
+                                        <th class="text-start">Tarih</th>
+                                        <th class="text-start">Alınan Karar Sayısı</th>
+                                        <th class="text-start">Tamamlanan Karar Sayısı</th>
+                                        <th class="text-start">Durumu</th>
+                                        <th style="width:1%;" colspan="3" class="text-center">Eylem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if toplantilar %}
+                                    {% for toplanti in toplantilar %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input" name="selected[]" value="{{ toplanti.toplanti_id }}" />
+                                        </td>
+                                        <td class="text-start">{{ toplanti.name }}</td>
+                                        <td class="text-start"><span class="badge {% if toplanti.toplanti_category_id == 2 %} bg-info {% elseif toplanti.toplanti_category_id == 3 %} bg-purple {% else %} bg-secondary {% endif %}">{{ toplanti.toplanti_no }}</span></td>
+                                        <td class="text-start">{{ toplanti.toplanti_yeri }}</td>
+                                        <td class="text-start">{{ toplanti.toplanti_tarihi }}</td>
+                                        <td class="text-start">{{ toplanti.karar_total1 }}</td>
+                                        <td class="text-start">{{ toplanti.karar_total2 }}</td>
+                                        <td class="text-center">
+                                            {% if toplanti.status == 1 %}<span class="badge bg-gradient-success">Tamamlandı</span> {% else %}<span class="badge bg-gradient-warning"> Planlandı</span> {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{toplanti.pdf}}" data-toggle="tooltip" target="_blank" title="Pdf olarak görüntüle" class="btn bg-warning btn-sm"><i class="bi bi-file-earmark-pdf"></i></a>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if user_persoel_id == toplanti.user_personel_id or level == 1 %}
+                                            <a href="{{ toplanti.edit }}" data-toggle="tooltip" title="Düzenle" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
+                                            {% else %}
+                                            <a href="javascript:void(0)" data-toggle="tooltip" title="Düzenle" class="btn btn-info btn-sm" disabled><i class="bi bi-pencil"></i></a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td class="text-center" colspan="10">{{ text_no_results }}</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+                                {{ pagination }}
+                            </div>
+                            <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+                                {{ results }}
+                            </div>
+                        </div>
+                    </div> </form> </div> </div> </div> 
+                    <div id="step-2" class="row" style="display:none;">
+        <div class="col-lg-12 mx-auto">
+            <div class="card">
+                <div id="form-toplanti-data" class="card-body">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-toplanti" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Yeni Toplantı Formu</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div id="toplanti-modal-body" class="modal-body">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="button-toplanti-generate" class="btn btn-primary">Devam Et</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ footer }}
+</main>
+
+
+<script type="text/javascript">
+  $('#button-toplanti-add').on('click', function() {
+    $('#toplanti-modal-body').html('');
+    $.ajax({
+      url: 'index.php?route=toplanti/toplanti/getForm&user_token={{ user_token }}',
+      dataType: 'html',
+      success: function(html) {
+        $('#toplanti-modal-body').html(html);
+        $('#modal-toplanti').modal('show');
+      },
+      
+    });
+  });
+   
+  $('.auto-filter').on('change', function() {
+        $('#cover-spin').show(0);
+        url = 'index.php?route=toplanti/toplanti&user_token={{ user_token }}';
+
+        if ($('select[name=\'filter_category\']').val()) {
+            url += '&filter_category=' + encodeURIComponent($('select[name=\'filter_category\']').val());
+        }
+
+        location = url;
+    });
+
+    //
+    -->
+</script>
+<script>
+    $('input[name=\'filter_name\']').autocomplete({
+        'source': function(request, response) {
+            $.ajax({
+                url: 'index.php?route=setting/autocomplete/kararautocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+                dataType: 'json',
+                success: function(json) {
+                    response($.map(json, function(item) {
+                        return {
+                            label: '<a href="' + item['edit'] + '" onclick="event.preventDefault(); window.location.href = \'' + item['edit'] + '\'"><span class="label label-danger">No :' + item['toplanti_no'] + '</span>&nbsp;&nbsp;&#11166;&nbsp;&nbsp;<span style="color:black;">' + item['name'] + '</span>&nbsp;&nbsp;&#11166;&nbsp;&nbsp;(<span style="color:blue;">' + item['personel'] + '</span>)</a>',
+                            value: item['toplanti_karar_id']
+                        }
+                    }));
+                }
+            });
+        },
+        'select': function(item) {
+            $('input[name=\'filter_name\']').val(search);
+        }
+    });
+</script>
+<script>
+$('#button-toplanti-generate').on('click', function() {
+    var $btn = $(this);
+    $.ajax({
+        url: 'index.php?route=toplanti/toplanti/save&user_token={{ user_token }}&toplanti_no=' + $('input[name=\'toplanti_no\']').val(),
+        type: 'post',
+        dataType: 'json',
+        data: $('#form-toplanti').serialize(),
+        beforeSend: function() {
+            $btn.buttonanimate('loading');
+        },
+        complete: function() {
+            $btn.buttonanimate('reset');
+        },
+        success: function(json) {
+            if (json.error.warning) {
+                alerterror(json.error.warning);
+            }
+
+            if (json.success) {
+                $('#modal-toplanti').modal('hide');
+                $('#form-toplanti-data').load('index.php?route=toplanti/toplanti/dataToplanti&user_token={{ user_token }}' + '&toplanti_history_id=' + json['toplanti_history_id']);
+                $('#step-1,#buttons').hide();
+                $('#step-2').show();
+            }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+</script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

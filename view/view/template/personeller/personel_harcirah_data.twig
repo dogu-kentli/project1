@@ -1,0 +1,142 @@
+ <div class="table-responsive-sm">
+    <table class="table table-striped align-middle mb-0">
+        <thead class="table-light">
+           <tr>
+              <th style="width: 1px;" class="text-center">{{"S.n"}}</th>
+              <th class="text-start">{{ "Personel Adı" }}</th>
+              <th class="text-start">{{ "Alma Gerekçesi" }}</th>
+              <th class="text-start">{{ "Alınan Tarih" }}</th>
+              <th class="text-start">{{ "Harcırah Mikt." }}</th>
+              <th class="text-start">{{ "Harcanan Mikt." }}</th>
+              <th class="text-start">{{ "Geri Ödenecek Mikt." }}</th>
+              <th class="text-center">{{ "Durumu" }}</th>
+              <th class="text-center" colspan="2" style="width:1%;">{{ "Eylem" }}</th>
+            </tr>
+          </thead>
+          <tbody>
+                {% if harcirahs %}
+                {% for harcirah in harcirahs %}
+                <tr>
+                  <td class="text-center">{{ harcirah.row }}</td>
+                   <td class="text-start" id="personel{{harcirah.personel_harcirah_id}}">{{ harcirah.personel }}</td>
+                   <td class="text-start" >{{ harcirah.description }}</td>
+                   <td class="text-start"><span id="tarih{{harcirah.personel_harcirah_id}}">{{ harcirah.date_added }}</span></td>
+                  <td class="text-start">₺ 
+                    <span id="amiktar{{harcirah.personel_harcirah_id}}" style="font-weight:bold; color:#27ae60;">
+                      {{ harcirah.a_miktar }}
+                    </span>
+                  </td>
+                  <td class="text-start">₺ 
+                    <span id="hmiktar{{harcirah.personel_harcirah_id}}" style="font-weight:bold; color:#c0392b;">
+                      {{ harcirah.h_miktar }}
+                    </span>
+                  </td>
+                  <td class="text-start">₺ 
+                    <span id="kmiktar{{harcirah.personel_harcirah_id}}" style="font-weight:bold; color:#7f8c8d;">
+                      {{ harcirah.k_miktar }}
+                    </span>
+
+                    <span id="description{{harcirah.personel_harcirah_id}}" style="font-weight:bold; color:#7f8c8d;display:none;">
+                      {{ harcirah.description }}
+                    </span>
+                  </td>
+                   
+                   <td class="text-center">
+                   {% if harcirah.status == 1 %}
+                    <span class="badge bg-success">{{ "Hesap Açık" }}</span> 
+                   {% else %} 
+                    <span class="badge bg-secondary">{{"Hesap Kapandı"}} </span>
+                   {% endif %}
+                  </td>
+                  <td class="text-center">
+				          {% if access %}
+                    <button type="button" data-toggle="tooltip" id="button-update" title="{{ "Hesabı Aç / Kapat" }}" name="{{harcirah.personel_harcirah_id}}" for="{{harcirah.personel_id}}" class="btn btn-info btn-sm" > {{"Aç/Kapa"}}</button>
+				          {% endif %}
+                  </td>
+				         {% if userPersonelId == 0 %}
+                  <td class="text-center">
+                    <button type="button" data-toggle="tooltip" title="{{ "Sil" }}" id="{{harcirah.personel_harcirah_id}}" class="btn btn-danger btn-sm delete-data"><i class="bi bi-dash-circle"></i></button>
+                  </td>
+                  {% endif %}
+				         </tr>
+                {% endfor %}
+                <div class="row">
+         
+                {% else %}
+                <tr>
+                  <td class="text-center" colspan="9">{{ text_no_results }}</td>
+                </tr>
+                {% endif %}
+              </tbody>
+    </table>
+</div>
+
+ <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+
+<script>
+$('button[id^=\'button-update\']').on('click', function() {
+  var id = $(this).attr('name');
+  var personel_id = $(this).attr('for');
+  $('#modal-harcirah').modal('show');
+  var personel = $('#personel' + id).text().trim();
+  var amiktar = $('#amiktar' + id).text().trim();
+  var hmiktar = $('#hmiktar' + id).text().trim();
+  var kmiktar = $('#kmiktar' + id).text().trim();
+  var tarih  = $('#tarih' + id).text().trim();
+  var description  = $('#description' + id).text().trim();
+  
+  $('input[name^=\'personel_harcirah_id\']').val(id);
+  $('input[name^=\'filter_personel\']').val(personel);
+  $('input[name^=\'personel_id\']').val(personel_id);
+  $('input[name^=\'alinan_miktar\']').val(amiktar);
+  $('input[name^=\'harcanan_miktar\']').val(hmiktar);
+  $('input[name^=\'kalan_miktar\']').val(kmiktar);
+  $('input[name^=\'date_added\']').val(tarih);
+  $('textarea[name^=\'description\']').val(description);
+});
+</script>
+
+
+
+<script type="text/javascript"><!--
+$('#button-save').on('click', function() {
+     var personel_harcirah_id = $('input[name^=\'kmiktar\']').val();
+     
+     $.ajax({
+      url: 'index.php?route=personeller/personel_harcirah/save&user_token={{ user_token }}&personel_harcirah_id=' + personel_harcirah_id,
+      type: 'post',
+      dataType: 'json',
+      data : $('#form-harcirah').serialize(),
+      
+      success: function(json) {
+        $('.alert-dismissible').remove();
+
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+         
+        if (json.success) {
+          $('#modal-harcirah').modal('hide');
+          $('.input-miktar').val('');
+           $('#data-harcirah').load('index.php?route=personeller/personel_harcirah/dataHarcama&user_token={{ user_token }}');
+           alertsuccess(json.success);
+
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+//--></script>
+
+
+

@@ -1,0 +1,458 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end">
+            {% if button_action == 1 %}
+            <a href="{{ add }}" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> {{" Yeni Kullanıcı"}}</a>
+            <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm" onclick="confirm('{{ text_confirm }}') ? $('#form-user').submit() : false;"><i class="bi bi-trash"></i> Sil</button>
+             {% endif %}
+            <a href="{{cancel}}" data-toggle="tooltip"  title="Filtreyi Temizle" class="btn btn-light border border-dark shadow-sm btn-sm bg-white" aria-label="Filtreyi temizle"><i id="filter-icon" class="bi bi-funnel-fill"></i></a>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-lg-4 col-6 mb-3">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_username" value="{{ filter_username }}" placeholder="{{ "Kullanıcı adı veya isim yazınız" }}" class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6 mb-3">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_store" value="{{ filter_store }}" placeholder="{{ "Derneği" }}" class="form-control ps-4">
+                                <input type="hidden" name="filter_store_id" value="{{ filter_store_id }}" id="input-store_id" class="form-control auto-filter" />
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 mb-2">
+                            <select name="filter_user_group" class="form-select auto-filter">
+                                <option value="">{{ " -- Hepsi -- " }}</option>
+                                {% for key, value in grouped_user_groups %}
+                                <option value="{{key}}" {% if filter_user_group == key %}selected="selected" {% endif %}>{{ value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        <div class="col-lg-1 col-6 mb-3">
+                            <select name="filter_status" class="form-select auto-filter">
+                                <option value="" {% if filter_status is not defined or filter_status == '' %} selected="selected" {% endif %}>{{" -- Hepsi --" }}</option>
+                                <option value="1" {% if filter_status is same as(1) or filter_status == '1' %} selected="selected" {% endif %}>{{ "Aktif" }}</option>
+                                <option value="0" {% if filter_status is same as(0) or filter_status == '0' %} selected="selected" {% endif %}>{{ "Pasif" }}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2 co1-6 mb-2">
+                            <select name="limit" class="form-select auto-filter">
+                                {% for key,value in limits %}
+                                <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-user">
+                    <div class="card-body">
+
+                        <div class="table-responsive-sm">
+                            <table class="table table-bordered table-striped align-middle mb-0">
+                                <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                    <tr>
+                                        <th style="width: 1px;" class="text-center">
+                                            <input type="checkbox" class="form-check-input" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" />
+                                        </th>
+                                        <th class="text-start">
+                                            {{ column_username }}
+                                        </th>
+                                        <th class="text-start" style="width: 28%;">
+                                            {{ "İzin Grubu" }}
+                                        </th>
+
+                                        <th class="text-center" style="width: 5%;">
+                                            {{ column_status }}
+                                        </th>
+                                        <th class="text-start" style="width: 10%;">
+                                            {{ column_date_added }}
+                                        </th>
+                                        <th style="width:1%;" colspan="2" class="text-end">{{ column_action }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if users %}
+                                    {% for user in users %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input" name="selected[]" value="{{ user.user_id }}" />
+                                        </td>
+                                        <td class="text-start">
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-bold text-dark">{{user.username }}</span>
+                                                <small class="text-muted">{{ user.name }}</small>
+                                            </div>
+                                        </td>
+                                        <td class="text-start">
+                                            <div class="border rounded p-2 bg-light">
+                                                <div class="fw-bold">{{ user.group_name }}</div>
+                                                <div class="text-muted">{{ user.store }}</div>
+                                            </div>
+                                        </td>
+
+                                        <td class="text-center">
+                                            <span class="badge {% if user.status == 'Aktif' %} bg-success {% else %} bg-danger {% endif %}">{{ user.status }}</span>
+                                        </td>
+                                        <td class="text-start">{{ user.date_added }}</td>
+                                        <td class="text-end"><a href="{{ user.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i> </a></td>
+                                        <td class="text-end"><button type="button" onclick="permissionFunction('{{ user.username }}','{{user.user_id}}','{{user.user_group_id}}');" data-toggle="tooltip" title="{{ "Özel İzinler" }}" class="btn btn-outline-dark btn-sm" {{button_permission}}><i class="bi bi-shield-lock-fill"></i></button></td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td class="text-center" colspan="5">{{ text_no_results }}</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+                                {{ pagination }}
+                            </div>
+                            <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+                                {{ results }}
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    {{footer}}
+</main>
+<!-- Modal -->
+<div class="modal fade" id="modal-permission" tabindex="-1" aria-labelledby="modalPermissionsLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content ">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPermissionsLabel">
+                    <i class="bi bi-shield-lock-fill text-info"></i> Özel İzinler
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="form-permission">
+                    <input type="hidden" name="user_id" value="0">
+
+                    <!-- Ad Soyad -->
+                    <div class="mb-3">
+                        <input type="text" class="form-control" name="name" readonly>
+                    </div>
+
+                    <div class="dropdown mb-3">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 d-flex justify-content-between align-items-center" type="button" id="permissionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="text-truncate">-- Bölüm Seçin --</span>
+                            <span class="caret ms-2"></span>
+                        </button>
+
+                        <ul class="dropdown-menu w-100" aria-labelledby="permissionDropdown" style="max-height: 300px; overflow-y: auto;">
+                        
+                            {% for key, group in permissions_grouped %}
+                            <li>
+                                <h6 class="dropdown-header fw-bold text-dark bg-light">{{ group.title }}</h6>
+                            </li>
+
+                            {% for item in group.items %}
+                            {% if item.route != 'setting/autocomplete' %}
+                            {% if item.route in item.modify_array %}
+                            {% set veri = '' %}
+                            {% else %}
+                            {% set veri = 'd-none' %}
+                            {% endif %}
+
+                            <li>
+                                <a class="dropdown-item permission-option" href="javascript:void(0)" data-value="{{ item.route }}" data-for="{{ veri }}">
+                                    {{ item.name }}
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if not loop.last %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                        </ul>
+
+
+                    </div>
+
+                    <!-- İzin Tablosu -->
+                    <div class="table-responsive-sm" id="data-permission" style="max-height:400px;overflow-y:auto;">
+
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" id="button-modal-save" class="btn btn-info">Kaydet</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    <!--
+    $('.auto-filter').on('change', function() {
+        $('#cover-spin').show(0);
+       
+        url = 'index.php?route=user/user&user_token={{ user_token }}';
+
+        if ($('input[name=\'filter_username\']').val()) {
+            url += '&filter_username=' + encodeURIComponent($('input[name=\'filter_username\']').val());
+        }
+
+        if ($('input[name=\'filter_store_id\']').val()) {
+            url += '&filter_store_id=' + encodeURIComponent($('input[name=\'filter_store_id\']').val());
+        }
+
+        if ($('input[name=\'filter_store\']').val()) {
+            url += '&filter_store=' + encodeURIComponent($('input[name=\'filter_store\']').val());
+        }
+
+        if ($('select[name=\'filter_status\']').val()) {
+            url += '&filter_status=' + encodeURIComponent($('select[name=\'filter_status\']').val());
+        }
+
+        if ($('select[name=\'filter_user_group\']').val()) {
+            url += '&filter_user_group=' + encodeURIComponent($('select[name=\'filter_user_group\']').val());
+        }
+
+        if ($('select[name=\'limit\']').val()) {
+            url += '&limit=' + encodeURIComponent($('select[name=\'limit\']').val());
+        }
+
+        location = url;
+    });
+
+    $('#button-clear').on('click', function() {
+        url = 'index.php?route=catalog/information&user_token={{ user_token }}';
+        location = url;
+    });
+    //
+    -->
+</script>
+<script>
+    $('input[name=\'filter_store\']').autocomplete({
+        'source': function(request, response) {
+            $.ajax({
+                url: 'index.php?route=setting/autocomplete/storeautocomplete&user_token={{ user_token }}&filter_store=' + encodeURIComponent(request),
+                dataType: 'json',
+                success: function(json) {
+                    json.unshift({
+                        name: '--Tümünü Seç--',
+                        value: '',
+                    });
+                    
+                    response($.map(json, function(item) {
+                        return {
+                            label: item['name'],
+                            value: item['store_id']
+                        }
+                    }));
+                }
+            });
+        },
+        'select': function(item) {
+            $('input[name=\'filter_store\']').val(item['label']);
+            $('input[name=\'filter_store_id\']').val(item['value']);
+            $('input[name=\'filter_store_id\']').trigger('change');
+        }
+    });
+</script>
+<script type="text/javascript">
+    $('.dropdown-item').on('click', function() {
+        
+        var select = $(this);
+        var rota = select.data('value');
+        var veri = select.data('for');
+        var text = select.text();
+        select.addClass('bg-light-info');
+        // Başına ikon eklemek için prepend kullan
+        select.prepend('<i class="bi bi-check-circle text-priyary me-1"></i>');
+
+        // Eğer zaten bu rota için satır varsa ekleme
+        if ($('#data-permission tbody tr[data-rota="' + rota + '"]').length > 0) {
+            return; // çık
+        }
+
+        if (rota == '') {
+            return; // çık
+        }
+
+        var row = `
+    <tr data-rota="${rota}">
+        <td class="fw-bold text-start">${text}</td>
+        <td class="text-center">
+            <input class="form-check-input" type="checkbox" name="permission[access][]" value="${rota}" checked="checked">
+        </td>
+        <td class="text-center">
+            <input class="form-check-input ${veri}" type="checkbox" name="permission[modify][]" value="${rota}" >
+        </td>
+        <td class="text-center" style="width:1%;">
+            <i class="bi bi-x-circle remove-row text-danger" title="Sil"></i>
+        </td>
+    </tr>
+    `;
+
+        $('#data-permission tbody').append(row);
+
+        var lastRow = $('#data-permission tbody tr:last')[0];
+
+        lastRow.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+        lastRow.addClass('flash-once');
+    });
+
+    // Silme işlemi
+    $('#data-permission').on('click', '.remove-row', function() {
+        var row = $(this).closest('tr');
+        var rota = row.data('rota');
+        row.remove();
+
+        var $option = $('.permission-option[data-value="' + rota + '"]');
+
+        if ($option.length) {
+            $option.removeClass('bg-light-info');
+            $option.find('i').remove();
+        }
+    });
+</script>
+<script type="text/javascript">
+    <!--
+    $('#button-modal-save').on('click', function() {
+        var user_id = $('input[name="user_id"]').val();
+        $.ajax({
+            url: 'index.php?route=user/user/save&user_token={{ user_token }}&user_id=' + user_id,
+            type: 'post',
+            data: $('#form-permission').serialize(),
+            dataType: 'json',
+
+            beforeSend: function() {
+                $('#button-modal-save').buttonanimate('loading');
+            },
+            complete: function() {
+                $('#button-modal-save').buttonanimate('reset');
+            },
+
+            success: function(json) {
+                if (json.error.warning) {
+                    alerterror(json.error.warning);
+                }
+
+                if (json.success) {
+                    $('#modal-permission').modal('hide');
+                    //$('#data-permission').load('index.php?route=user/user/datapermission&user_token={{ user_token }}&user_id=' + user_id);
+                }
+
+            },
+
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+
+        });
+    });
+    //
+    -->
+</script>
+<script>
+    function permissionFunction(name, user_id, user_group_id) {
+        $('input[name=\'user_id\']').val(user_id);
+        $('input[name=\'name\']').val(name);
+        $('#data-permission').load('index.php?route=user/user/datapermission&user_token={{ user_token }}&user_id=' + user_id + '&user_group_id=' + user_group_id);
+        $('.dropdown-item').removeClass('bg-light-info');
+        $('.dropdown-item').find('i').remove();
+        $('#modal-permission').modal('show');
+
+    }
+</script>
+<script>
+    var error_warning = '{{error_warning}}';
+    var success = '{{success}}';
+    $(document).ready(function() {
+        if (error_warning) {
+            alerterror(error_warning);
+        }
+
+        if (success) {
+            alertsuccess(success);
+        }
+    });
+</script>
+
+
+<style>
+    .group-box {
+        display: inline-block;
+        padding: 4px 8px;
+        border: 1px solid #000000;
+        /* Bootstrap primary rengi */
+        border-radius: 4px;
+        background: linear-gradient(to right, #e9f5ff, #fdfdfd);
+        box-shadow: 0 2px 6px rgba(0, 123, 255, 0.2);
+        font-weight: 500;
+        color: #000000;
+        transition: all 0.3s ease;
+    }
+
+    .group-box:hover {
+        background: #007bff;
+        color: #fff;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    /* Optgroup başlıklarının font boyutu */
+    .form-select optgroup {
+        font-size: 14px;
+        /* istediğin boyutu yaz */
+        font-weight: 600;
+        /* opsiyonel: biraz kalın olsun */
+        color: #2c3e50;
+        /* opsiyonel: daha koyu renk */
+    }
+</style>

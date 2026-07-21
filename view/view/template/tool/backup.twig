@@ -1,0 +1,386 @@
+{{ header }}{{ column_left }}
+<main id="universiteler" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+         
+        
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+             <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-12 me-auto text-center">
+                            <div class="ms-auto position-relative">
+                               <button type="button" id="button-backup" class="btn btn-rainbow-custom btn-glow-green">
+                                
+                                <i class="bi bi-arrow-counterclockwise"></i> {{ "Yedek Al" }}</span>
+                               </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div style="display:none;">
+                      {% set table_row = 0 %}
+                {% for table in tables %}
+                  <div class="form-check">
+                    <input type="checkbox" name="backup[]" value="{{ table }}" id="input-backup-{{ table_row }}" class="form-check-input" checked/> <label for="input-backup-{{ table_row }}" class="form-check-label">{{ table }}</label>
+                  </div>
+                  {% set table_row = table_row + 1 %}
+                {% endfor %}     
+                </div>
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-12 me-auto">
+                            <div class="ms-auto position-relative">
+                               <div id="progress-backup" class="progress" style="height:20px;">
+									              <div id="progress-bar" class="progress-bar" role="progressbar" >
+                                 <span class="span-percent"></span>
+                                </div>
+                               
+								               </div>
+                               
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                </div>
+                <div id="progress-text" class="card-header text-center py-3">
+                    
+                    
+                </div>
+                
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-information">
+                    <div class="card-body" >
+                    <div class="alert border-0 bg-light-info alert-dismissible fade show py-2">
+                    <div class="d-flex align-items-center">
+                      <div class="fs-3 text-info"><i class="bi bi-info-circle-fill"></i>
+                      </div>
+                      <div class="ms-3">
+                        <div class="text-dark">{{text_import}}</div>
+                      </div>
+                    </div>
+                  
+                  </div>
+                   <div id="history">{{ history }}</div>
+                        
+
+                     </div>   
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+    {{footer}}
+</main>
+<script type="text/javascript"><!--
+$('#button-backup').on('click', function () {
+    var element = this;
+    var $btn = $(this);
+
+    $btn.buttonanimate('loading');
+     
+    $('#button-upload, #history .btn').prop('disabled', true);
+
+    $('#progress-bar').css('width', '0%');
+    $('#progress-bar').removeClass('bg-danger bg-success');
+
+    var next = 'index.php?route=tool/backup/backup&user_token={{ user_token }}&table=' + $('input[name^=\'backup\']:checked').first().val();
+   
+    var backup = function () {
+        return $.ajax({
+            url: next,
+            type: 'post',
+            data: $('input[name^=\'backup\']:checked'),
+            dataType: 'json',
+            success: function (json) {
+                $('.alert-dismissible').remove();
+
+                if (json.error) {
+                    $('#progress-bar').addClass('bg-danger');
+                    $('#progress-text').html('<div class="text-danger">' + json.error + '</div>');
+
+                    $('#history').load('index.php?route=tool/backup/history&user_token={{ user_token }}');
+
+                    $btn.buttonanimate('loading');
+                    $btn.buttonanimate('reset');
+                }
+                
+                if (json['text']) {
+                    $('#progress-text').html(json['text']);
+                }
+
+                if(json['progress'] < 45) {
+                    $('#progress-bar').addClass('bg-info active');
+                }
+
+                if(json['progress'] >= 45 && json['progress'] < 90 ) {
+                    $('#progress-bar').removeClass('bg-info');
+                    $('#progress-bar').addClass('bg-primary');
+                }
+
+                if(json['progress'] > 90 ) {
+                    $('#progress-bar').removeClass('bg-primary');
+                    $('#progress-bar').addClass('bg-success');
+                }
+
+                if (json['progress']) {
+                    $('#progress-bar').css('width', json['progress'] + '%');
+                    $('.span-percent').html(json['progress'] + '%');                
+                }
+
+                if (json.success) {
+                    $('#progress-bar').css('width', '100%').addClass('bg-success');
+                    $('#progress-import .progress-bar').attr('aria-valuenow', '100');
+                    $('.span-percent').html('100%');
+                    $('#progress-bar').removeClass('active');
+                    $('#progress-text').html('<div class="text-success">' + json.success + '</div>');
+
+                    $('#history').load('index.php?route=tool/backup/history&user_token={{ user_token }}');
+
+                    $btn.buttonanimate('loading');
+                    $btn.buttonanimate('reset');
+                    
+                }
+
+                if (json['next']) {
+                    next = json['next'];
+
+                    chain.attach(backup);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                $btn.buttonanimate('reset');
+            }
+        });
+    };
+
+    chain.attach(backup);
+});
+
+// Restore
+$('#history').on('click', '.btn-warning', function () {
+    
+    var element = this;
+
+    $(element).buttonanimate('loading');
+
+    $('#button-upload, #button-backup, #history .btn').not(element).prop('disabled', true);
+
+    $('#progress-bar').css('width', '0%');
+    $('#progress-bar').removeClass('bg-danger bg-success');
+
+    var next = 'index.php?route=tool/backup/restore&user_token={{ user_token }}&filename=' + encodeURIComponent($(this).val());
+
+    var restore = function () {
+        return $.ajax({
+            url: next,
+            type: 'post',
+            dataType: 'json',
+            success: function (json) {
+                console.log(json);
+
+                $('.alert-dismissible').remove();
+
+                if (json.error) {
+                    $('#progress-bar').addClass('bg-danger');
+                    $('#progress-text').html('<div class="text-danger">' + json.error + '</div>');
+
+                    $('#history').load('index.php?route=tool/backup/history&user_token={{ user_token }}');
+
+                    $(element).buttonanimate('reset');
+
+                    $('#button-upload, #button-backup, #history .btn').not(element).prop('disabled', false);
+                }
+
+                if (json['progress']) {
+                    $('#progress-bar').css('width', json['progress'] + '%');
+                }
+
+                if (json['text']) {
+                    $('#progress-text').html(json['text']);
+                }
+
+                if (json.success) {
+                    $('#progress-bar').css('width', '100%').addClass('bg-success');
+                    $('#progress-text').html('<div class="text-success">' + json.success + '</div>');
+
+                    $('#history').load('index.php?route=tool/backup/history&user_token={{ user_token }}');
+
+                    $(element).buttonanimate('reset');
+
+                    $('#button-upload, #button-backup, #history .btn').not(element).prop('disabled', false);
+                }
+
+                if (json['next']) {
+                    next = json['next'];
+
+                    chain.attach(restore);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+
+                $(element).button('reset');
+
+                $('#button-upload, #button-backup, #history .btn').not(element).prop('disabled', false);
+            }
+        });
+    }
+
+    chain.attach(restore);
+});
+
+
+// Delete
+$('#history').on('click', '.btn-danger', function () {
+    var element = this;
+    
+    if (confirm('Dikkat : Bu veriyi silmek istediğinize emin misiniz?') == false) {    
+        exit();
+    }
+    
+    $.ajax({
+        url: 'index.php?route=tool/backup/delete&user_token={{ user_token }}&filename=' + encodeURIComponent($(element).val()),
+        type: 'post',
+        dataType: 'json',
+        beforeSend: function () {
+            $(element).buttonanimate('loading');
+        },
+        complete: function () {
+            $(element).buttonanimate('reset');
+        },
+        success: function (json) {
+            $('.alert-dismissible').remove();
+
+            if (json.error) {
+                alerterror(json.error);
+            }
+
+            if (json.success) {
+                 alertsuccess(json.success);
+
+                $('#history').load('index.php?route=tool/backup/history&user_token={{ user_token }}');
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+//--></script>
+
+  <script type="text/javascript"><!--
+$('#button-import').on('click', function() {
+	$('#form-upload').remove();
+	
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="import" /></form>');
+	
+	$('#form-upload input[name=\'import\']').trigger('click');
+	
+	if (typeof timer != 'undefined') {
+		clearInterval(timer);
+	}
+	
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'import\']').val() != '') {
+			clearInterval(timer);
+	
+			$('#progress-import .progress-bar').attr('aria-valuenow', 0);
+			$('#progress-import .progress-bar').css('width', '0%');
+	
+			$.ajax({
+				url: 'index.php?route=tool/backup/import&user_token={{ user_token }}',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				beforeSend: function() {
+					$('#button-import').buttonanimate('loading');
+				},
+				complete: function() {
+					$('#button-import').buttonanimate('reset');
+				},
+				success: function(json) {
+					$('.alert-dismissible').remove();
+					
+					if (json.error) {
+						alerterror(json.error);
+					}
+					
+					if (json.success) {
+						alertsuccess(json.success);
+					}
+					
+					if (json['total']) {
+						$('#progress-import .progress-bar').attr('aria-valuenow', json['total']);
+						$('#progress-import .progress-bar').css('width', json['total'] + '%');
+                        $('.span-percent').html(json['progress']);
+					}
+					
+					if (json['next']) {
+						next(json['next']);
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+
+function next(url) {
+	$.ajax({
+		url: url,
+		dataType: 'json',
+		success: function(json) {
+			$('.alert-dismissible').remove();
+			
+			if (json.error) {
+				alerterror(json.error);
+			}
+			
+			if (json.success) {
+				alertsuccess(json.success);
+			}
+			
+			if (json['total']) {
+				$('#progress-import .progress-bar').attr('aria-valuenow', json['total']);
+				$('#progress-import .progress-bar').css('width', json['total'] + '%');
+			}
+			
+			if (json['next']) {
+				next(json['next']);
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+}
+  //--></script> 
+

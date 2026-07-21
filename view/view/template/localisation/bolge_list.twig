@@ -1,0 +1,116 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                 <ol class="breadcrumb mb-0 p-0">
+				            {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+					         {% endfor %}
+                  </ol>
+            </nav>
+        </div>
+        <div class="ms-auto">
+        {% if store_id == 0  %}
+          <a href="{{add}}" data-toggle="tooltip" class="btn btn-sm btn-primary" title="{{ button_add }}"><i class="bi bi-plus-lg"></i> Ekle</a>
+				  
+				   <button type="button" onclick="confirm('{{ text_confirm }}') ? $('#form-geo-zone').submit() : false;" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i> Sil</button>
+				{% endif %}
+        </div>
+    </div>
+    <!--end breadcrumb-->
+   
+    <hr>
+    <div class="card">
+          
+        <div class="card-body">
+            <div class="table-responsive">
+                <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5 align-middle mb-0">
+                    
+                    <div class="row">
+                        <div class="col-sm-12">
+                        <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-geo-zone">
+                            <table id="example" class="table table-invoice" role="grid" aria-describedby="example_info">
+                              <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                <tr>
+                                  <th style="width: 1px;" class="text-center">
+                                    <input type="checkbox" class="form-check-input" onclick="$('input[name*=\'selected\']').trigger('click');" />
+                                  </th>
+                                  <th class="text-start">{{ column_name }}</th>
+                                  <th class="text-start">{{ column_description }}</th>
+                                  <th style="width: 1px;" class="text-right">{{ column_action }}</th>
+                                </tr>
+                              </thead>
+                             <tbody>
+                            {% if bolgeler %}
+                            {% for geo_zone in bolgeler %}
+                            <tr>
+                              <td class="text-center">{% if geo_zone.geo_zone_id in selected %}
+                                <input type="checkbox" name="selected[]" value="{{ geo_zone.geo_zone_id }}" checked="checked" />
+                                {% else %}
+                                <input type="checkbox" name="selected[]" value="{{ geo_zone.geo_zone_id }}" />
+                                {% endif %}</td>
+                              <td class="text-start">{{ geo_zone.name }}</td>
+                              <td class="text-start">{{ geo_zone.description }}</td>
+                              <td class="text-end"><a href="{{ geo_zone.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a></td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                              <td class="text-center" colspan="4">{{ text_no_results }}</td>
+                            </tr>
+                            {% endif %}
+                          </tbody>
+
+                          </table>
+                          </form>
+                        </div>
+                    </div>
+                     <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{footer}}
+</main>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      $('#alert').prepend(
+              '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + error_warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );
+     }
+
+     if (success) {
+	      $('#alert').append(
+              '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + success + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );  
+    }
+});
+</script>
+

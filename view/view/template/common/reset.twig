@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en" class="minimal-theme">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="view/assets/images/favicon-32x32.png" type="image/png" />
+  <!-- Bootstrap CSS -->
+  <link href="view/assets/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="view/assets/css/bootstrap-extended.css" rel="stylesheet" />
+  <link href="view/assets/css/style.css" rel="stylesheet" />
+  <link href="view/assets/css/icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
+  <!-- loader-->
+	<link href="view/assets/css/pace.min.css" rel="stylesheet" />
+
+  <title>{{ heading_title }}</title>
+</head>
+
+<body>
+ {% if error_warning %}
+	<div id="alert" class="alert border-0 bg-danger alert-dismissible fade show py-2">
+		<div class="d-flex align-items-center">
+		  <div class="fs-3 text-white"><i class="bi bi-x-circle-fill"></i>
+		  </div>
+		  <div class="ms-3">
+			<div class="text-white">{{error_warning}}</div>
+		  </div>
+		</div>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="$('.alert-dismissible').remove();"></button>
+	  </div>
+	 {% endif %}
+  <!--start wrapper-->
+  <div class="wrapper">
+    
+       <!--start content-->
+       <main class="authentication-content">
+        <div class="container-fluid">
+          <div class="authentication-card">
+            <div class="card shadow rounded-0 overflow-hidden">
+              <div class="row g-0">
+                <div class="col-lg-6 d-flex align-items-center justify-content-center border-end">
+                  <img src="view/assets/images/error/forgot-password-frent-img.jpg" class="img-fluid" alt="">
+                </div>
+                <div class="col-lg-6">
+                  <div class="card-body p-4 p-sm-5">
+                    <h5 class="card-title">{{ heading_title }}</h5>
+                    <p class="card-text mb-5">Şifre sıfırlama ekranına hoşgeldiniz. Lütfen yeni şifrenizi giriniz!</p>
+                    <form action="{{ action }}" class="form-body" method="post" enctype="multipart/form-data">
+                        <div class="row g-3">
+                          <div class="col-12">
+                            <label for="inputNewPassword" class="form-label">{{ entry_password }}</label>
+                            <div class="ms-auto position-relative">
+                              <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i class="bi bi-lock-fill"></i></div>
+                              <input type="password" name="password" value="{{ password }}" class="form-control radius-25 ps-5" id="inputNewPassword" placeholder="{{ entry_password }}">
+							  
+                            </div>
+							 {% if error_password %}
+                              <div class="text-danger">{{ error_password }}</div>
+                             {% endif %}
+                          </div>
+                          <div class="col-12">
+                            <label for="inputConfirmPassword" class="form-label">{{ entry_confirm }}</label>
+                            <div class="ms-auto position-relative">
+                              <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i class="bi bi-lock-fill"></i></div>
+                              <input type="password" name="confirm" value="{{ confirm }}" class="form-control radius-25 ps-5" id="inputConfirmPassword" placeholder="{{ entry_confirm }}">
+							  
+                            </div>
+							 {% if error_confirm %}
+                             <div class="text-danger">{{ error_confirm }}</div>
+                            {% endif %}
+                          </div>
+                          <div class="col-12">
+                            <div class="d-grid gap-3">
+                              <button type="submit" class="btn btn-primary btn-lg radius-25">{{ button_save }}</button>
+							  <a href="{{ cancel }}" class="btn btn-lg btn-light radius-25"><i class="bi bi-reply"></i> Geri</a>
+                            </div>
+                          </div>
+                        </div>
+                    </form>
+                 </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+       </main>
+        
+       <!--end page main-->
+
+  </div>
+  <!--end wrapper-->
+
+
+  <!--plugins-->
+  <script src="view/assets/js/jquery.min.js"></script>
+  <script src="view/assets/js/pace.min.js"></script>
+
+
+</body>
+<script>
+$(document).ready(function () {
+    setTimeout(function () {
+        $('.alert-dismissible').fadeTo(3000, 0, function() {
+            $(this).remove();
+        });
+    }, 3000);
+});
+</script>
+
+<style>
+#alert {
+    z-index: 9999;
+    font-size: 14px;
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    width: 350px;
+    transform: translateX(-50%);
+}
+
+@media (min-width: 992px) {
+    #alert {
+        width: 450px;
+    }
+}
+
+#alert .alert {
+    margin-bottom: 15px;
+}
+
+/* Alert shadow styles */
+#alert .alert-primary {
+    box-shadow: 0 0 0 5px rgba(var(--bs-primary-rgb), 0.1);
+}
+#alert .alert-secondary {
+    box-shadow: 0 0 0 5px rgba(var(--bs-secondary-rgb), 0.1);
+}
+#alert .alert-success {
+    box-shadow: 0 0 0 5px rgba(var(--bs-success-rgb), 0.1);
+}
+#alert .alert-warning {
+    box-shadow: 0 0 0 5px rgba(var(--bs-warning-rgb), 0.1);
+}
+#alert .alert-danger {
+    box-shadow: 0 0 0 5px rgba(var(--bs-danger-rgb), 0.1);
+}
+#alert .alert-info {
+    box-shadow: 0 0 0 5px rgba(var(--bs-info-rgb), 0.1);
+}
+#alert .alert-light {
+    box-shadow: 0 0 0 5px rgba(var(--bs-light-rgb), 0.1);
+}
+#alert .alert-dark {
+    box-shadow: 0 0 0 5px rgba(var(--bs-dark-rgb), 0.1);
+}
+</style>
+</html>

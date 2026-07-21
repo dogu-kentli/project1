@@ -1,0 +1,201 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">Toplu Sms</h5>
+            <div class="ms-auto">
+              <button id="button-send" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_send }}" class="btn btn-sm btn-primary" onclick="send('index.php?route=mail/bulkmail/send&user_token={{ user_token }}');"><i class="bi bi-envelope"></i></button>
+              <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm btn-sm bg-white">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+         <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-sms" class="row g-2">
+
+			<div class="row mb-3">
+				<div class="col-12 col-lg-6">
+				<label class="form-label fw-bold" for="input-sehir">Kime</label>
+				<select name="to" class="form-select">
+					<option value="">{{ "--Seçim Yapın--" }}</option>
+					<option value="all">{{ "Tüm Öğrencilere" }}</option>
+					<option value="store">{{ "Seçili Dernek Öğrencilerine" }}</option>
+				</select>
+				</div>
+			</div>
+
+			<!-- Dernek Seçim -->
+			<div class="row mb-3" id="to-store" style="display:none;">
+				<div class="col-12 col-lg-6">
+				<label class="form-label fw-bold" for="input-sehir">Dernek Seçim</label>
+				<div style="max-height:300px; overflow-y:auto; border:1px solid #ccc; padding:10px;" id="store-checkbox" class="bg-light">
+					{% for store in stores %}
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" name="store_id[]" value="{{ store.store_id }}">
+						<label class="form-check-label">{{ store.name }}</label>
+					</div>
+					{% endfor %}
+				</div>
+				</div>
+			</div>
+
+			<!-- Konu -->
+			<div class="row mb-3">
+				<div class="col-12 col-lg-6">
+				<label class="form-label fw-bold" for="input-subject">{{ entry_subject }}</label>
+				<input type="text" name="subject" placeholder="{{ entry_subject }}" id="input-subject" class="form-control"/>
+				</div>
+			</div>
+
+			<!-- Mesaj -->
+			<div class="row mb-3">
+				<div class="col-12 col-lg-8">
+				<label class="form-label fw-bold" for="textarea-editor">{{ entry_message }}</label>
+				<textarea name="text" placeholder="{{ entry_message }}" id="textarea-editor" style="height: 300px; overflow-y:auto;" class="form-control">{{ store_address }}</textarea>
+				</div>
+			</div>
+
+			</form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ footer }}
+</main>
+<script>
+$(document).ready(function () {
+	$("rte-toolbar-button[rte-cmd-name='togglemore']").css({"pointer-events": "none","opacity": "0.4"});
+	$("rte-toolbar-button[rte-tooltip='Emoji Ekle']").css({ "pointer-events": "none", "opacity": "0.4" });
+});
+</script>
+
+<script>
+	var editor1cfg = {};
+	editor1cfg.toolbar = "basic";
+	editor1cfg.lang = "tr"; // Türkçe dil ayarı
+	editor1cfg.removeButtons = ["images", "video"];
+  editorResizeMode: "none";
+	var editor1 = new RichTextEditor("#textarea-editor", editor1cfg);
+</script>
+
+<script>
+$(document).ready(function () {
+	$("rte-toolbar-button[rte-cmd-name='togglemore']").css({"pointer-events": "none","opacity": "0.4"});
+});
+
+</script>
+<script type="text/javascript"><!--
+$('select[name=\'to\']').on('change', function() {
+	$('.to').hide();
+	$('#to-' + this.value.replace('_', '-')).show();
+
+	if(this.value == 'all') {
+		$('#to-store input[type=\'checkbox\']').prop('checked',true);
+	}else{
+		$('#to-store input[type=\'checkbox\']').prop('checked',false);
+	}
+});
+
+$('select[name=\'to\']').trigger('change');
+//--></script> 
+ 
+<script type="text/javascript"><!--
+function send(url) {
+	$.ajax({
+		url: url,
+		type: 'post',
+		data: $('#form-sms').serialize(),
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-send').buttonanimate('loading');
+		},
+		success: function(json) {
+			$('.alert-dismissible, .text-danger').remove();
+
+			
+				if (json.error.warning) {
+					$('#alert').prepend(
+                    '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                        '<div class="d-flex align-items-center">' +
+                            '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                            '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                        '</div>' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                    '</div>'
+					);
+				}
+
+				if (json.error['email']) {
+					$('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error['email'] + '</div>');
+				}
+
+				if (json.error['to']) {
+					$('select[name=\'to\']').after('<div class="text-danger">' + json.error['to'] + '</div>');
+				}
+
+				if (json.error['subject']) {
+					$('input[name=\'subject\']').after('<div class="text-danger">' + json.error['subject'] + '</div>');
+				}
+
+				if (json.error['message']) {
+					$('#alert').prepend(
+                    '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                        '<div class="d-flex align-items-center">' +
+                            '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                            '<div class="ms-3"><div class="text-dynamic">' + json.error['message'] + '</div></div>' +
+                        '</div>' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                    '</div>'
+					);
+				}
+			
+
+			if (json.success) {
+				$('#alert').append(
+				'<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+					'<div class="d-flex align-items-center">' +
+					'<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+					'<div class="ms-3"><div class="text-dynamic">' + json.success + '</div></div>' +
+					'</div>' +
+					'<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+				'</div>'
+				);
+
+				 $('#form-sms').find('input[type="text"], input[type="email"], textarea, select').val('');
+                 $('#form-sms').find('input[type="checkbox"], input[type="radio"]').prop('checked', false);
+			}
+				
+			if (json['next']) {
+				send(json['next']);
+			} else {
+				$('#button-send').buttonanimate('reset');
+			}
+			
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+}
+//--></script>
+<script>
+$('#store-checkbox input[type="checkbox"]').on('change', function () {
+    const $row = $(this).closest('tr');
+    if ($(this).is(':checked')) {
+        $row.addClass('alert-info');
+    } else {
+        $row.removeClass('alert-info');
+    }
+});
+</script>
+
+<style>
+rte-floatpanel.rte-floatpanel-paragraphop {
+  display: none !important;
+}
+</style>

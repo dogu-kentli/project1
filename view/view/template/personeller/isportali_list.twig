@@ -1,0 +1,379 @@
+{{ header }}{{ column_left }}
+<main id="isportali" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+       <div class="ms-auto text-end me-3">
+       <button type="button" id="button-add" data-toggle="tooltip" title="{{ "Yeni İş Ekle" }}" class="btn btn-primary btn-sm button-add"><i class="bi bi-plus-lg"></i> Ekle</button>
+         <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success btn-sm"><i class="bi bi-download"></i></a>
+        
+         <a href="{{clear}}" type="button" data-toggle="tooltip" title="Filtreyi Temizle" class="btn btn-light border border-dark shadow-sm btn-sm bg-white"><i class="bi bi-filter"></i></a>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+
+            <div class="card-header py-3">
+                    <div class="row g-3 ">
+                       <div class="col-lg-2 col-6 me-auto">
+                       <select name="filter_list" class="form-select select-filter-list"> 
+                            <option value="1" {% if list == 1 %} selected="selected" {% endif %}>{{"Tüm işleri Göster"}}</option>
+                            <option value="2" {% if list == 2 %} selected="selected" {% endif %}>{{"Sadece Kendi İşlerimi Göster"}}</option>
+                      </select>
+                       </div>
+                       <div class="col-lg-1 col-6 me-auto"></div>
+                       <div class="col-lg-2 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_personel" id="filter-personel-name" value="" placeholder="{{ "Personel... " }}" class="form-control ps-4">
+                                <input type="hidden" name="filter_personel_id" id="filter-personel-id" value=""  class="form-control auto-filter" >
+                            </div>
+                        </div>
+
+                       <div class="col-lg-1 col-6 me-auto"></div>
+
+                        <div class="col-lg-2 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_birim" id="filter-birim-name" vaule="{{filter_birim}}" placeholder="{{ "Birim " }}" class="form-control ps-4">
+                                <input type="hidden" name="filter_birim_id" id="filter-birim-id" value="{{filter_birim_id}}" class="form-control auto-filter" >
+                            </div>
+                        </div>
+
+                        
+                         <div class="col-lg-2 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_category" id="filter-category-name" placeholder="{{ "Kategori" }}" class="form-control ps-4">
+                                <input type="hidden" name="filter_category_id" id="filter-category-id" value="{{filter_category_id}}" class="form-control auto-filter" >
+                            </div>
+                        </div>
+
+                        <div class="col-lg-1 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_status" id="filter-status-name" placeholder="Durumu" class="form-control ps-4">
+                                <input type="hidden" name="filter_status_id" id="filter-status-id" value="{{filter_status}}" class="form-control auto-filter" >
+                            </div>
+                        </div>
+
+
+                       <div class="col-lg-1 co1-6 col-md-3">
+                          <select name="limit" class="form-select auto-filter">
+                            {% for key,value in limits %}
+                            <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                    </div>
+                </div>
+                 
+                 
+          <div class="card-body" id="isportali-data"></div>
+        </div>
+        </div>
+
+
+    </div>
+
+  {{footer}}  
+</main>
+
+
+
+<script>
+$('#isportali-data').delegate('.sort-oncelik', 'click', function(e) {
+ e.preventDefault();
+	
+$('#isportali-data').load(this.href);
+});
+
+$('#isportali-data').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+	$('#isportali-data').load(this.href);
+});
+
+
+$('.auto-filter').on('change', function(e) {
+  e.preventDefault();
+ 
+  url = 'index.php?route=personeller/isportali/dataIsportali&user_token={{ user_token }}';
+
+	if ($('input[name=\'filter_personel_id\']').val()) {
+		url += '&filter_personel=' + encodeURIComponent($('input[name=\'filter_personel_id\']').val());
+	}
+
+	if ($('input[name=\'filter_status_id\']').val()) {
+		url += '&filter_status=' + encodeURIComponent($('input[name=\'filter_status_id\']').val());
+	}
+
+	if ($('input[name=\'filter_birim_id\']').val()) {
+		url += '&filter_birim=' + encodeURIComponent($('input[name=\'filter_birim_id\']').val());
+	}
+	
+	if ($('input[name=\'filter_category_id\']').val()) {
+		url += '&filter_category=' + encodeURIComponent($('input[name=\'filter_category_id\']').val());
+	}
+
+	if ($('select[name^=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name^=\'limit\']').val());
+	}
+	
+  $('#cover-spin').show(0);
+	
+	$('#isportali-data').load(url);
+
+});
+
+
+$('.select-filter-list').on('change', function() {
+  var filter_list =  $('select[name^=\'filter_list\']').val();
+  
+  var url = 'index.php?route=personeller/isportali/dataIsportali&user_token={{ user_token }}&filter_list=' + filter_list;	
+  
+  $('#isportali-data').load(url);
+  
+});
+
+$('#isportali-data').load('index.php?route=personeller/isportali/dataIsportali&user_token={{ user_token }}');
+
+$('#isportali-data').on('dblclick','td', function() {
+     var user_personel_id = '{{user_personel_id}}';
+     var personel_id = $('#data_personel' + $(this).attr('id')).val();
+    
+    if(user_personel_id != 0){
+      if(user_personel_id != personel_id){
+      exit();
+      }
+    }
+	
+    $(this).find('.isttakibi-span').toggle();
+    $(this).find('input').toggle();
+    $(this).find('input').focus();
+    sessionStorage.setItem('id', $(this).attr('id'));
+});
+
+</script>
+
+<script>
+  $('.page-content').on('click', '.button-add', function(e) {
+   e.preventDefault();
+    var action = 'add';
+    $.ajax({
+      url: 'index.php?route=personeller/isportali/addData&user_token={{ user_token }}&formaction=' + action,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+	     
+       if (json.error.warning) {
+	      $('#alert').prepend(
+                '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                '</div>'
+            );   
+       }
+		
+        if (json.success) {
+          $('#isportali-data').load('index.php?route=personeller/isportali/dataIsportali&user_token={{ user_token }}');
+          $('#alert').append(
+            '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+            '<div class="d-flex align-items-center">' +
+            '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+            '<div class="ms-3"><div class="text-dynamic">' + json.success + '</div></div>' +
+            '</div>' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>'
+          );
+           
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ });
+</script>
+
+<script>
+  function saveToDB(column,id) {
+    var action = 'edit';
+
+    var url = $('input[name^=\'filter_url\']').val();
+    
+    $.ajax({
+      url: 'index.php?route=personeller/isportali/addData&user_token={{ user_token }}&formaction=' + action + '&id=' + id,
+      type: 'post',
+      dataType: 'json',
+      data: '&' + column + '=' + $('#' + column + id).val(),
+      success: function(json) {
+        $('.alert-dismissible').remove();
+		
+        if (json.error.warning) {
+           $('#alert').prepend(
+                '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                '</div>'
+            );   
+        }
+
+        if (json.success) {           
+           $('#isportali-data').find('input').hide();
+           $('#isportali-data').find('span').show();
+           $('#isportali-data').load(url);
+           $('#alert').append(
+            '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+            '<div class="d-flex align-items-center">' +
+            '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+            '<div class="ms-3"><div class="text-dynamic">' + json.success + '</div></div>' +
+            '</div>' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>'
+          );
+           
+        }
+      },
+      
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  }
+ </script>
+
+{# ANA FİLTRELER #}
+<script>
+$('input[name^=\'filter_personel\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/autocompletePersoneller&user_token={{ user_token }}&filter_personel=' +  encodeURIComponent(request),
+       dataType: 'json',
+        success: function(json) {
+          json.unshift({
+             name: '--Tümünü Seç--',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['personel_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_personel\']').val(item['label']);
+      $('input[name^=\'filter_personel_id\']').val(item['value']);
+      $('input[name^=\'filter_personel_id\']').trigger('change');
+    }
+  });
+
+  $('input[name^=\'filter_category\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/isportali/categoryautocomplete&user_token={{ user_token }}&filter_category=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+           json.unshift({
+             name: '-- Tümünü Seç --',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['personel_category_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_category\']').val(item['label']);
+      $('input[name^=\'filter_category_id\']').val(item['value']);
+      $('input[name^=\'filter_category_id\']').trigger('change');
+    }
+  });
+
+
+  $('input[name^=\'filter_birim\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/birimautocomplete&user_token={{ user_token }}&filter_birim=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+           json.unshift({
+             name: '--Tümünü Seç--',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['personel_birim_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_biriml\']').val(item['label']);
+      $('#filter-birim-id').val(item['value']);
+      $('#filter-birim-id').trigger('change');
+    }
+  });
+
+  $('#filter-status-name').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/isportali/statusautocomplete&user_token={{ user_token }}&filter_status=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          json.unshift({
+             text: '-- Tümünü Seç --',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            
+            return {
+              label: item['text'],
+              value: item['status_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('#filter-status-name').val(item['label']);
+      $('#filter-status-id').val(item['value']);
+      $('#filter-status-id').trigger('change');
+    }
+  });
+
+  
+ </script>

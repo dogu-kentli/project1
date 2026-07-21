@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GÖREVLENDİRME BİLGİ FORMU | UDEF</title>
+
+  <script type="text/javascript" src="view/javascript/jquery/jquery-3.7.0.min.js"></script>
+
+  <style>
+    :root{
+      --brand:#0f4c81;
+      --text:#1d1d1f;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --bg:#ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font: 14px/1.5 "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .page{
+      max-width: 95%;
+      margin: 32px auto;
+      padding: 28px 28px 40px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.06);
+      position: relative;
+    }
+
+    /* LOGO */
+    .top-logo{
+      width:150px;
+      margin-bottom:16px;
+      display:block;
+    }
+
+    /* YAZDIR BUTONU */
+    .print-btn{
+      position:absolute;
+      top:20px;
+      right:20px;
+      background:var(--brand);
+      color:#fff;
+      border:none;
+      padding:8px 14px;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:13px;
+      transition:0.2s;
+    }
+    .print-btn:hover{
+      opacity:0.85;
+    }
+
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      border-bottom:2px solid var(--line);
+      padding-bottom:14px;
+      margin-bottom:18px;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .brand-title{
+      font-weight:700;
+      font-size:16px;
+      color:var(--brand);
+      letter-spacing:.2px;
+    }
+
+    .brand-sub{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .doc-meta{
+      text-align:right;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    h1{
+      font-size:20px;
+      margin:14px 0 0;
+      letter-spacing:.3px;
+      text-align:center;
+    }
+
+    h2{
+      font-size:16px;
+      margin:22px 0 10px;
+      color:var(--brand);
+    }
+
+    .section{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:14px;
+      margin-bottom:16px;
+      background:#fafafa;
+    }
+
+    .kv{
+      display:grid;
+      grid-template-columns:240px 1fr;
+      gap:8px 14px;
+    }
+
+    .kv .k{color:#374151;font-weight:600}
+    .kv .v{color:#111827;word-break:break-word}
+
+    .list{display:flex;flex-direction:column;gap:6px;padding-left:0;margin:0}
+
+    .list-item{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+
+    .bullet{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--brand);
+      margin-top:6px;
+      flex:0 0 8px;
+    }
+
+    .sig-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-top:12px;
+    }
+
+    .sig{
+      border:1px dashed var(--line);
+      border-radius:10px;
+      padding:12px;
+      min-height:90px;
+      background:#fff;
+    }
+
+    .sig .role{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .sig .name{font-weight:600}
+
+    .approval{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border:1px solid #d1fae5;
+      background:#f0fdf4;
+      color:#065f46;
+      border-radius:10px;
+      margin-top:10px;
+      font-size:13px;
+    }
+
+    .footer{
+      margin-top:18px;
+      padding-top:12px;
+      border-top:1px solid var(--line);
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .code{
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background:#f3f4f6;
+      padding:2px 6px;
+      border-radius:6px;
+      border:1px solid var(--line);
+    }
+
+    /* 🚀🚀 YAZDIRMA MODU — RENKLER VE TASARIM TAMAMEN KORUNUR 🚀🚀 */
+    @media print {
+
+      /* Renklerin kaybolmasını %100 önler */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .page {
+        box-shadow: none !important;
+        border-color: #ccc !important;
+        max-width: 95% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+      }
+
+      .print-btn {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<main class="page">
+
+  <img src="view/image/logo.png" width="200" height="auto" />
+
+  <button class="print-btn" id="yazdir">Yazdır</button>
+
+  <header class="header">
+    <div class="brand">
+      <div class="brand-sub">Görevlendirmeler</div>
+    </div>
+    <div class="doc-meta">
+      <div><strong>Tarih :</strong> {{bugun}}</div>
+    </div>
+  </header>
+
+  <h1>GÖREVLENDİRME BİLGİ FORMU</h1>
+
+  <section class="section">
+    <h2>Görev Bilgileri</h2>
+
+    <div class="kv">
+      <div class="k">Görev Kayıt No</div><div class="v">{{ID}}</div>
+      <div class="k">Görev Kaydını Oluşturan</div><div class="v">{{sorumlu}}</div>
+      <div class="k">Birim</div>
+      <div class="v">
+        {% for item in birim_sorumlu %}
+          {{ item.name }}
+        {% endfor %}
+      </div>
+
+      <div class="k">Görevin Konusu</div><div class="v">{{konu}}</div>
+      <div class="k">Görevin Amacı</div><div class="v">{{description}}</div>
+
+      <div class="k">Görev Başlangıç</div><div class="v">{{date_start}}</div>
+      <div class="k">Görev Bitiş</div><div class="v">{{date_end}}</div>
+
+      <div class="k">Kullanılacak Ulaşımlar</div><div class="v">{{araclar}}</div>
+      <div class="k">Ek Ulaşım Bilgileri</div><div class="v">{{diger_ulasim}}</div>
+
+      {% if diger_gorevliler %}
+        <div class="k">Diğer Görevli Kişiler</div>
+        <div class="v">
+          <ul class="list">
+            {% for key,value in diger_gorevliler %}
+              <li class="list-item"><span class="bullet"></span>{{value}}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <div class="k">Avans / Harcırah</div><div class="v">{{harcirah_tutari}} TRY</div>
+      <div class="k">Yazıyla</div><div class="v">{{yaziyla}}</div>
+      <div class="k">Ödeme Türü</div><div class="v">Banka Yoluyla Ödeme</div>
+    </div>
+  </section>
+
+  <section class="section">
+
+    <div class="approval">
+      Yukarıdaki bilgiler doğrultusunda görevlendirme yapılması uygun görülmüştür.
+    </div>
+
+    <div class="sig-grid">
+
+      <div class="sig">
+        <div class="role">Birim Sorumlusu Onayı</div>
+        <div class="name"></div>
+      </div>
+
+      <div class="sig">
+        <div class="name">Emin Sandık</div>
+        <div class="role">Başkan Yardımcısı</div>
+      </div>
+
+      <div class="sig">
+        <div class="name">Abdullah Muhammed İslam</div>
+        <div class="role">Başkan</div>
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+  $("#yazdir").on("click", function () {
+    window.print();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,391 @@
+{{ header }}{{ column_left }}
+<main id="universiteler" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+        {% if store_id == 0 %}
+         <button type="button" id="button-add" data-toggle="tooltip" title="{{ button_add }}"  class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> {{" Ekle"}}</button>
+        {% endif %}
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-12 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="{{ " Bir başlık yazınız." }}" id="input-universite"  class="form-control auto-filter form-control-lg ps-4">
+                               
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-information">
+                    <div class="card-body">
+
+                         <div class="table-responsive-sm">
+                            <table class="table table-striped align-middle mb-0">
+                                <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                    <th class="text-start">{{ column_name }}</th>
+                                    <th class="text-start">{{ column_text }}</th>
+                                    <th class="text-start">{{ column_store }}</th>
+                                    <th class="text-start">{{ column_date_added }}</th>
+                                    <th class="text-center">{{ column_status }}</th>
+                                    <th style="width:1%;" class="text-center" colspan="2">{{ column_action }}</th>
+                                   </thead>
+                                   <tbody>
+                                    {% if duyurular %}
+                                    {% for duyuru in duyurular %}
+                                      <tr>
+                                        
+                                        <td class="text-start" {% if duyuru.status == false %} style="font-weight:bold;" {% endif %}>
+                                          {{ duyuru.name }}
+                                        </td>
+                                        <td class="text-start">{{ duyuru.text }}</td>
+                                        <td class="text-start">
+                                         
+                                        <div class="border rounded p-2 bg-light">
+                                  {{ duyuru.store.name }}
+                                  </div>
+                                        </td>
+                                        <td class="text-start">{{ duyuru.date_added }}</td>
+                                        <td class="text-center">
+                                          {% if duyuru.okundu %}
+                                              <i class="bi bi-check2-all text-primary"></i> 
+                                          {% else %}
+                                              <i class="bi bi-check2 text-secondary"></i> 
+                                          {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                         <button type="button" data-bs-toggle="tooltip" title="{{ text_view }}" onclick="edit('{{ duyuru.duyuru_id }}')" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></button>
+                                        </td>
+
+                                        {% if store_id == 0 %}
+                                        <td class="text-center">
+                                         <button type="button"  class="btn btn-danger btn-sm " onclick="remove('{{ duyuru.duyuru_id }}');" ><i class="bi bi-dash-circle"></i></button>
+                                        </td>
+                                        {% endif %}
+                                      </tr>
+                                
+                                  {% endfor %}
+                                {% else %}
+                                  <tr>
+                                    <td class="text-center" colspan="7">{{ text_no_results }}</td>
+                                  </tr>
+                                {% endif %}
+                                   </tbody>
+                                 </table>
+                        </div>
+
+                        <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="modal fade" id="modal-duyuru-udef" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Duyuru Formu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div id="modal-body-form" class="modal-body" style="display:none;">
+              <form id="form-duyuru" class="form-horizontal">
+                <input type="hidden" name="duyuru_id" value="0"> 
+                
+                <div class="form-group mb-3">
+                  <label for="recipient-name" class="col-form-label fw-bold">Konu Başlığı:</label>
+                  <input type="text" name="name" placeholder="{{"Konu Başlığı" }}" value="" id="input-title" class="form-control">
+                </div>
+
+                <div class="form-group mb-3">
+                  <label for="message-text" class="col-form-label fw-bold">Açıklama:</label>
+                  <textarea class="form-control" name="text" placeholder="{{ entry_text }}" id="textarea-editor" style="height: 300px;overflow-y: auto; "></textarea>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group mb-3">
+                      <input type="text" class="form-control" name="filename" value="" placeholder="{{ entry_filename }}" id="input-filename"  readonly>
+                      <input type="hidden" class="form-control" name="code" value="" placeholder="{{ entry_filename }}" id="input-code"  readonly>
+                      <button class="btn btn-info" id="button-upload" type="button" id="button-addon2"><i class="bi bi-upload"></i> {{ button_file_upload }}</button>
+                    </div>
+                </div>
+
+                 <div class="form-group ">
+                  <div class="border bg-light bildirim" style="height: 150px; overflow: auto;display:none;">
+                  <div class="form-check">             
+                      <input class="form-check-input" type="checkbox"  onchange="$('input[name^=\'store_id\']').prop('checked', $(this).prop('checked'));">
+                      <label class="form-check-label fw-bold" for="flexCheckChecked">{{ "Tümünü Seç" }}</label>
+                   </div>
+                 {% for store in stores %}
+                    <div class="form-check">             
+                      <input class="form-check-input" type="checkbox" name="store_id[]" value="{{ store.store_id }}">
+                      <label class="form-check-label" for="flexCheckChecked">{{ store.name }}</label>
+                   </div>
+                 {% endfor %}
+                  </div>
+                </div>
+            </form>
+          </div>
+
+          <div id="modal-body-info" class="modal-body"></div>
+
+
+          <div class="modal-footer d-flex justify-content-between">
+            <div class="form-check mb-3 text-start">             
+                 <input class="form-check-input" type="checkbox" name="config_bildirim" value="1" onclick="$('.bildirim').toggle();">
+                 <label class="form-check-label" for="flexCheckChecked">Toplu Bildirim Gönder</label>
+              </div>
+            <button type="button" id="button-modal-edit" class="btn btn-info btn-sm" onclick="$('#modal-body-info').hide();$('#modal-body-form').show();$('#button-modal-save').show();$('#button-modal-edit').hide();" {% if store_id > 0 %} disabled {% endif %}><i class="bi bi-pencil"></i> {{ " Düzenle" }}</button>
+            <button type="button" id="button-modal-save" class="btn btn-success btn-sm" style="display:none;"><i class="bi bi-save"></i> {{ " Kaydet" }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{footer}}
+</main>
+
+<script type="text/javascript"><!--
+$('#button-add').on('click', function() {
+
+editor1.setHTMLCode('');
+
+   $('#modal-duyuru-udef input,textarea').val('');
+   $('#button-modal-edit').hide();
+   $('#modal-body-form').show();
+   $('#modal-body-info').hide();
+   $('#button-modal-save').show('');
+	 $('#modal-duyuru-udef').modal('show');
+ 
+});
+//--></script>
+
+<script type="text/javascript"><!--
+$('#button-modal-save').on('click', function() {
+   var config_bildirim = $('#modal-duyuru-udef input[name=\'config_bildirim\']').prop('checked') ? 1 : 0;
+  $.ajax({
+		url: 'index.php?route=setting/udef_duyuru/save&user_token={{ user_token }}&config_bildirim=' + config_bildirim,
+		type: 'post',
+        data: $('#form-duyuru').serialize(),
+        dataType: 'json',
+		
+     beforeSend: function () {
+        $('#button-modal-save').buttonanimate('loading');
+     },
+     complete: function () {
+        $('#button-modal-save').buttonanimate('reset');
+     },
+    
+     success: function(json) {
+		 if (json.error.warning) {
+	      alerterror(json.error.warning);
+      }
+
+      if (json.success) {
+			  $('#modal-duyuru-udef').modal('hide');
+        location = json.success;
+        
+      }
+
+		 },
+
+     error: function (xhr, ajaxOptions, thrownError) {
+        console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+     }
+		
+	});
+});
+//--></script>
+
+<script type="text/javascript"><!--
+function edit(duyuru_id) {
+  $('#modal-duyuru-udef input[name=\'duyuru_id\']').val(duyuru_id);
+  $.ajax({
+		url: 'index.php?route=setting/udef_duyuru/getDuyuruInfo&user_token={{ user_token }}&duyuru_id=' + duyuru_id,
+    dataType: 'json',
+     
+     success: function(json) {
+      $('.alert-dismissible').remove();
+      $('#modal-body-info').html('');
+      $('#modal-body-info').show();
+      $('#modal-body-form').hide();
+      $('#button-modal-edit').show();
+      $('#button-modal-save').hide();
+
+      var html = '';
+
+      if (json['duyuru_id']) {
+        $('#modal-duyuru-udef input[name=\'name\']').val(json['baslik']);
+         //editor1.setHTML(json['text']);
+         // JSON'dan gelen text'i editöre yüklemek için
+          editor1.setHTMLCode(json['text']);
+
+        $('#modal-duyuru-udef input[name=\'filename\']').val(json['file']);
+        $('#modal-duyuru-udef input[name=\'code\']').val(json['code']);
+
+        html += '<h3>' + json['baslik'] + '</h3>';
+        html += '<p>' + json['text'] + '</p>';
+        if (json['filename']) {
+        html += '<p>' + json['filename'] + '</p>';
+        }
+
+        $('#modal-body-info').append(html);
+		    
+		  }
+
+      $('#modal-duyuru-udef').modal('show'); 
+
+		 },
+    
+    error: function (xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+    }
+		
+	});
+};
+//--></script>
+
+<script type="text/javascript"><!--
+function remove(duyuru_id) {
+    if (confirm('Dikkat : Bu işlem geri alınamaz. Bu bağışçıyı silmek istediğinize emin misiniz?') == false) {    
+        return; // exit yerine return kullanılmalı
+    }
+
+    $('#cover-spin').show(0);
+
+    $.ajax({
+        url: 'index.php?route=setting/udef_duyuru/delete&user_token={{ user_token }}&duyuru_id=' + duyuru_id,
+        type: 'post',
+        dataType: 'json',
+
+        success: function(json) {
+            if (json.error && json.error.warning) {
+                alerterror(json.error.warning);
+                $('#cover-spin').hide(0);
+            }
+
+            if (json.success) {
+                location = json.success;
+            }
+        },
+
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+}
+//--></script>
+
+<script type="text/javascript"><!--
+$('#button-upload').on('click', function() {
+	$('#form-upload').remove();
+$('#cover-spin').hide(0);
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+
+			$.ajax({
+				url: 'index.php?route=catalog/download/upload&user_token={{ user_token }}',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				beforeSend: function() {
+					$('#button-upload').buttonanimate('loading');
+				},
+				complete: function() {
+					$('#button-upload').buttonanimate('reset');
+				},
+				success: function(json) {
+					if (json.error) {
+						 alerterror(json.error);
+					}
+
+					if (json.success) {
+						alert(json.success);
+
+						$('input[name=\'filename\']').val(json['filename']);
+						$('input[name=\'mask\']').val(json['mask']);
+            $('input[name=\'code\']').val(json['code']);
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+//--></script>
+
+<script>
+$(document).ready(function () {
+	$("rte-toolbar-button[rte-cmd-name='togglemore']").css({"pointer-events": "none","opacity": "0.4"});
+	$("rte-toolbar-button[rte-tooltip='Emoji Ekle']").css({ "pointer-events": "none", "opacity": "0.4" });
+});
+
+
+</script>
+
+<script>
+
+	var editor1cfg = {};
+	editor1cfg.toolbar = "basic";
+	editor1cfg.lang = "tr"; // Türkçe dil ayarı
+	editor1cfg.removeButtons = ["images", "video"];
+  editorResizeMode: "none";
+	var editor1 = new RichTextEditor("#textarea-editor", editor1cfg);
+</script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+    
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

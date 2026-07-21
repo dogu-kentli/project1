@@ -1,0 +1,114 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                 <ol class="breadcrumb mb-0 p-0">
+				            {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+					         {% endfor %}
+                  </ol>
+            </nav>
+        </div>
+        <div class="ms-auto">
+       
+        </div>
+    </div>
+    <!--end breadcrumb-->
+   
+    <hr>
+    <div class="card">
+          
+        <div class="card-body">
+            <div class="table-responsive">
+                <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
+                    
+                    <div class="row">
+                        <div class="col-sm-12">
+                        <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-country">
+                     <table id="example" class="table table-hover table-striped align-middle shadow-sm" role="grid" aria-describedby="example_info">
+                       <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                        <tr>
+                        <th class="text-start" style="width:1px;">{{ "#" }}</th>
+                        <th class="text-start">{{ "Karar Başlığı" }}</th>
+                        <th class="text-start">{{ "Toplantı No" }}</th>
+                        <th class="text-center">{{ "Durumu" }}</th>
+                        <th class="text-start">{{ "Karar Tarihi" }}</th>
+                        <th style="width: 1px;" class="text-end">{{ "Eylem" }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if kararlar %}
+                        {% for karar in kararlar %}
+                            <tr>
+                            <td class="text-center fw-bold text-primary">{{ karar.row }}</td>
+                            <td class="text-start">
+                                {{ karar.name_sort }}
+                            </td>
+                            <td class="text-start">
+                                <span class="badge bg-light text-dark border">{{ karar.no }}</span>
+                            </td>
+                            <td class="text-center">
+                                {% if karar.statu == "TK" %}
+                                <span class="badge bg-success">{{ karar.statu }}</span>
+                                {% elseif karar.statu == "DEK" %}
+                                <span class="badge bg-primary">{{ karar.statu }}</span>
+                                {% elseif karar.statu == "İK" %}
+                                <span class="badge bg-danger">{{ karar.statu }}</span>
+                                {% else %}
+                                <span class="badge bg-warning">{{ karar.statu }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-start">
+                                <i class="bi bi-calendar-event me-1 text-muted"></i>{{ karar.karar_tarihi }}
+                            </td>
+                            <td class="text-center">
+                                <button type="button" data-bs-toggle="tooltip" title="detaylar" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-eye"></i>
+                                </button>
+                            </td>
+                            </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td class="text-center text-muted fst-italic" colspan="6">{{ text_no_results }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                    </table>
+
+                          </form>
+                        </div>
+                        <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{footer}}
+</main>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

@@ -1,0 +1,16 @@
+<div class="tile bg-info">
+  <div class="tile-heading" style="text-transform: none;"><i class="fa fa-male"></i> <strong>{{ "Bölgeye Göre Öğrenci Raporu" }}</strong></div>
+    <ul class="list-group list-group-flush">
+      {% for bolge in bolgeler %}
+      <li class="list-group-item">
+      <span style="color:#000000;font-weight:bold;">{{bolge.name}}</span> <span style="color:#000000;font-weight:bold;" class="pull-right"><i class="fa fa-user"></i> {{ bolge.total}}</span>
+      <div class="progress" style="height:16px">  
+       <div class="progress-bar progress-bar-striped bg-primary active" role="progressbar" style="width: {{ bolge.percent }}%;"  aria-valuenow="{{ bolge.percent }}"  aria-valuemin="0" aria-valuemax="100">
+      {{ bolge.percent|round(1, 'ceil')}}% </div>
+      </div>
+      
+     </li>
+     {% endfor %}
+     <li class="list-group-item bg-light" style="color:#000000;font-weight:bold;"> Toplam : {{gtotal}}<span class="pull-right">{{"Bugün Kayıt Olan"}} : {{today_total}}</span></li>
+  </ul>
+</div>

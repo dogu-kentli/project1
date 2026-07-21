@@ -1,0 +1,58 @@
+<div class="card radius-10 w-100 overflow-hidden">
+      <div class="card-header bg-gradient-light">
+      <div class="row g-3 align-items-center">
+            <div class="col-9">
+            <h6 class="mb-0"><i class="bi bi-graph-up"></i> Öğrenci Raporu</h6>
+            </div>
+            <div class="col-3">
+            <div class="d-flex">
+            <div class="dropdown ms-auto">
+                  <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i class="bx bx-dots-horizontal-rounded font-22 text-option"></i> </a>
+                  <ul class="dropdown-menu">
+                  <li><a class="dropdown-item sort" data-id="#dernekler-data" href="{{link1}}" >Bugün</a></li>
+                  <li><a class="dropdown-item sort" data-id="#dernekler-data" href="{{link2}}">Bu Ay</a></li>
+                  <li><a class="dropdown-item sort" data-id="#dernekler-data" href="{{link4}}">Geçen Ay</a></li>
+                  <li><a class="dropdown-item sort" data-id="#dernekler-data" href="{{link3}}">Bu Yıl</a></li>
+                  <li><a class="dropdown-item sort" data-custom="true" data-link="{{link5}}" data-id="#dernekler-data"  href="javascript:void(0)" onclick="$('.table-dernek').find('thead').show();">Özel Tarih</a></li>
+                  </ul>
+            </div>
+            </div>
+            </div>
+      </div>
+      </div>
+      <div class="card-body">
+            <table class="table table-striped table-dernek" >
+            <thead style="display:none;">
+             <tr>
+                  <td colspan="3" class="text-center"><input type="date" data-id="#dernekler-data" data-link="{{link5}}" id="date-start" name="date_start" class="form-control form-control-sm date-sort"></td>
+                  <td colspan="2" class="text-center"><input type="date" data-id="#dernekler-data" data-link="{{link5}}" id="date-end" name="date_end" class="form-control form-control-sm date-sort"></td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr >
+                  <th class="text-left" style="line-height: 22.5px;">Dernek</td>
+                  <th class="text-center">Gün</th>
+                  <th class="text-center">Ay</th>
+                  <th class="text-center">Yıl</th>
+                  <th class="text-center">Toplam</th>
+            </tr>
+            {% for store in stores %}
+                  <tr >
+                  <td class="text-left" style="line-height: 22.5px;"> {{store.name}}</td>
+                  <td class="text-center">{{ store.btotal}}</td>
+                  <td class="text-center">{{ store.atotal}}</td>
+                  <td class="text-center">{{ store.ytotal}}</td>
+                  <td class="text-center">{{ store.etotal}}</td>
+                  </tr>
+                  {% endfor %}
+                  <tr>
+                  <td colspan="5" style="line-height:25px;border:1px solid#ccc; font-weight:bold;" class="bg-light">Toplam : {{gtotal}}</td>
+                  </tr>
+                  </tbody>
+            </table>
+      </div>
+</div>
+ 
+<script>
+ $('#cover-spin').hide();
+</script> 

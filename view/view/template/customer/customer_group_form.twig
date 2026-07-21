@@ -1,0 +1,86 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">Öğrenci Grupları Formu</h5>
+            <div class="ms-auto">
+              <button type="submit" form="form-ogrenci-group" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-save"></i>
+              </button>
+              <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm btn-sm bg-white">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-ogrenci-group" class="row g-3">
+            
+            <div class="col-12">
+              <label class="form-label" for="input-name">{{ entry_name }}</label>
+              {% for language in languages %}
+              <input type="text" name="customer_group_description[{{ language.language_id }}][name]" value="{{ customer_group_description[language.language_id] ? customer_group_description[language.language_id].name }}" placeholder="{{ entry_name }}" class="form-control"/>
+             {% endfor %}
+            </div>
+
+            {% for language in languages %}
+            <div class="form-group" style="display:none;">
+              <label class="col-sm-2 control-label" for="input-description{{ language.language_id }}">{{ entry_description }}</label>
+              <div class="col-sm-10">
+                <div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}"/></span> <textarea name="customer_group_description[{{ language.language_id }}][description]" rows="5" placeholder="{{ entry_description }}" id="input-description{{ language.language_id }}" class="form-control">{{ customer_group_description[language.language_id] ? customer_group_description[language.language_id].description }}</textarea>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+
+          <div class="form-group" style="display:none;">
+            <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_approval }}">{{ entry_approval }}</span></label>
+            <div class="col-sm-10">
+              <label class="radio-inline">
+                {% if approval %}
+                  <input type="radio" name="approval" value="1" checked="checked"/>
+                  {{ text_yes }}
+                {% else %}
+                  <input type="radio" name="approval" value="1"/>
+                  {{ text_yes }}
+                {% endif %}
+              </label> <label class="radio-inline">
+                {% if not approval %}
+                  <input type="radio" name="approval" value="0" checked="checked"/>
+                  {{ text_no }}
+                {% else %}
+                  <input type="radio" name="approval" value="0"/>
+                  {{ text_no }}
+                {% endif %}
+              </label>
+            </div>
+          </div>
+
+            <div class="col-12">
+              <label class="form-label" for="input-name">{{ entry_sort_order }}</label>
+              <input type="text" name="sort_order" value="{{ sort_order }}" placeholder="{{ entry_sort_order }}" id="input-sort-order" class="form-control"/>
+              
+            </div>
+
+            <div class="col-12">
+              <label class="form-label d-block">{{ entry_default }} (Evet / Hayır)</label>
+              <div class="form-check form-switch">
+                 {% if status == customer_group_id  %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                <input class="form-check-input" type="checkbox" {{ checked }} name="status" value="1" id="statusSwitch"
+                       style="width:3rem;height:1.5rem;">
+                
+              </div>
+            </div>
+            <input type="hidden" name="status" value="{{ customer_group_id }}">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ footer }}
+</main>
+

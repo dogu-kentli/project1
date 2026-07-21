@@ -1,0 +1,318 @@
+ <div class="table-responsive-sm">
+ <input type="hidden" name="filter_url" value="{{filter_url}}">
+    <table id="table-isportali" class="table table-bordered align-middle mb-0 ">
+        <thead class="table-light">
+            <tr>
+                <th class="text-start">{{ "Görev Tanımı" }}</th>
+                <th class="text-start">{{ "Personel " }}</th>
+                <th class="text-start">{{ "S.Tarih" }}</th>
+                <th class="text-start">{{ "Birim " }}</th>
+                <th class="text-center">{{ "Kategori " }}</th>
+                <th class="text-center">{{ "Durumu " }}</th>
+                <th class="text-center">{{ "Öncelik " }}</th>
+                <th colspan="3" class="text-center" style="width:1%;"> {{"Eylem"}}  </th>
+            </tr>
+        </thead>
+     <tbody class="data-list">
+       {% if istakibilist %}
+	     {% set row = 1 %}
+      
+	     {% for istakibi in istakibilist %}
+	  
+      <tr id="data-list{{istakibi.personel_istakibi_id}}" class="{{istakibi.color}}">
+	    
+      <td id="{{ istakibi.personel_istakibi_id }}" class="text-left"><span class="isttakibi-span" style="display:block">{{ istakibi.gorev }}</span>
+       <input type="text" name="gorev" value="{{ istakibi.gorev }}" placeholder="Yapılacak görev" id="gorev{{ istakibi.personel_istakibi_id }}" class="form-control input-portal" onchange="saveToDB('gorev','{{ istakibi.personel_istakibi_id }}')" style="display:none;"/>
+      </td>
+      <td id="{{ istakibi.personel_istakibi_id }}" class="text-left item"><span class="isttakibi-span" style="display:block">{{ istakibi.personel['name'] }}</span>
+         <input type="text" name="personel" value="{{ istakibi.personel['name'] }}" id="personel{{ istakibi.personel_istakibi_id }}" placeholder="Personel" class="form-control input-portal" style="display:none;" />
+         <input type="hidden" name="personel_id" value="{{ istakibi.personel['personel_id'] }}" id="personel_id{{ istakibi.personel_istakibi_id }}" onchange="saveToDB('personel_id','{{ istakibi.personel_istakibi_id }}')" class="form-control input-portal" style="display:none;"/>
+      </td>
+      <td id="{{ istakibi.personel_istakibi_id }}" class="text-left item">
+         <span class="text-center isttakibi-span" style="display:block">{{ istakibi.date_end }}</span>
+         <input type="date" name="date_end" value="{{istakibi.date_end}}" placeholder="Bitiş Tarihi" id="date_end{{ istakibi.personel_istakibi_id }}" onchange="saveToDB('date_end','{{ istakibi.personel_istakibi_id }}')" class="form-control input-portal" style="display:none;"/>
+      </td>
+		   <td id="{{ istakibi.personel_istakibi_id }}" class="text-left item"><span id="birimspan{{ istakibi.personel_istakibi_id }}" class="isttakibi-span" style="display:block">{{ istakibi.birim['name'] }}</span>
+         <input type="text" name="birim" value="{{istakibi.birim['name']}}" placeholder="Birim Seçin" id="birim{{ istakibi.personel_istakibi_id }}" class="form-control" style="display:none;" readonly />
+         <input type="hidden" name="birim_id" value="" id="personel_birim_id{{ istakibi.personel_istakibi_id }}" onchange="saveToDB('personel_birim_id','{{ istakibi.personel_istakibi_id }}')" class="form-control input-portal" style="display:none;"/>
+       </td>
+       <td id="{{ istakibi.personel_istakibi_id }}" class="text-left item">
+         <span class="isttakibi-span" style="display:block">{{ istakibi.category['name'] }}</span>
+         <input type="text" name="category" value="{{ istakibi.category['name'] }}" id="category{{ istakibi.personel_istakibi_id }}" placeholder="Kategori" class="form-control input-portal" style="display:none;" />
+         <input type="hidden" name="category_id" value="{{ istakibi.category['personel_category_id'] }}" id="personel_category_id{{ istakibi.personel_istakibi_id }}" onchange="saveToDB('personel_category_id','{{ istakibi.personel_istakibi_id }}')" class="form-control input-portal" style="display:none;"/>
+       </td>
+       <td class="text-left item">{{ istakibi.status }}</td>
+	     <td id="{{ istakibi.personel_istakibi_id }}" class="text-left">
+          
+          <span class="isttakibi-span" style="display:block">{{istakibi.oncelik}}</span>
+        
+          <input type="text" name="oncelik" value="{{istakibi.oncelik}}" placeholder="Öncelik Durumu" id="oncelik{{ istakibi.personel_istakibi_id }}"  class="form-control input-portal" style="display:none;"/>
+          <input type="hidden" name="oncelik_id" value="{{istakibi.oncelik}}"  id="oncelik_id{{ istakibi.personel_istakibi_id }}" onchange="saveToDB('oncelik_id','{{ istakibi.personel_istakibi_id }}')" class="form-control" />
+       </td>
+      <td class="text-center">
+       <input type="hidden" id="data_personel{{ istakibi.personel_istakibi_id }}" value="{{istakibi.personel_id}}">
+	      <button type="button" id="button-view"  data-toggle="tooltip" title="Görüntüle" onclick="functionView('{{ istakibi.personel_istakibi_id }}','{{ istakibi.personel_id }}')" class="btn btn-info btn-sm"> <i class="bi bi-eye"></i></button>
+	 
+	   </td>
+	  
+      <td class="text-center" {% if user_personel_id  %} style="display:none;" {% endif %}>
+	     <button type="button" id="{{istakibi.personel_istakibi_id}}"  class="btn btn-danger btn-sm button-delete"><i class="bi bi-x-circle"></i></button>
+	    </td>	  
+      
+	 </tr>
+     
+	   {% set row = row + 1 %}
+     {% endfor %}
+     {% else %}
+        <tr>
+        <td class="text-center" colspan="6">{{"Sonuç bulunamadı"}}</td>
+       </tr>
+      {% endif %}
+      </tbody>
+      <tfoot id="isportali-footer">
+           <tr>
+            
+            <td colspan="9">
+            <button type="button" id="button-add" data-toggle="tooltip" title="{{ "Ekle" }}" class="btn btn-info button-add btn-sm"><i class="bi bi-plus-circle"></i>{{" Ekle"}}</button></td>
+           </tr>
+      </tfoot>
+      </table> 
+</div>
+
+<div class="row mt-3 align-items-center">
+    <div class="col-sm-6 small text-muted">{{ results }}</div>
+    <div class="col-sm-6 d-flex justify-content-end">{{ pagination }}</div>
+</div>
+
+<div class="modal fade" id="modal-isportali" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered " >
+    <div class="modal-content border-0 shadow-lg">
+      
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold text-primary" id="modalLabel">
+          <i class="fa-solid fa-pen-to-square me-2"></i>İş Kayıt Formu
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form id="form-comment">
+        <div class="modal-body p-4">
+          <ul class="list-group">
+          
+          
+        </ul>
+          <div class="mb-3">
+            <label for="personel_category_id" class="form-label fw-semibold">Faaliyet Kategorisi</label>
+            <select name="personel_category_id" id="personel_category_id" class="form-select faaliyet-category border-2">
+              <option value="" selected disabled>-- Kategori Seçin --</option>
+              {% for category in categories %}
+                <option value="{{category.personel_category_id}}">{{category.name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <input type="hidden" name="personel_istakibi_id" value="">
+            <label for="comment1" class="form-label fw-semibold">Açıklama</label>
+            <textarea name="comment1" rows="3" id="comment1" 
+                      class="form-control border-2" 
+                      placeholder="Görev hakkında açıklama yazınız (Maksimum 1000 karakter)"></textarea>
+          </div>
+
+          <div class="mb-0">
+            <label for="comment2" class="form-label fw-semibold">Sonuç Raporu</label>
+            <textarea name="comment2" rows="3" id="comment2" 
+                      class="form-control border-2" 
+                      placeholder="Sonuç Raporu (Maksimum 1000 karakter)"></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer bg-light border-top-0">
+          
+          <button type="button" id="button-save" class="btn btn-primary btn-save px-4 shadow-sm" disabled>
+            <i class="fa-solid fa-floppy-disk me-2"></i> {{ button_save }}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+<script>
+$('.button-count-filter').on('click', function() {
+  var url = 'index.php?route=personeller/isportali/dataIsportali&user_token={{ user_token }}&filter_status=' + $(this).attr('id');	
+  
+  $('#isportali-data').load(url);
+});
+
+</script>
+
+<script type="text/javascript"><!--
+  $('input[name^=\'oncelik\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/isportali/oncelikautocomplete&user_token={{ user_token }}&filter_oncelik=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['text'],
+              value: item['status_id']
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+       $('#oncelik' + sessionStorage.getItem('id')).val(item['label']);
+       $('#oncelik_id' + sessionStorage.getItem('id')).val(item['value']);
+       $('#oncelik_id' + sessionStorage.getItem('id')).trigger('change');
+    }
+  });
+
+
+  $('input[name^=\'category\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=personeller/isportali/categoryautocomplete&user_token={{ user_token }}&filter_category=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['personel_category_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('#category' + sessionStorage.getItem('id')).val(item['label']);
+      $('#personel_category_id' + sessionStorage.getItem('id')).val(item['value']);
+      $('#personel_category_id' + sessionStorage.getItem('id')).trigger('change');
+    }
+  });
+
+//--></script>
+
+<script type="text/javascript"><!--
+function functionView(id,personel_id) {
+    var user_personel_id = '{{user_personel_id}}';
+    
+    $('#modal-isportali .btn-save').prop('disabled',true);
+    if(user_personel_id == personel_id) {
+      $('#modal-isportali .btn-save').prop('disabled',false);
+    }
+
+    if(user_personel_id == 0) {
+      $('#modal-isportali .btn-save').prop('disabled',false);
+    }
+
+    $('#modal-isportali').modal('show');
+    $('#modal-isportali input[name^=\'personel_istakibi_id\']').val(id);
+    
+    $.ajax({
+      url: 'index.php?route=personeller/isportali/dataView&user_token={{ user_token }}&personel_istakibi_id='  +id,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+       $('.alert-dismissible').remove();
+       $('.list-group-item').remove();
+       $('.dropdown-menu').find('li').attr('class','');
+        
+       if (json['gorev']) {
+         $('#modal-isportali .list-group').append(json['gorev']);
+         $('#modal-isportali textarea[name^=\'comment1\']').val(json['comment1']);
+         $('#modal-isportali textarea[name^=\'comment2\']').val(json['comment2']);
+         $('#modal-isportali select[name^=\'status\']').val(json['status']);
+         $('#modal-isportali select[name^=\'personel_category_id\']').val(json['personel_category_id']);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+}
+
+
+$('#button-save').on('click', function() {
+    var element = $('#modal-isportali input[name^=\'personel_istakibi_id\']').val();
+	
+     $.ajax({
+      url: 'index.php?route=personeller/isportali/save&user_token={{ user_token }}&personel_istakibi_id='  + element,
+      type: 'post',
+      dataType: 'json',
+      data : $('#form-comment').serialize(),
+      
+      success: function(json) {
+        $('.alert-dismissible').remove();
+
+        if (json.error.warning) {
+	      alerterror(json.error.warning);
+        }
+        if (json.success) {
+           $('#modal-isportali').modal('hide');
+           alertsuccess(json.success);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+
+ $('.button-delete').on('click', function() {
+    if (confirm('Dikkat : Bu işlem geri alınamaz. Bu görevi silmek istediğinize emin misiniz?') == false) {    
+        exit();
+    }
+   
+    var element = $(this).attr('id');
+	
+     $.ajax({
+      url: 'index.php?route=personeller/isportali/deleteData&user_token={{ user_token }}&personel_istakibi_id='  + element,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        $('.alert-dismissible').remove();
+
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+         
+        if (json.success) {
+         $('#modal-isportali').modal('hide');
+         $('#isportali-data').load('index.php?route=personeller/isportali/dataIsportali&user_token={{ user_token }}');
+          alertsuccess(json.success);
+          
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+$('#button-close').on('click', function() {
+    $('#modal-isportali').modal('hide');
+});
+
+//--></script>
+<script>
+$(document).ready(function(){
+ $('#cover-spin').hide(0);
+});
+</script> 
+
+
+
+
+
+
+

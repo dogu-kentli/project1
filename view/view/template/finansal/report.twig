@@ -1,0 +1,38 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+         <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-warning" ><i class="fa fa-file-excel-o" aria-hidden="true"></i> </a>
+    
+    </div>
+  </div><br>
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header"><i class="fa-solid fa-chart-bar"></i> {{ "Seçim Yapın" }}</div>
+      <div class="card-body bg-light">
+            <div class="input-group">
+              <select name="report" id="select-report" class="form-control">
+                {% for report in reports %}
+                  <option value="{{ report.href }}"{% if report.code == "kasa_raporu" %} selected {% endif %}>{{ report.text }}</option>
+                {% endfor %}
+              </select>
+              <div class="input-group-addon"><i class="fa-solid fa-filter"></i>&nbsp;{{ text_filter }}</div>
+            </div>
+      </div>
+    </div>
+    <div id="report"></div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#select-report').on('change', function(e) {
+    if ($(this).val()) {
+        $('#report').load(this.value);
+    }
+});
+
+$('#select-report').trigger('change');
+//--></script>
+
+
+{{ footer }}

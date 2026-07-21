@@ -1,0 +1,873 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">Aylık Teşkilat Raporu</h5>
+            <div class="ms-auto">
+              <button type="button" form="form-country" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary button-save btn-sm">
+                <i class="bi bi-save"></i>
+              </button>
+              <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+         <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-report" class="form-horizontal">
+            <table class="table table-bordered">
+             <thead>
+              <tr>
+                <th colspan="6" class="text-center">{% if store_logo  %} <img src="{{ store_logo}}"/> {% else %}<img src="view/image/logo.png" width="200" height="auto" /></a> {% endif %}
+                </th>
+              </tr>
+              <tr>
+                <th colspan="6" id="imza" {% if teskilat_id  < 1 %} style="display:none;" {% endif %}>
+                  <h4>Kıymetli dernek başkanım; kurumunuzun aylık raporunu zamanında ve eksiksiz şekilde doldurmanızı rica ederim.</h4><br>
+                  <h4>Abdullah Muhammed İslam<br> Başkan</h3>
+                  
+                  
+                </th>
+              </tr>
+              
+              <tr>
+                <th colspan="6" class="text-center">
+                    <div class="input-container">
+                        <input type="hidden" name="name" value="{{store_name}}" placeholder="............" class="form-control" style="width:100px;">
+                    </div>
+
+                    <div class="input-container">
+                        <h3><strong> {{store_name}} </strong></h3>
+                    </div>
+                    <br>
+                     <div id="report-message" class="alert alert-info" style="font-size:16px;display:none;"><i class="fa fa-exclamation-circle"></i> 
+                        
+                     </div>
+                   
+                    <div class="input-container">
+                         Dönemi :
+                        <input type="text" name="donemi" value="{{donemi}}" placeholder="..............." id="input-rapor-donemi" onchange="donemkontrol(this)" class="form-control input-border-none" style="width:110px;" readonly>
+                    </div>
+    
+                </th>
+              </tr>
+              <tr id="rapor-donemi" style="display:none;"><td class="text-center"></td></tr>
+              </thead> 
+              </table>
+             <div id="table-data" {% if teskilat_id == false %} style="display:none;" {% endif %}>
+             <table class="table table-bordered " style="table-layout: fixed; width: 100%;">
+             <thead class="bg-light">
+              <tr>
+                <th colspan="6" class="text-center"><h4><strong>KURUM BİLGİLERİ</strong></h4></th>
+              </tr>
+            </thead>
+
+             <thead>
+              <tr>
+                <th class="text-center">Yönetim Kurulu<br> Üye Sayısı</th>
+                <th class="text-center">Toplantı Periyodu</th>
+                <th class="text-center">İcra Kurulu <br>Üye Sayısı</th>
+                <th class="text-center">Toplantı Periyodu</th>
+                <th class="text-center">Hanımlar Komisyonu <br>Mevcut Mu <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot2}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></span></th>
+                <th class="text-center">Web Site Adresi</th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><input type="text" name="dernek_bilgileri[yonetim_kurulu]" value="{{ dernek_bilgileri['yonetim_kurulu']}}" placeholder="Yönetim Kurulu Üye Sayısı" class="input-border-none"></td>
+                <td>
+                <select name="dernek_bilgileri[toplanti_periyodu1]"  placeholder="Yapıldı/Yapılmadı" class="form-control mutad-egitim">
+                   <option value="Haftada Bir" {% if dernek_bilgileri['toplanti_periyodu1'] == 'Haftada Bir' %} selected {% endif %}>Haftada Bir</option>
+                   <option value="2 Haftada Bir" {% if dernek_bilgileri['toplanti_periyodu1'] == '2 Haftada Bir' %} selected {% endif %}>2 Haftada Bir</option>
+                   <option value="Ayda Bir" {% if dernek_bilgileri['toplanti_periyodu1'] == 'Ayda Bir' %} selected {% endif %}>Ayda Bir</option>
+                </select>
+                </td>
+                <td><input type="text" name="dernek_bilgileri[icra_kurulu]" value="{{dernek_bilgileri['icra_kurulu']}}" placeholder="İcra Kurulu Üye Sayısı" class="input-border-none"></td>
+                 <td>
+                <select name="dernek_bilgileri[toplanti_periyodu2]"  placeholder="Yapıldı/Yapılmadı" class="form-control mutad-egitim">
+                   <option value="Haftada Bir" {% if dernek_bilgileri['toplanti_periyodu2'] == 'Haftada Bir' %} selected {% endif %}>Haftada Bir</option>
+                   <option value="2 Haftada Bir" {% if dernek_bilgileri['toplanti_periyodu2'] == '2 Haftada Bir' %} selected {% endif %}>2 Haftada Bir</option>
+                   <option value="Ayda Bir" {% if dernek_bilgileri['toplanti_periyodu2'] == 'Ayda Bir' %} selected {% endif %}>Ayda Bir</option>
+                </select>
+                </td>
+                <td><input type="text" name="dernek_bilgileri[hanimlar_komisyonu]" value="{{ dernek_bilgileri['hanimlar_komisyonu']}}" placeholder="Mevcut ise üye sayısı" class="input-border-none"></td>
+                <td><input type="text" name="dernek_bilgileri[web]" value="{{ dernek_bilgileri['web']}}" placeholder="Web Site Adresi" class="input-border-none"></td>
+            </tr>
+         
+          </tbody>
+          </table>
+          <table class="table table-bordered" style="table-layout: fixed; width: 100%;">
+           <thead class="bg-light">
+              <tr>
+                <th colspan="6" class="text-center"><h4><strong>ÖĞRENCİ ÇALIŞMALARI İSTATİSTİKLERİ</strong></h4></th>
+              </tr>
+            </thead>
+           <thead>
+              <tr>
+                <th >Hedef Öğrenci Sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot3}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></span></th>
+                <th>İrtibatta Olduğumuz Öğrenci Sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot18}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></span></th>
+                <th>Mevcut Öğrenci Sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot4}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></th>
+                <th>Bu ay Tanışılan <br>Öğrenci Sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot5}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></th>
+                <th>Ülke Başkanı Sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot6}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></th>
+                <th style="display:none;">Mezun Sayısı</th>
+                <th>İrtibatlı Öğrenci Birliği Sayısı</th>
+              </tr>
+
+            </thead>
+            <tbody>
+            <tr id="ogrenci-istatistik">
+                <td><input type="text" name="ogrenci_calisma_istatistik[hedef_ogrenci_sayisi]" value="{{ogrenci_calisma_istatistik['hedef_ogrenci_sayisi']}}" placeholder="Hedef Öğrenci Sayısı" class="input-border-none" readonly></td>
+                <td><input type="text" name="ogrenci_calisma_istatistik[irtibatli_ogrenci_sayisi]" value="{{ogrenci_calisma_istatistik['irtibatli_ogrenci_sayisi']}}" placeholder="İrtibatta olduğunuz öğrenci Sayısı" class="input-border-none"></td>
+                <td><input type="text" name="ogrenci_calisma_istatistik[mevcut_ogrenci_sayisi]" value="{{ogrenci_calisma_istatistik['mevcut_ogrenci_sayisi']}}" placeholder="Mevcut Öğrenci Sayısı" class="input-border-none" readonly></td>
+                <td><input type="text" name="ogrenci_calisma_istatistik[yeni_tanisilan]"  value="{{ogrenci_calisma_istatistik['yeni_tanisilan']}}" placeholder="Bu ay Tanışılan Öğrenci Sayısı" class="input-border-none"></td>
+                <td><input type="text" name="ogrenci_calisma_istatistik[ulke_baskani_sayisi]" value="{{ogrenci_calisma_istatistik['ulke_baskani_sayisi']}}" placeholder="Ülke Başkanı Sayısı" class="input-border-none"></td>
+                <td style="display:none;"><input type="text" name="ogrenci_calisma_istatistik[mezun_sayisi]" value="{{ogrenci_calisma_istatistik['mezun_sayisi']}}" placeholder="Mezun Sayısı" class="input-border-none"></td>
+                <td><input type="text" name="ogrenci_calisma_istatistik[irtibatli_ogrenci_birligi_sayisi]" value="{{ogrenci_calisma_istatistik['irtibatli_ogrenci_birligi_sayisi']}}" placeholder="İrtibatlı Öğrenci Birliği Sayısı" class="input-border-none"></td>
+            </tr>
+          </tbody>
+
+          <thead>
+              <tr>
+                <th>Toplam burslu öğrenci sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot3_2}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></span></th>
+                <th>Derneğinizin yönettiği öğrenci evleri sayısı:</th>
+                <th>Derneğinizin yönettiği öğrenci evlerinde kalan toplam öğrenci sayısı: </th>
+                <th >Derneğinizin irtibatta olduğu öğrenci evleri sayısı: </th>
+                <th colspan="2">Derneğinizin irtibatta olduğu öğrenci evlerinde kalan toplam öğrenci sayısı:</th>
+                
+              </tr>
+
+            </thead>
+            <tbody>
+            <tr>
+            <td ><input type="text" name="ogrenci_calisma_istatistik[toplam_burslu_ogrenci]" value="{{ogrenci_calisma_istatistik['toplam_burslu_ogrenci']}}" placeholder="Toplam Burslu Öğrenci Sayısı" class="input-border-none"></td>
+            <td ><input type="text" name="ogrenci_calisma_istatistik[ogrenci_evleri_yonetim_sayisi]" value="{{ogrenci_calisma_istatistik['ogrenci_evleri_yonetim_sayisi']}}" placeholder="Yönettiğiniz Öğrenci Evi Sayısı" class="input-border-none"></td>
+            <td ><input type="text" name="ogrenci_calisma_istatistik[ogrenci_evleri_ogrenci_sayisi]" value="{{ogrenci_calisma_istatistik['ogrenci_evleri_ogrenci_sayisi']}}" placeholder="Yönetilen Evlerdeki Öğrenci Sayısı" class="input-border-none" ></td>
+            <td ><input type="text" name="ogrenci_calisma_istatistik[ogrenci_evleri_irtibat_sayisi]" value="{{ogrenci_calisma_istatistik['ogrenci_evleri_irtibat_sayisi']}}" placeholder="İrtibatta Olduğunuz Öğrenci Evi Sayısı" class="input-border-none"></td>
+            <td style="width:%10;"colspan="2"><input type="text" name="ogrenci_calisma_istatistik[ogrenci_evleri_irtibat_ogrenci_sayisi]" value="{{ogrenci_calisma_istatistik['ogrenci_evleri_irtibat_ogrenci_sayisi']}}" placeholder="İrtibattaki Evlerdeki Öğrenci Sayısı" class="input-border-none"></td>
+          </tr>
+          </tbody>
+          </table>
+          
+          <table class="table table-bordered ">
+           <thead class="bg-light">
+              <tr>
+                <th colspan="6" class="text-center"><h4><strong>EĞİTİM ÇALIŞMALARI</strong> <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot7}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></span></h4></th>
+              </tr>
+            </thead>
+           <thead>
+              <tr>
+                <th colspan="6" class="bg-light"><h4>a) Mutad Eğitim Çalışmaları  <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot17}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></span></h4></th>
+              </tr>
+              <tr>
+                <th style="width:10%;">Tarih</th>
+                <th style="width:20%;">Faaliyet Adı</th>
+                <th style="width:10%;">Yapıldı/Yapılmadı</th>
+                <th style="width:10%;">Katılım Sayısı</th>
+                <th >Açıklama</th>
+              </tr>
+            </thead>
+             <tbody id="egitim-calismalari1">
+            {% set row = 0 %}
+             {% for key,value in egitim_calismalari1 %}
+             <tr id="egitim1-row{{key}}">
+              <td>
+                <input type="date" name="egitim_calismalari1[{{ key }}][tarih]" value="{{ value.tarih }}" placeholder="Tarih" class="input-border-none mutad{{row}}" disabled>
+              </td>
+              <td>
+                <input type="text" name="egitim_calismalari1[{{ key }}][faaliyet_adi]" value="{{ value.faaliyet_adi }}" placeholder="Faaliyet Adı" class="input-border-none" readonly>
+              </td>
+               <td>
+                <select name="egitim_calismalari1[{{ key }}][mutad]" value="{{ value.mutad }}" for="{{row}}" onclick="mutadautocomplete('{{row}}')" placeholder="Yapıldı/Yapılmadı" class="form-control mutad-egitim">
+                   <option value="Yapılmadı" {% if value.mutad == 'Yapılmadı' %} selected {% endif %}>Yapılmadı</option>
+                   <option value="Yapıldı" {% if value.mutad == 'Yapıldı' %} selected {% endif %}>Yapıldı</option>
+                </select>
+              </td>             
+              <td>
+                <input type="text" name="egitim_calismalari1[{{ key }}][katilim_sayisi]" value="{{ value.katilim_sayisi }}" placeholder="Katılım Sayısı" class="input-border-none mutad{{row}}" disabled>
+              </td>
+               <td >
+                <textarea  name="egitim_calismalari1[{{ key }}][aciklama]"  onkeyup="autoTextHeight(this)" placeholder="Kısa bir açıklama yazınız." class="input-border-none textarea mutad{{row}}" disabled>{{ value.aciklama }}</textarea>
+              </td>
+              <td style="width:1%;" class="text-end">
+                <button type="button" data-toggle="tooltip" title="{{ 'Satır Sil' }}" onclick="$('#egitim1-row{{ key }}').remove();" class="btn btn-danger btn-sm" disabled>
+                    <i class="bi bi-dash-circle"></i>
+                </button>
+            </td>
+           </tr>
+           {% set row = row + 1 %}
+          {% endfor %}
+            </tbody>
+            <tbody>
+            <tr>
+                <td colspan="6" class="text-end"> <button type="button"  data-toggle="tooltip" title="{{ "Yeni Satır Ekle" }}" onclick="addEgitim1();" class="btn btn-info btn-sm" disabled><i class="bi bi-plus-circle"></i></button></td>
+            </tr>
+        
+           </tbody>
+            <tbody id="egitim-calismalari2" >
+             <tr>
+                <th colspan="6" class="bg-light"><h4>b) Diğer Eğitim Çalışmaları</h4></th>
+              </tr>
+              <tr>
+                <th>Tarih</th>
+                <th>Faaliyet Adı</th>
+                <th>Katılım Sayısı</th>
+                <th colspan="2">Açıklama</th>
+              </tr>
+             {% for key, value in egitim_calismalari %}
+             <tr id="egitim-row{{key}}" >
+              <td >
+                <input type="date" name="egitim_calismalari[{{ key }}][tarih]" value="{{ value.tarih }}" placeholder="Tarih" class="input-border-none">
+              </td>
+              <td >
+                <input type="text" name="egitim_calismalari[{{ key }}][faaliyet_adi]" value="{{ value.faaliyet_adi }}" placeholder="Faaliyet Adı" class="input-border-none">
+              </td>            
+              <td>
+                <input type="text" name="egitim_calismalari[{{ key }}][katilim_sayisi]" value="{{ value.katilim_sayisi }}" placeholder="Katılım Sayısı" class="input-border-none">
+              </td>
+               <td colspan="2">
+                <textarea  name="egitim_calismalari[{{ key }}][aciklama]" placeholder="Kısa bir açıklama yazınız." class="input-border-none textarea">{{ value.aciklama }}</textarea>
+              </td>
+              <td class="text-end">
+                <button type="button" data-toggle="tooltip" title="{{ 'Satır Sil' }}" onclick="$('#egitim-row{{ key }}').remove();" class="btn btn-danger btn-sm">
+                    <i class="bi bi-dash-circle"></i>
+                </button>
+            </td>
+           </tr>
+          {% endfor %}
+            </tbody>
+            <tbody>
+            <tr>
+                <td colspan="6" class="text-end"> <button type="button"  data-toggle="tooltip" title="{{ "Yeni Satır Ekle" }}" onclick="addEgitim2();" class="btn btn-info btn-sm"><i class="bi bi-plus-circle"></i></button></td>
+            </tr>
+        
+           </tbody>
+           </table>
+
+           <table class="table table-bordered" >
+            <thead class="bg-light">
+              <tr>
+                <th colspan="6" class="text-center"><h4><strong>ÖĞRENCİ ÇALIŞMALARI </strong><span data-toggle="tooltip" data-placement="top" title="{{text_dipnot8}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></h4></th>
+              </tr>
+            </thead>
+            <thead >
+               <tr>
+                <th style="width:10%;">Tarih</th>
+                <th style="width:20%;">Faaliyet Adı</th>
+                <th style="width:10%;">Katılım Sayısı</th>
+                <th colspan="2">Açıklama</th>
+                <th style="width:1%">Eylem</th>
+              </tr>
+            </thead>
+            <tbody id="ogrenci-calismalari">
+           
+              {% for key, value in ogrenci_calismalari %}
+             <tr id="ogrenci-row{{key}}">
+              <td >
+                <input type="date" name="ogrenci_calismalari[{{ key }}][tarih]" value="{{ value.tarih }}" placeholder="Tarih" class="input-border-none">
+              </td>
+              <td >
+                <input type="text" name="ogrenci_calismalari[{{ key }}][faaliyet_adi]" value="{{ value.faaliyet_adi }}" placeholder="Faaliyet Adı" class="input-border-none">
+              </td>
+               <td>
+                <input type="text" name="ogrenci_calismalari[{{ key }}][katilim_sayisi]" value="{{ value.katilim_sayisi }}" placeholder="Katılım Sayısı" class="input-border-none">
+              </td>
+              <td colspan="2">
+                <textarea name="ogrenci_calismalari[{{ key }}][aciklama]" placeholder="Kasaca Açıklama Yazınız" class="input-border-none">{{ value.aciklama }}</textarea>
+              </td>
+               <td style="width:1%;" class="text-end">
+                <button type="button" data-toggle="tooltip" title="{{ 'Satır Sil' }}" onclick="$('#ogrenci-row{{ key }}').remove();" class="btn btn-danger btn-sm">
+                    <i class="bi bi-dash-circle"></i>
+                </button>
+            </td>
+           </tr>
+          {% endfor %}
+          </tbody>
+          <tbody>
+           <tr>
+                <td colspan="6" class="text-end"> <button type="button"  data-toggle="tooltip" title="{{ "Yeni Satır Ekle" }}" onclick="addOgrenci();" class="btn btn-info btn-sm"><i class="bi bi-plus-circle"></i></button></td>
+            </tr>
+          </tbody>
+          </table>
+           <table class="table table-bordered">
+          <thead class="bg-light">
+              <tr>
+                <th colspan="6" class="text-center"><h4><strong>SOSYAL KÜLTÜREL FAALİYETLER</strong> <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot9}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></h4></th>
+              </tr>
+          </thead>
+          <thead>
+               <tr>
+                <th style="width:10%;">Tarih</th>
+                <th style="width:20%;">Faaliyet Adı</th>
+                <th style="width:10%;">Katılım Sayısı</th>
+                <th colspan="2">Açıklama</th>
+                <th style="width:1%"></th>
+              </tr>
+            </thead>
+            <tbody id="sosyal-calismalar">
+             {% for key, value in sosyal_calismalar %}
+             <tr id="sosyal-row{{key}}">
+              <td >
+                <input type="date" name="sosyal_calismalar[{{ key }}][tarih]" value="{{ value.tarih }}" placeholder="Tarih" class="input-border-none">
+              </td>
+              <td >
+                <input type="text" name="sosyal_calismalar[{{ key }}][faaliyet_adi]" value="{{ value.faaliyet_adi }}" placeholder="Faaliyet Adı" class="input-border-none">
+              </td>
+               <td>
+                <input type="text" name="sosyal_calismalar[{{ key }}][katilim_sayisi]" value="{{ value.katilim_sayisi }}" placeholder="Katılım Sayısı" class="input-border-none">
+              </td>
+              <td colspan="2">
+                <textarea name="sosyal_calismalar[{{ key }}][aciklama]" placeholder ="Kısaca Açıklama Yazınız" class="input-border-none">{{ value.aciklama }}</textarea>
+              </td>
+              <td class="text-end" style="width:1%;">
+                <button type="button" data-toggle="tooltip" title="{{ 'Satır Sil' }}" onclick="$('#sosyal-row{{ key }}').remove();" class="btn btn-danger btn-sm">
+                    <i class="bi bi-dash-circle"></i>
+                </button>
+            </td>
+           </tr>
+          {% endfor %}
+            </tbody>
+            <tbody>
+            <tr>
+                <td colspan="6" class="text-end"> <button type="button"  data-toggle="tooltip" title="{{ "Yeni Satır Ekle" }}" onclick="addSosyal();" class="btn btn-info btn-sm"><i class="bi bi-plus-circle"></i></button></td>
+            </tr>
+           
+          </tbody>
+          </table>
+
+           <table class="table table-bordered">
+          <thead class="bg-light">
+              <tr>
+                <th colspan="6" class="text-center"><h4><strong>GENEL FAALİYETLER</strong> <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot9}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></h4></th>
+              </tr>
+          </thead>
+         
+          <thead>
+               <tr>
+                <th style="width:10%;">Tarih</th>
+                <th style="width:20%;">Faaliyet Adı</th>
+                <th style="width:10%;">Katılım Sayısı</th>
+                <th colspan="2">Açıklama</th>
+                <th style="width:1%"></th>
+              </tr>
+            </thead>
+            <tbody id="genel-calismalar">
+           
+             {% for key, value in genel_calismalar %}
+             <tr id="genel-row{{key}}">
+              <td >
+                <input type="date" name="genel_calismalar[{{ key }}][tarih]" value="{{ value.tarih }}" placeholder="Tarih" class="input-border-none">
+              </td>
+              <td >
+                <input type="text" name="genel_calismalar[{{ key }}][faaliyet_adi]" value="{{ value.faaliyet_adi }}" placeholder="Faaliyet Adı" class="input-border-none">
+              </td>
+               <td>
+                <input type="text" name="genel_calismalar[{{ key }}][katilim_sayisi]" value="{{ value.katilim_sayisi }}" placeholder="Katılım Sayısı" class="input-border-none">
+              </td>
+              <td colspan="2">
+                <textarea name="genel_calismalar[{{ key }}][aciklama]" placeholder ="Kısaca Açıklama Yazınız" class="input-border-none">{{ value.aciklama }}</textarea>
+              </td>
+              <td class="text-end" style="width:1%;">
+                <button type="button" data-toggle="tooltip" title="{{ 'Satır Sil' }}" onclick="$('#genel-row{{ key }}').remove();" class="btn btn-danger btn-sm">
+                    <i class="bi bi-dash-circle"></i>
+                </button>
+            </td>
+           </tr>
+          {% endfor %}
+            </tbody>
+            <tbody>
+            <tr>
+                <td colspan="6" class="text-end"> <button type="button"  data-toggle="tooltip" title="{{ "Yeni Satır Ekle" }}" onclick="addGenel();" class="btn btn-info btn-sm"><i class="bi bi-plus-circle"></i></button></td>
+            </tr>
+           
+          </tbody>
+          </table>
+
+          <table class="table table-bordered" style="table-layout: fixed; width: 100%;">
+          <thead class="bg-light">
+              <tr>
+                <th colspan="6" class="text-center"><h4><strong>TANITIM BİRİMİ </strong><span data-toggle="tooltip" data-placement="top" title="{{text_dipnot10}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></h4></th>
+              </tr>
+          </thead>
+          <thead >
+              <tr>
+                <th>Facebook</th>
+                <th colspan="2">Instagram</th>
+                <th>Youtube</th>
+                <th colspan="2">Twitter</th>
+                
+              </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><input type="text" name="tanitim_birimi[facebook]" value="{{tanitim_birimi['facebook']}}" placeholder="Facebook" class="input-border-none"></td>
+                <td colspan="2"><input type="text" name="tanitim_birimi[instagram]" value="{{tanitim_birimi['instagram']}}" placeholder="Instagram" class="input-border-none"></td>
+                <td><input type="text" name="tanitim_birimi[youtube]" value="{{tanitim_birimi['youtube']}}" placeholder="Youtube" class="input-border-none"></td>
+                <td colspan="2"><input type="text" name="tanitim_birimi[twitter]" value="{{tanitim_birimi['twitter']}}" placeholder="Twitter" class="input-border-none"></td>
+                
+            </tr>
+            <tr>
+                <td><input type="text" name="tanitim_birimi[icerik_facebook]" value="{{tanitim_birimi['icerik_facebook']}}" placeholder="Güncel takip sayısı yazınız" class="input-border-none"></td>
+                <td colspan="2"><input type="text" name="tanitim_birimi[icerik_instagram]" value="{{tanitim_birimi['icerik_instagram']}}" placeholder=" Güncel takip sayısı yazınız" class="input-border-none"></td>
+                <td><input type="text" name="tanitim_birimi[icerik_youtube]" value="{{tanitim_birimi['icerik_youtube']}}" placeholder="Güncel takip sayısı yazınızerik" class="input-border-none"></td>
+                <td colspan="2"><input type="text" name="tanitim_birimi[icerik_twitter]" value="{{tanitim_birimi['icerik_twitter']}}" placeholder="Güncel takip sayısı yazınız" class="input-border-none"></td>
+            </tr>
+            <tr>
+                <td><input type="text" name="tanitim_birimi[icerik_facebook2]" value="{{tanitim_birimi['icerik_facebook2']}}" placeholder="Bu ay içerisinde paylaşılan içerik sayısı yazınız" class="input-border-none"></td>
+                <td colspan="2"><input type="text" name="tanitim_birimi[icerik_instagram2]" value="{{tanitim_birimi['icerik_instagram2']}}" placeholder="Bu ay içerisinde paylaşılan içerik sayısı yazınız" class="input-border-none"></td>
+                <td><input type="text" name="tanitim_birimi[icerik_youtube2]" value="{{tanitim_birimi['icerik_youtube2']}}" placeholder="Bu ay içerisinde paylaşılan içerik sayısı yazınız" class="input-border-none"></td>
+                <td colspan="2"><input type="text" name="tanitim_birimi[icerik_twitter2]" value="{{tanitim_birimi['icerik_twitter2']}}" placeholder="Bu ay içerisinde paylaşılan içerik sayısı yazınız" class="input-border-none"></td>
+            </tr>
+           
+           </tbody>
+           </table>
+
+           <table class="table table-bordered" style="table-layout: fixed; width: 100%;">
+            <thead class="bg-light">
+              <tr>
+                <th colspan="6" class="text-center"><h4><strong>MALİYE VE KURUMSAL İLİŞKİLER BİRİMİ</strong></h4></th>
+              </tr>
+          </thead>
+          <thead >
+              <tr>
+                <th class="text-center">Bireysel Bağışçı <br>Sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot11}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></th>
+                <th class="text-center">Yapılan Mali Ziyaret <br>Sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot12}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></th>
+                <th class="text-center">Toplam Mevcut Kumbara <br>Sayısı</th>
+                <th class="text-center">Toplam Aidat Veren Kişi <br>Sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot13}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></th>
+                <th class="text-center">Gidilen Kurumsal Ziyaret <br>Sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot14}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></th>
+                <th class="text-center">Gelen Kurumsal Ziyaret <br>Sayısı <span data-toggle="tooltip" data-placement="top" title="{{text_dipnot15}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><input type="text" name="maliye_kurumsal_iliskiler_birimi[bireysel_bagisci_sayisi]" value="{{maliye_kurumsal_iliskiler_birimi['bireysel_bagisci_sayisi']}}" placeholder="Bireysel Bağışçı Sayısı" class="input-border-none"></td>
+                <td><input type="text" name="maliye_kurumsal_iliskiler_birimi[yapilan_mali_ziyaret_sayisi]" value="{{maliye_kurumsal_iliskiler_birimi['yapilan_mali_ziyaret_sayisi']}}" id="input-mali-ziyaret" placeholder="Yapılan Mali Ziyaret Sayısı"  class="input-border-none"></td>
+                <td><input type="text" name="maliye_kurumsal_iliskiler_birimi[toplam_mevcut_kumbara_sayisi]" value="{{maliye_kurumsal_iliskiler_birimi['toplam_mevcut_kumbara_sayisi']}}" placeholder="Toplam Mevcut Kumbara Sayısı" class="input-border-none"></td>
+                <td><input type="text" name="maliye_kurumsal_iliskiler_birimi[toplam_aidat_veren_kisi_sayisi]" value="{{maliye_kurumsal_iliskiler_birimi['toplam_aidat_veren_kisi_sayisi']}}" placeholder="Toplam Aidat Veren Kişi Sayısı" class="input-border-none"></td>
+                <td><input type="text" name="maliye_kurumsal_iliskiler_birimi[gidilen_kurumsal_ziyaret_sayisi]" value="{{maliye_kurumsal_iliskiler_birimi['gidilen_kurumsal_ziyaret_sayisi']}}" id="input-gidilen-ziyaret" placeholder="Gidilen Kurumsal Ziyaret Sayısı" class="input-border-none"></td>
+                <td><input type="text" name="maliye_kurumsal_iliskiler_birimi[gelen_kurumsal_ziyaret_sayisi]" value="{{maliye_kurumsal_iliskiler_birimi['gelen_kurumsal_ziyaret_sayisi']}}" id="input-gelen-ziyaret" placeholder="Gelen Kurumsal Ziyaret Sayısı" class="input-border-none"></td>
+            </tr>
+          </tbody>
+           </table>
+
+           <table class="table table-bordered" >
+           <thead class="bg-light">
+              <tr>
+                <th colspan="6" class="text-center"><h4><strong>GELECEK AYIN PLANLAMASI </strong><span data-toggle="tooltip" data-placement="top" title="{{text_dipnot16}}" style="color:#008bd2;"><i class="bi bi-question-circle"></i></h4></th>
+              </tr>
+          </thead>
+          <thead >
+              <tr>
+                <th style="width:15%;">Birim</th>
+                <th style="width:20%;">Faaliyet Adı</th>
+                <th style="width:10%;">Planlanan Tarih</th>
+                <th colspan="2">Açıklama</th>
+                <th style="width:1%;"></th>
+              </tr>
+            </thead>
+            <tbody id="planlama">
+          
+             {% for key, value in gelecek_ay_planlama %}
+             <tr id="sosyal-row{{key}}">
+              <td >
+                <input type="text" name="gelecek_ay_planlama[{{ key }}][birim]" value="{{ value.birim }}" placeholder="Birim" class="input-border-none">
+              </td>
+              <td >
+                <input type="text" name="gelecek_ay_planlama[{{ key }}][faaliyet_adi]" value="{{ value.faaliyet_adi }}" placeholder="Faaliyet Adı" class="input-border-none">
+              </td>
+               <td>
+                <input type="date" name="gelecek_ay_planlama[{{ key }}][tarih]" value="{{ value.tarih }}" placeholder="Katılım Sayısı" class="input-border-none">
+              </td>
+              <td colspan="2">
+                <textarea name="gelecek_ay_planlama[{{ key }}][aciklama]" placeholder ="Kısaca Açıklama Yazınız" class="input-border-none">{{ value.aciklama }}</textarea>
+              </td>
+              <td class="text-end" style="width:1%;">
+                <button type="button" data-toggle="tooltip" title="{{ 'Satır Sil' }}" onclick="$('#planlama-row{{ key }}').remove();" class="btn btn-danger btn-sm">
+                    <i class="bi bi-dash-circle"></i>
+                </button>
+            </td>
+           </tr>
+          {% endfor %}
+            </tbody>
+            <tbody>
+            <tr>
+                <td colspan="6" class="text-end"> <button type="button"  data-toggle="tooltip" title="{{ "Yeni Satır Ekle" }}" onclick="addPlanlama();" class="btn btn-info btn-sm"><i class="bi bi-plus-circle"></i></button></td>
+            </tr>
+           
+          </tbody>
+         </table>
+         </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ footer }}
+</main>
+<style>
+   .input-container {
+      display: inline-block;
+      margin-right: 2px; /* Inputlar arasında boşluk */
+  }
+
+  .input-border-none {
+    width:100%;
+    height:28px;
+    border:none;
+    outline: none; /* Opsiyonel: focus durumundaki çerçeveyi kaldırmak için */
+    resize: none;  /* Yeniden boyutlamayı kapatır */
+    overflow: hidden;
+  }
+
+  .description-border-none {
+    width:100%;
+    border-color: #eee;
+    outline: none; /* Opsiyonel: focus durumundaki çerçeveyi kaldırmak için */
+    resize: none;  /* Yeniden boyutlamayı kapatır */
+    overflow: hidden;
+  }
+
+  .input-border-none::placeholder {
+    color: #dbdbdb;
+  }
+
+  .tooltip-inner {
+  max-width: 400px;
+  padding: 3px 8px;
+  font-size:14px;
+  color: #000000;
+  text-align: left;
+  opacity:1;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px; 
+  }
+
+  </style>
+<script type="text/javascript"><!--
+     $('input[name=\'donemi\']').autocomplete({
+		  'source': function(request, response) {
+			  $.ajax({
+				   url: 'index.php?route=teskilat/teskilat/autocomplete&user_token={{ user_token }}&filter_donemi=' +  encodeURIComponent(request),
+				  dataType: 'json',
+				  success: function(json) {
+					  response($.map(json, function(item) {
+             
+						  return {
+							  label: item['text'],
+							  value: item['id']
+						  }
+					  }));
+				  }
+			  });
+		  },
+		  'select': function(item) {
+			  $('input[name=\'donemi\']').val(item['label']);
+         $('input[name=\'donemi\']').trigger('change');
+		  }
+	  });
+
+
+    function mutadautocomplete(row) {
+	  $('input[name=\'egitim_calismalari1[' + row + '][mutad]\']').autocomplete({
+		  'source': function(request, response) {
+			  $.ajax({
+				   url: 'index.php?route=teskilat/teskilat/autocomplete3&user_token={{ user_token }}&filter_mutad=' +  encodeURIComponent(request),
+				  dataType: 'json',
+				  success: function(json) {
+					  response($.map(json, function(item) {
+						  return {
+							  label: item['text'],
+							  value: item['id']
+						  }
+					  }));
+				  }
+			  });
+		  },
+		  'select': function(item) {
+        $('input[name=\'egitim_calismalari1[' + row + '][mutad]\']').val(item['label']);
+		  }
+	  });
+    }
+//--></script>
+<script type="text/javascript"><!--
+$('.button-save').on('click', function() {
+  $('.text-danger,.alert-dismissible').remove();
+  var errorArray = [];
+  
+  var donemi = $('input[name=\'donemi\']').val();
+
+  if(donemi == '') {
+    errorArray.push('Lütefen dönemi bilirtiniz.');
+    $('input[name=\'donemi\']').after('<div class="text-danger"><span>Lütfen dönemi belirtiniz</span></div>'); 
+  }
+
+  $('#form-report input[required]').each(function() {
+     event.preventDefault();
+        if ($(this).val() === '') {
+            errorArray.push('Lütfen gerekli alanları doldurun.');
+            $(this).after('<div class="text-danger"><span>Zorunlu</span></div>');
+            $(this).css('border', '1px solid #f78981');// Çerçeveyi kırmızı yap
+        }
+  });
+
+  if (errorArray.length === 0) {
+    $('#form-report').submit();        
+  } else {
+    $('#alert').prepend(
+        '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+        '<div class="d-flex align-items-center">' +
+        '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+        '<div class="ms-3"><div class="text-dynamic">Lütfen eksik bilgileri doldurun</div></div>' +
+        '</div>' +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        '</div>'
+    ); 
+    
+  }
+});
+
+//--></script>
+<script type="text/javascript"><!--
+function addEgitim1() {
+     var row = $('#egitim-calismalari1 tr').length;
+         row = row + 1;
+         
+         html = '<tr id="egitim1-row' + row + '">';
+	       html += '  <td  class="text-left"><input type="date" name="egitim_calismalari1[' + row + '][tarih]" placeholder="{{ "Tarih" }}" class="input-border-none" /></td>';
+	       html += '  <td class="text-left"><input name="egitim_calismalari1[' + row + '][faaliyet_adi]" placeholder="{{ "faaliyet Adı" }}" class="input-border-none" /></td>';
+         html += '  <td class="text-left" ><input name="egitim_calismalari1[' + row + '][mutad]" placeholder="{{ "Yapıldı/Yapılmadı." }}" class="input-border-none" /></td>';
+         html += '  <td class="text-left" ><input name="egitim_calismalari1[' + row + '][katilim_sayisi]" placeholder="{{ "Katılım Sayısı." }}" class="input-border-none" /></td>';
+         html += '  <td style="width:50%;" class="text-left" ><textarea name="egitim_calismalari1[' + row + '][aciklama]" onkeyup="autoTextHeight(this)" placeholder="{{ "Kısa Açıklama Yazınız" }}" class="input-border-none" /></textarea></td>';
+         html += '  <td class="text-end" style="width:1%;"><button type="button" class="btn btn-danger btn-sm" onclick="$(\'#egitim1-row' + row + '\').remove();"><i class="bi bi-dash-circle"></i></button></td>';
+         html += '</tr>';
+
+         $('#egitim-calismalari1').append(html);
+         mutadautocomplete(row);
+  }
+
+  function addEgitim2() {
+     var row = $('#egitim-calismalari2 tr').length;
+         row = row + 1;
+         
+         html = '<tr id="egitim-row' + row + '">';
+	       html += '  <td  class="text-left"><input type="date" name="egitim_calismalari[' + row + '][tarih]" placeholder="{{ "Tarih" }}" class="input-border-none" /></td>';
+	       html += '  <td class="text-left"><input name="egitim_calismalari[' + row + '][faaliyet_adi]" placeholder="{{ "faaliyet Adı" }}" class="input-border-none" /></td>';        
+         html += '  <td class="text-left" ><input name="egitim_calismalari[' + row + '][katilim_sayisi]" placeholder="{{ "Katılım Sayısı." }}" class="input-border-none" /></td>';
+         html += '   <td colspan="2" class="text-left" ><textarea name="egitim_calismalari[' + row + '][aciklama]" onkeyup="autoTextHeight(this)" placeholder="{{ "Kısa Açıklama Yazınız" }}" class="input-border-none" /></textarea></td>';
+         html += '  <td class="text-end"><button type="button" class="btn btn-danger btn-sm" onclick="$(\'#egitim-row' + row + '\').remove();"><i class="bi bi-dash-circle"></i></button></td>';
+         html += '</tr>';
+
+         $('#egitim-calismalari2').append(html);
+  }
+
+  function addOgrenci() {
+     var row = $('#ogrenci-calismalari tr').length;
+         row = row + 1;
+         
+         html = '<tr id="ogrenci-row' + row + '">';
+	       html += '  <td class="text-left" ><input type="date" name="ogrenci_calismalari[' + row + '][tarih]" placeholder="{{ "Tarih" }}" class="input-border-none" /></td>';
+	       html += '  <td class="text-left" ><input name="ogrenci_calismalari[' + row + '][faaliyet_adi]" placeholder="{{ "faaliyet Adı" }}" class="input-border-none" /></td>';
+         html += '  <td class="text-left" ><input name="ogrenci_calismalari[' + row + '][katilim_sayisi]" placeholder="{{ "Katılım Sayısı." }}" class="input-border-none" /></td>';
+         html += '   <td colspan="2" class="text-left" ><textarea name="ogrenci_calismalari[' + row + '][aciklama]" onkeyup="autoTextHeight(this)" placeholder="{{ "Kısa Açıklama Yazınız" }}" class="input-border-none" /></textarea></td>';
+         html += '  <td class="text-end"><button type="button" class="btn btn-danger btn-sm" onclick="$(\'#ogrenci-row' + row + '\').remove();"><i class="bi bi-dash-circle"></i></button></td>';
+         html += '</tr>';
+
+         $('#ogrenci-calismalari').append(html);
+  }
+
+
+  function addSosyal() {
+     var row = $('#sosyal-calismalar tr').length;
+         row = row + 1;
+         
+         html = '<tr id="sosyal-row' + row + '">';
+	       html += '  <td class="text-left"><input type="date" name="sosyal_calismalar[' + row + '][tarih]" placeholder="{{ "Tarih" }}" class="input-border-none" /></td>';
+	       html += '  <td class="text-left"><input name="sosyal_calismalar[' + row + '][faaliyet_adi]" placeholder="{{ "faaliyet Adı" }}" class="input-border-none" /></td>';
+         html += '  <td class="text-left"><input name="sosyal_calismalar[' + row + '][katilim_sayisi]" placeholder="{{ "Katılım Sayısı." }}" class="input-border-none" /></td>';
+         html += '  <td colspan="2" class="text-left" ><textarea name="sosyal_calismalar[' + row + '][aciklama]" onkeyup="autoTextHeight(this)" placeholder="{{ "Kısa Açıklama Yazınız" }}" class="input-border-none" /></textarea></td>';
+         html += '  <td class="text-end"><button type="button" class="btn btn-danger btn-sm" onclick="$(\'#sosyal-row' + row + '\').remove();"><i class="bi bi-dash-circle"></i></button></td>';
+         html += '</tr>';
+
+         $('#sosyal-calismalar').append(html);
+  }
+
+function addGenel() {
+  var row = $('#genel-calismalar tr').length;
+      row = row + 1;
+      
+      html = '<tr id="genel-row' + row + '">';
+      html += '  <td class="text-left"><input type="date" name="genel_calismalar[' + row + '][tarih]" placeholder="{{ "Tarih" }}" class="input-border-none" /></td>';
+      html += '  <td class="text-left"><input name="genel_calismalar[' + row + '][faaliyet_adi]" placeholder="{{ "faaliyet Adı" }}" class="input-border-none" /></td>';
+      html += '  <td class="text-left"><input name="genel_calismalar[' + row + '][katilim_sayisi]" placeholder="{{ "Katılım Sayısı." }}" class="input-border-none" /></td>';
+      html += '  <td colspan="2" class="text-left" ><textarea name="genel_calismalar[' + row + '][aciklama]" onkeyup="autoTextHeight(this)" placeholder="{{ "Kısa Açıklama Yazınız" }}" class="input-border-none" /></textarea></td>';
+      html += '  <td class="text-end"><button type="button" class="btn btn-danger btn-sm" onclick="$(\'#genel-row' + row + '\').remove();"><i class="bi bi-dash-circle"></i></button></td>';
+      html += '</tr>';
+
+      $('#genel-calismalar').append(html);
+}
+
+function addPlanlama() {
+  var row = $('#planlama tr').length;
+      row = row + 1;
+      
+      html = '<tr id="planlama-row' + row + '">';
+      html += '  <td class="text-left"><input type="text" name="gelecek_ay_planlama[' + row + '][birim]" placeholder="{{ "Birim" }}" class="input-border-none" /></td>';
+      html += '  <td class="text-left"><input name="gelecek_ay_planlama[' + row + '][faaliyet_adi]" placeholder="{{ "faaliyet Adı" }}" class="input-border-none" /></td>';
+      html += '  <td class="text-left"><input type="date" name="gelecek_ay_planlama[' + row + '][tarih]" placeholder="{{ "Planlanan Tarih" }}" class="input-border-none" /></td>';
+      html += '  <td colspan="2" class="text-left" ><textarea name="gelecek_ay_planlama[' + row + '][aciklama]" onkeyup="autoTextHeight(this)" placeholder="{{ "Kısa Açıklama Yazınız" }}" class="input-border-none" /></textarea></td>';
+      html += '  <td class="text-end"><button type="button" class="btn btn-danger btn-sm" onclick="$(\'#planlama-row' + row + '\').remove();"><i class="bi bi-dash-circle"></i></button></td>';
+      html += '</tr>';
+
+      $('#planlama').append(html);
+}
+   
+$(document).on('click', '.textarea', function(e) {
+  autoTextHeight(this)
+});
+
+function autoTextHeight(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+//--></script>
+<script type="text/javascript"><!--
+$('#button-form').on('click', function() {
+     $('.input-url').hide();
+     $('textarea[name=\'url\']').val('');
+     $('#modal-button-generate').prop('disabled',false);
+     $('#modal-generate').modal('show'); 
+ });
+
+$('#button-copy').on('click', function() {
+  var copyText  = $('textarea[name=\'url\']');
+       copyText.select();
+       document.execCommand("copy");     
+});
+
+$('#egitim-calismalari1 .mutad-egitim').on('change', function() {
+    var target = $('#egitim-calismalari1 .mutad' + $(this).attr('for'));
+    
+    if ($(this).val() == 'Yapıldı') {
+        target.prop('disabled', false);
+        target.prop('required', true); // Zorunlu alan olarak işaretle
+    } else {
+        target.prop('disabled', true);
+        target.css('border', ''); // Çerçeveyi varsayılan hale getir
+        target.prop('required', false); // Zorunlu olma özelliğini kaldır
+    }
+});
+
+$('#modal-button-generate').on('click', function() {
+    $.ajax({
+      url: 'index.php?route=teskilat/teskilat/formGenerate&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+
+      if (json.error.warning) {
+	     $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error.warning + '</div>'); 
+      }
+       
+       if(json['error_kurum']) {
+        $('#error-kurum').append('<span>' + json['error_kurum'] + '</span>');
+       }
+
+      if(json['error_diger']) {
+        $('#error-diger').append('<span>' + json['error_diger'] + '</span>');
+       }
+
+       if (json['token']) {
+         $('textarea[name=\'url\']').val(json['token']);
+         $('#modal-button-generate').prop('disabled',true);
+         $('.input-url').show();
+        
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+	  $('textarea[name=\'url\']').val(token);
+    
+});
+
+
+//--></script>
+<script type="text/javascript"><!--
+function donemkontrol(element) {
+  $('.alert-dismissible').remove();
+    $.ajax({
+      url: 'index.php?route=teskilat/teskilat/donemkontrol&user_token={{ user_token }}&teskilat_rapor_id={{teskilat_id}}&donemi=' +  element.value,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        
+        if (json.error.warning) {
+	        $('.button-save').prop('disabled',true);
+          $('#table-data').hide();
+          $('#alert').prepend(
+                '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                '</div>'
+            );
+        
+        }
+
+         if (json.success) {
+           $('#report-message').addClass('alert-dismissible').html(json.success);
+           $('#report-message').show();
+           $('.json-table').remove();
+           $('.button-save').prop('disabled',false);
+           $('#table-data').show();
+           $('#rapor-donemi').hide().find('span').remove();
+
+           if(json['egitim_faaliyetleri']) {
+             $('#egitim-calismalari2').append(json['egitim_faaliyetleri']);
+           }
+
+           if(json['ogrenci_faaliyetleri']) {
+             $('#ogrenci-calismalari').append(json['ogrenci_faaliyetleri']);
+           }
+
+           if(json['sosyal_faaliyetler']) {
+             $('#sosyal-calismalar').append(json['sosyal_faaliyetler']);
+           }
+
+           if(json['genel_faaliyetler']) {
+             $('#genel-calismalar').append(json['genel_faaliyetler']);
+           }
+
+           if(json['total2']) {
+             $('#input-mali-ziyaret').val(json['total2']);
+           }
+
+           if(json['total3']) {
+             $('#input-gidilen-ziyaret').val(json['total3']);
+           }
+
+           if(json['total1']) {
+             $('#input-gelen-ziyaret').val(json['total1']);
+           }
+
+            $('table tbody textarea').keyup();
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+}
+
+//--></script>
+
+

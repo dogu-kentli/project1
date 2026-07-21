@@ -1,0 +1,267 @@
+{{ header }}{{ column_left }}
+<main id="isportali" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end">
+         <button type="button" id="button-add" data-toggle="tooltip" title="{{ "Ekle" }}" class="btn btn-primary btn-sm button-add" ><i class="bi bi-plus-lg"></i>{{" Ekle"}}</button>
+         <button type="button" id="button-odeme" data-toggle="tooltip" title="{{ "Ödemeyi Onayla" }}" class="btn btn-success btn-sm" ><i class="bi bi-check"></i>{{" Ödendi"}}</button>
+         <a href="{{ export }}" id="button-export" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-warning btn-sm" ><i class="bi bi-download"></i></a>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+
+            <div class="card-header py-3">
+                    <div class="row g-3 ">
+                       <div class="col-lg-3 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_baslik" id="filter-personel-name" value="{{filter_baslik}}" placeholder="{{ "Bir başlık yazın " }}" class="form-control auto-filter ps-4">
+                                
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-6 me-auto"></div>
+                        <div class="col-lg-1 col-6 me-auto"></div>
+                       <div class="col-lg-1 col-6 me-auto"></div>
+                       <div class="col-lg-2 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_status" id="filter-personel-name" value="{{filter_status}}" placeholder="{{ "Durumu... " }}" class="form-control ps-4">
+                                <input type="hidden" name="filter_status_id" id="filter-status-id" value="{{filter_status_id}}"  class="form-control auto-filter" >
+                            </div>
+                        </div>
+
+                       <div class="col-lg-1 col-6 me-auto"></div>
+                       
+
+                        <div class="col-lg-2 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_odeme" id="filter-odeme-name" value="{{filter_odeme}}" placeholder="{{ "Ödeme Durumu... " }}" class="form-control ps-4">
+                                <input type="hidden" name="filter_odeme_id" id="filter-personel-id" value="{{filter_odeme_id}}"  class="form-control auto-filter" >
+                            </div>
+                        </div>
+
+
+                       <div class="col-lg-1 co1-6 col-md-3">
+                          <select name="limit" class="form-select auto-filter" id="select-limit">
+                          {% for key,value in limits %}
+						               <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+						               {% endfor %}
+                         </select>
+                        </div>
+                    </div>
+                </div>
+                 
+                 
+          <div class="card-body" id="development-data"></div>
+        </div>
+        </div>
+
+
+    </div>
+
+  {{footer}}  
+</main>
+
+<script>
+
+$('#development-data').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+	$('#development-data').load(this.href);
+});
+
+$('.auto-filter').on('change', function(e) {
+  e.preventDefault();
+
+  url = 'index.php?route=setting/development/dataDevelopment&user_token={{ user_token }}';
+
+  if ($('input[name=\'filter_baslik\']').val()) {
+		url += '&filter_baslik=' + encodeURIComponent($('input[name=\'filter_baslik\']').val());
+	}
+
+	if ($('input[name=\'filter_status_id\']').val()) {
+		url += '&filter_status=' + encodeURIComponent($('input[name=\'filter_status\']').val());
+    url += '&filter_status_id=' + encodeURIComponent($('input[name=\'filter_status_id\']').val());
+	}
+
+  if ($('input[name=\'filter_odeme_id\']').val()) {
+		url += '&filter_odeme=' + encodeURIComponent($('input[name=\'filter_odeme\']').val());
+    url += '&filter_odeme_id=' + encodeURIComponent($('input[name=\'filter_odeme_id\']').val());
+	}
+
+  if ($('select[name=\'limit\']').val()) {
+		url += '&limit=' + encodeURIComponent($('select[name=\'limit\']').val());
+	}
+
+  $('#cover-spin').show(0);
+
+	$('#development-data').load(url);
+});
+
+
+$('#development-data').on('dblclick','td', function() {
+    $(this).find('.istakibi-span').toggle();
+    $(this).find('input').toggle();
+    $(this).find('select').toggle();
+    $(this).find('input').focus();
+    sessionStorage.setItem('id', $(this).attr('id'));
+});
+
+$('#development-data').load('index.php?route=setting/development/dataDevelopment&user_token={{ user_token }}');
+</script>
+
+<script>
+  $('.button-add').on('click', function(e) {
+   e.preventDefault();
+    var action = 'add';
+    $.ajax({
+      url: 'index.php?route=setting/development/addData&user_token={{ user_token }}&formaction=' + action,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+
+        if (json.success) {
+          $('#development-data').load('index.php?route=setting/development/dataDevelopment&user_token={{ user_token }}');
+           alertsuccess(json.success);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ });
+
+ 
+ $('#button-odeme').on('click', function() {
+     $.ajax({
+      url: 'index.php?route=setting/development/odeme&user_token={{ user_token }}',
+      type: 'post',
+      dataType: 'json',
+      data : $('#form-developer').serialize(),
+      
+      success: function(json) {
+        
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+
+        if (json.success) {
+           $('#modal-development').modal('hide');
+           alertsuccess(json.success);
+
+           $('#development-data').load('index.php?route=setting/development/dataDevelopment&user_token={{ user_token }}');
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+function saveToDB(column,id) {
+    var action = 'edit';
+
+    $.ajax({
+      url: 'index.php?route=setting/development/addData&user_token={{ user_token }}&formaction=' + action + '&id=' + id,
+      type: 'post',
+      dataType: 'json',
+      data: '&' + column + '=' + $('#' + column + id).val(),
+      success: function(json) {
+        
+        if (json.error.warning) {
+             alerterror(json.error.warning);
+        }
+        
+        if (json.success) {
+          $('#development-data').load('index.php?route=setting/development/dataDevelopment&user_token={{ user_token }}');
+          alertsuccess(json.success);
+        }
+      },
+      
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  }
+ 
+</script>
+
+<script type="text/javascript"><!-- 
+  $('input[name^=\'filter_status\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/development/statusautocomplete&user_token={{ user_token }}&filter_status=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          json.unshift({
+             text: '-- Tümünü Seç --',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['text'],
+              value: item['status_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_status\']').val(item['label']);
+      $('input[name^=\'filter_status_id\']').val(item['value']);
+      $('input[name^=\'filter_status_id\']').trigger('change');
+    }
+});
+
+
+$('input[name^=\'filter_odeme\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/development/odemeautocomplete&user_token={{ user_token }}&filter_odeme=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          json.unshift({
+             text: '-- Tümünü Seç --',
+             value: '',
+          });
+          response($.map(json, function(item) {
+            return {
+              label: item['text'],
+              value: item['odeme_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_odeme\']').val(item['label']);
+      $('input[name^=\'filter_odeme_id\']').val(item['value']);
+      $('input[name^=\'filter_odeme_id\']').trigger('change');
+    }
+});
+
+//--></script>
+

@@ -1,0 +1,140 @@
+<div class="row">
+  <div id="filter-report" class="col-sm-12 hidden-sm hidden-lg">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-filter"></i> {{ text_filter }}</h3>
+      </div>
+      <div class="panel-body">
+	    <div class="form-group">
+          <label class="control-label" for="input-information">{{ entry_customer }}</label>
+          <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="{{ entry_customer }}" id="input-information" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label class="control-label" for="input-date-start">{{ entry_date_start }}</label>
+          <div class="input-group date">
+            <input type="text" name="filter_date_start" value="{{ filter_date_start }}" placeholder="{{ entry_date_start }}" data-date-format="YYYY-MM-DD" id="input-date-start" class="form-control" />
+            <div class="input-group-btn">
+            <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
+            </div></div>
+        </div>        
+        <div class="form-group">
+          <label class="control-label" for="input-date-end">{{ entry_date_end }}</label>
+          <div class="input-group date">
+            <input type="text" name="filter_date_end" value="{{ filter_date_end }}" placeholder="{{ entry_date_end }}" data-date-format="YYYY-MM-DD" id="input-date-end" class="form-control" />
+            <div class="input-group-btn">
+            <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
+            </div></div>
+        </div>
+        <div class="form-group text-right">		  
+          <button type="button" id="button-filter" class="btn btn-default"><i class="fa fa-filter"></i> {{ button_filter }}</button>
+		  <button type="button"  id="button-filter-reset" class="btn btn-danger"><i class="fa fa-remove"></i> Temizle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-bar-chart"></i> {{ heading_title }}</h3>
+      </div>
+      <div class="panel-body">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <td class="text-left">{{ column_customer }}</td>
+                <td class="text-left">{{ column_email }}</td>
+                <td class="text-left">{{ column_customer_group }}</td>
+                <td class="text-left">{{ column_tarih }}</td>
+                <td class="text-right">{{ column_saat }}</td>
+                <td class="text-right">{{ column_status }}</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+            {% if informations %}
+            {% for information in informations %}
+            <tr>
+              <td class="text-left">{{ information.title }}</td>
+              <td class="text-left">{{ information.meta_title }}</td>
+              <td class="text-left">{{ information.sort_order }}</td>
+              <td class="text-left">{{ information.date_added }}</td>
+              <td class="text-right">{{ information.saat }}</td>
+              <td class="text-right">{{ information.status }}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+              <td class="text-center" colspan="6">{{ text_no_results }}</td>
+            </tr>
+            {% endif %}
+            </tbody>
+            
+          </table>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 text-left">{{ pagination }}</div>
+          <div class="col-sm-6 text-right">{{ results }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#button-filter-reset').on('click', function() {
+  url = 'index.php?route=report/report&code=etkinlik_transaction&user_token={{ user_token }}';     
+  location = url;
+});
+</script>
+<script type="text/javascript"><!--
+$('#button-filter').on('click', function() {
+	var url = '';
+	
+	var filter_name = $('input[name=\'filter_name\']').val();
+	
+	if (filter_name) {
+		url += '&filter_name=' + encodeURIComponent(filter_name);
+	}
+	
+	var filter_date_start = $('input[name=\'filter_date_start\']').val();
+	
+	if (filter_date_start) {
+		url += '&filter_date_start=' + encodeURIComponent(filter_date_start);
+	}
+	
+	var filter_date_end = $('input[name=\'filter_date_end\']').val();
+	
+	if (filter_date_end) {
+		url += '&filter_date_end=' + encodeURIComponent(filter_date_end);
+	}
+	
+	location = 'index.php?route=report/report&code=etkinlik_transaction&user_token={{ user_token }}' + url;
+});
+//--></script> 
+<script type="text/javascript"><!--
+$('.date').datetimepicker({
+	language: '{{ datepicker }}',
+	pickTime: false
+});
+//--></script> 
+<script type="text/javascript"><!--
+$('input[name=\'filter_name\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=localisation/stock_status/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['stock_status_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_name\']').val(item['label']);
+	}
+});
+//--></script>

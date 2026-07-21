@@ -1,0 +1,115 @@
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div id="vmap" style="width: 100%; height:400px;" >
+	  <div id="text" style="position: absolute;top: 10px; left:39%;font-weight:bold; font-size:16px; color:#23a1d1;">
+	  {{ "FEDERASYONUMUZA BAĞLI DERNEK VE TEMSİLCİLİKLER" }}
+	</div>
+	
+	</div>
+  </div>
+</div>
+
+
+ <div id="modal-store" class="modal" style="overflow:auto;">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div id="button-close" style="position:absolute; top:-10px;right:-8px;z-index:999999;"><i class="fa fa-close" style="font-size:20px"></i></div>
+      <div class="modal-body">
+			  <div id="modal-body" class="row">
+			  
+
+				</div>
+       </div>
+    </div>
+  </div>
+</div>
+<link type="text/css" href="view/javascript/jquery/jqvmap/jqvmap.css" rel="stylesheet" media="screen" />
+<script type="text/javascript" src="view/javascript/jquery/jqvmap/jquery.vmap.js"></script> 
+<script type="text/javascript" src="view/javascript/jquery/jqvmap/maps/jquery.vmap.turkey.js"></script> 
+<script type="text/javascript"><!--
+$(document).ready(function() {
+	    
+		$.ajax({
+		url: 'index.php?route=extension/dashboard/map/map&user_token={{ user_token }}',
+		dataType: 'json',
+		success: function(json) {
+			data = [];
+			
+			for (i in json) {
+				data[i] = json[i]['total'];
+			}
+
+			$('#vmap').vectorMap({
+				map: 'turkey_tr',
+				backgroundColor: '#fff',
+				borderColor: '#fff',
+				color: '#919190',
+				hoverColor: '#000000',
+				borderColor: '#818181',
+				selectedColor: '#ccc',
+                scaleColors: ['#23a1d1'],
+				enableZoom: true,
+				showTooltip: true,
+				values: data,
+				normalizeFunction: 'polynomial',
+				onLabelShow: function(event, label, code) {
+					if (json[code]) {
+						label.html('<strong>' + label.text() + '</strong><br/>' + json[code]['name'] + '<br /><span id="il-' + name + '" style="display:none;">' + json[code]['total'] + '</span>');	
+					}
+					
+				},
+				
+				onRegionClick: function(event, label, code){
+				var il_id = $('#il-' + name).text();
+                $.ajax({
+		            url: 'index.php?route=extension/dashboard/map/info&user_token={{ user_token }}&code=' + il_id,
+		            dataType: 'json',
+		            success: function(json) {
+					    $('#modal-body .col').remove();
+						  	var row = 1;
+						    var html = '';
+								
+							if (json['store']) {
+						     for (i = 0; i < json['store'].length; i++) {
+								 if(json['store'].length > 1) {var divclass='col-sm-6 col'}else{var divclass = 'col-sm-12 col';}
+							   html += '<div class="' + divclass + '">';
+					           html += '<span class="list-group-item text-center">' + '<img src="' +  json['store'][i]['logo'] + '" class="img-thumbnail"></span>';
+							   html += '<span class="list-group-item bg-primary"><strong>' + json['store'][i]['name'] + '</strong><span class="badge bg-primary" ><a href="' + json['store'][i]['in_url'] + '" target="_blank"><i class="fab fa-instagram" style="color:white;" ></i></a> <a href="' + json['store'][i]['fb_url'] + '" target="_blank"><i class="fab fa-facebook" style="color:white"></i></a> <a href="' + json['store'][i]['tw_url'] + '" target="_blank"><i class="fab fa-twitter" style="color:white"></i></a> <a href="' + json['store'][i]['yt_url'] + '" target="_blank"><i class="fab fa-youtube" style="color:white"></i></a></span>' +'</span>';
+							   html += '<span class="list-group-item"><strong>Dernek Başkanı:</strong> ' + json['store'][i]['baskan'] + '</span>';
+							   html += '<span class="list-group-item"><strong>Başkan Telefon:</strong> ' + json['store'][i]['telephone2'] + '</span>';
+							   html += '<span class="list-group-item"><strong>Dernek Telefon:</strong> ' + json['store'][i]['telephone'] + '</span>';
+							   html += '<span class="list-group-item"><i class="fa fa-globe" style="color:blue"></i> ' + '<a href="' + json['store'][i]['web'] + '" target="_blank">' + json['store'][i]['web'] + '</a></span>';
+							   html += '<span class="list-group-item"><i class="fa fa-envelope" style="color:blue"></i> ' + json['store'][i]['email'] + '</span>';
+							   html += '<span class="list-group-item"><i class="fa fa-map-marker" style="color:blue"></i> ' + json['store'][i]['address'] + '</span>';
+							   html += '<span class="list-group-item"><i class="fa fa-user" style="color:blue"></i> ' + json['store'][i]['total'] + '</span>';
+							   html += '</div>';
+								 
+								 row++;
+				        }
+							
+							  $('#modal-body').append(html);
+
+								if(json['store'].length > 1) {
+                                    $('#modal-store').find('.modal-dialog').removeClass('modal-sm');
+								}else{
+									$('#modal-store').find('.modal-dialog').addClass('modal-sm');
+								}
+
+								$('#modal-store').show();
+					    }			
+					}
+				  });	
+                }
+				
+			});			
+		},
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+	});			
+});
+$('#button-close,div').on('click', function() {
+ $('#modal-store').hide(); 
+});
+//--></script> 
+

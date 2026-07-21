@@ -1,0 +1,96 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">LİSE BİLGİ FORMU</h5>
+            <div class="ms-auto">
+              <button type="submit" form="form-country" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary">
+                <i class="bi bi-save"></i>
+              </button>
+              <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm bg-white">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-country" class="row g-3">
+
+            <!-- Ad Soyad -->
+            <div class="col-12">
+              <label class="form-label" for="input-name">{{ entry_name }}</label>
+              <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control"/>
+              {% if error_name %}
+                <div class="text-danger">{{ error_name }}</div>
+              {% endif %}
+            </div>
+
+            <!-- İl -->
+            <div class="col-12">
+              <label class="form-label" for="input-sehir">İl</label>
+              <select name="sehir_id" onchange="sehir(this, '{{ sehir_id }}');" class="form-select">
+                {% for sehir in sehirler %}
+                  <option value="{{ sehir.il_id }}" {% if sehir.il_id == sehir_id %} selected="selected" {% endif %}>{{ sehir.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- İlçe -->
+            <div class="col-12">
+              <label class="form-label" for="input-city">İlçe</label>
+              <select name="city_id" class="form-select"></select>
+            </div>
+
+            <!-- Yıl -->
+            <div class="col-12">
+              <label class="form-label" for="input-date">Yıl</label>
+              <input type="text" name="date" value="{{ date }}" placeholder="Eğitime Başlama Yılı" id="input-date" class="form-control"/>
+            </div>
+
+            <!-- Status (Switch) -->
+            <div class="col-12">
+              <label class="form-label d-block">{{ entry_status }}</label>
+              <div class="form-check form-switch">
+                {% if status %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                <input class="form-check-input" type="checkbox" {{ checked }} name="status" value="1" id="statusSwitch"
+                       style="width:3rem;height:1.5rem;">
+                <label class="form-check-label ms-2" for="statusSwitch">Aktif / Pasif</label>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ footer }}
+</main>
+
+<script type="text/javascript"><!--
+function sehir(element, city_id) {
+  $.ajax({
+    url: 'index.php?route=setting/autocomplete/sehirautocomplete&user_token={{ user_token }}&sehir_id=' + element.value,
+    dataType: 'json',
+    success: function(json) {
+      let html = '<option value="">{{ text_select }}</option>';
+      if (json['city'] && json['city'] != '') {
+        for (let i = 0; i < json['city'].length; i++) {
+          html += '<option value="' + json['city'][i]['ilce_id'] + '"';
+          if (json['city'][i]['ilce_id'] == '{{city_id}}') {
+            html += ' selected="selected"';
+          }
+          html += '>' + json['city'][i]['name'] + '</option>';
+        }
+      } else {
+        html += '<option value="0">{{ text_none }}</option>';
+      }
+      $('select[name=\'city_id\']').html(html);
+    }
+  });
+}
+$('select[name$=\'sehir_id\']').trigger('change');
+//--></script>

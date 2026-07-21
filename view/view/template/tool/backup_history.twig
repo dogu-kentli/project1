@@ -1,0 +1,39 @@
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+	      <th class="text-center">#</th>
+        <th>{{ column_filename }}</th>
+        <th>{{ "Boyut (KB/MB)" }}</th>
+        <th class="d-none d-lg-table-cell">{{ column_date_added }}</th>
+        <th style="width:1%;" class="text-end">{{ column_action }}</th>
+      </tr>
+    </thead>
+    <tbody>
+	  {% set row = 1 %}
+      {% if histories %}
+        {% for history in histories %}
+          <tr>
+		    <td class="text-center" style="width:1%;">{{ row }}</td>
+            <td>{{ history.filename }}</td>
+            <td>{{ history.size }}</td>
+            <td class="d-none d-lg-table-cell">{{ history.date_added }}</td>
+            <td class="text-right">
+              <button type="button" onclick="location = '{{ history.download }}';" data-bs-toggle="tooltip" title="{{ button_download }}" class="btn btn-info btn-sm"><i class="bi bi-download"></i></button>
+              <button type="button" value="{{ history.filename }}" data-bs-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Sil</button>
+            </td>
+          </tr>
+		  {% set row = row + 1 %}
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="4" class="text-center">{{ "Sonuç Bulunamadı" }}</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+<div class="row">
+  <div class="col-sm-6 text-start">{{ pagination }}</div>
+  <div class="col-sm-6 text-end">{{ results }}</div>
+</div>

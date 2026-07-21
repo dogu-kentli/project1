@@ -1,0 +1,831 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card shadow-sm border-0 rounded-3">
+        
+        <div class="card-header py-3 bg-transparent border-bottom">
+          <div class="d-sm-flex align-items-center justify-content-between">
+            <h5 class="mb-2 mb-sm-0 fw-bold text-secondary">Form / Anket Düzenleme</h5>
+            <div class="ms-auto d-flex gap-2">
+              <button type="button" id="button-save" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-save btn-sm px-3 shadow-sm">
+                <i class="bi bi-save me-1"></i> Kaydet
+              </button>
+              <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-secondary shadow-sm btn-sm px-3">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+       <div class="card-body p-4">
+      <form id="form-anket" class="row g-3">
+    
+      <div class="card border-2 bg-light rounded-3 mb-2">
+        <div class="card-body p-4">
+        
+        <div class="row g-3 align-items-start">
+          
+          <div class="col-12 col-lg-8">
+            <div class="row g-3">
+              
+              <div class="col-12 mb-2">
+                <label class="form-label fw-bold">Anket Başlığı</label>
+                <input type="text" name="name" value="{{name}}" class="form-control" placeholder="Başlığı giriniz" required>
+              </div>
+
+              <div class="col-12 mb-2">
+                <label class="form-label fw-bold">Hedef Seçimi</label>
+                <select name="secim" class="form-select " required>
+                  <option value="">{{"--Seçim Yapın--"}}</option>
+                  <option value="1" {% if secim == 1 %} selected="selected" {% endif %}>Seçili Dernek/Temsilciliklere</option>
+                  <option value="2" {% if secim == 2 %} selected="selected" {% endif %}>Projeli Öğrencilere</option>
+                  <option value="3" {% if secim == 3 %} selected="selected" {% endif %}>Ortaöğretim Öğrencileri</option>
+                  <option value="4" {% if secim == 4 %} selected="selected" {% endif %}>Mezun Öğrenciler</option>
+                  <option value="4" {% if secim == 6 %} selected="selected" {% endif %}>Personeller</option>
+                  <option value="5" {% if secim == 5 %} selected="selected" {% endif %}>Link Sahibi Olanlar</option>
+                </select>
+              </div>
+
+              <div class="col-12 mt-2">
+                <div class="row g-3">
+                  <div class="col-6">
+                    <label class="form-label fw-bold">Başlangıç Tarihi</label>
+                    <input type="date" name="date_start" value="{{date_start}}" class="form-control">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label fw-bold">Bitiş Tarihi</label>
+                    <input type="date" name="date_end" value="{{date_end}}" class="form-control">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-4 order-first order-lg-last text-start text-lg-end">
+            <div class="d-inline-block bg-white p-3 rounded-3 shadow-sm border border-light w-100 text-start" style="max-width: 250px;">
+              <label class="form-label fw-bold d-block">Resim / Afiş</label>
+              <div class="text-center">
+                <a href="javascript:void(0);" class="img-thumbnail d-inline-block transition-all">
+                  <img src="{{ thumb }}" id="src-image" class="thumbnail border border-light-info border-2 rounded-3 shadow-sm"  title="Resim eklemek için tıklayın" alt="Anket Resmi">
+                </a>
+                <input type="hidden" name="image" value="{{ image }}" id="input-image"/>
+                
+              </div>
+             
+              <small class="d-block text-muted lh-sm" style="font-size: 0.72rem;">
+                Düzgün bir görüntü için 700 X 370 boyutlarında resim yükleyin.
+              </small>
+            </div>
+            
+          </div>
+
+        </div>
+
+    
+        <div class="row mt-3">
+
+        <div class="col-12 col-md-4 mb-3">
+            <label class="form-label fw-bold d-block">Personel/Birim</label>
+            <div class="input-group mb-3">
+                <!-- Autocomplete input -->
+                <input type="text" name="setting[birim]" value="{{ setting.birim }}" class="form-control auto-complete" data-for="8" placeholder="Oluşturan Birim">
+                <input type="hidden" name="setting[birim_id]" value="{{ setting.birim_id }}" class="form-control auto-complete-id">
+            </div>
+        </div>
+
+          <div class="col-12 mb-4">
+            <label class="form-label fw-bold">Açıklama</label>
+            <textarea name="description" id="textarea-editor" style="height: 300px; overflow-y:auto;" class="form-control shadow-sm" rows="4" placeholder="Kısa bir açıklama yazın...">{{description}}</textarea>
+          </div>
+
+          <div class="col-12 mb-2">
+            <label class="form-label fw-bold d-block">Dernek seçimi olsun mu?</label>
+            <div class="form-check form-switch mt-2">
+              {% if setting.dernek %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+              <input class="form-check-input" type="checkbox" {{ checked }} name="setting[dernek]" value="1" id="statusSwitch" style="width: 2.8rem; height: 1.4rem; cursor: pointer;">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="anket-container" class="border border-thin"></div>
+
+    <div class="text-center my-4">
+      <button type="button" onclick="addSection();" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-bold shadow-sm transition-all">
+        <i class="bi bi-plus-circle me-1"></i> Yeni Bölüm Ekle
+      </button>
+    </div>
+
+    <div class="card border-0 bg-light rounded-3 mb-3">
+  <div class="card-body text-center py-4 d-flex justify-content-center gap-3">
+    {% if eksen_form_id and secim == 5 %}
+      <button type="button" class="btn btn-outline-warning btn-sm px-3 shadow-sm rounded-pill" id="button-copy">
+        <i class="bi bi-link-45deg me-1"></i> Linki Kopyala
+      </button>
+    {% endif %}
+    <input type="hidden" name="form_url" value="{{form_url}}" />
+    <input type="hidden" name="code" value="{{code}}"/>
+    <button type="button" title="Form önizleme" onclick="generateFormPreview();" class="btn btn-outline-info btn-sm px-4 fw-bold shadow-sm transition-all rounded-pill">
+      <i class="bi bi-eye me-1"></i> Formu Önizle
+    </button>
+    <button type="button" class="btn btn-primary btn-sm btn-save px-4 shadow-sm fw-bold rounded-pill">
+      <i class="bi bi-save me-1"></i> Formu Kaydet
+    </button>
+  </div>
+</div>
+
+
+  </form>
+</div>
+
+      </div>
+    </div>
+  </div>
+  {{ footer }}
+</main>
+
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-dialog-scrollable">
+    <div class="modal-content rounded-3 shadow border-0">
+      <div class="modal-header bg-light py-3">
+        <h5 class="modal-title fw-bold text-secondary" id="previewModalLabel"><i class="bi bi-eye me-2"></i> Form / Anket Önizlemesi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body p-4 bg-white" id="modal-preview-body">
+        </div>
+      <div class="modal-footer bg-light py-2">
+        <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Önizlemeyi Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="copy-tooltip" 
+     style="display:none; position:absolute; background:#333; color:#fff; padding:5px 10px; border-radius:4px; font-size:13px;">
+  Kopyalandı!
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+<style>
+    /* Ghost: sürüklenen kartın bırakılacağı yer */
+    .drag-ghost {
+        opacity: 0 !important;
+        background: transparent !important;
+        border: 2px dashed #0d6efd !important;
+        border-radius: 0.5rem !important;
+        box-shadow: none !important;
+    }
+
+    /* Sürüklenen kartın kendisi (Sortable klonu) */
+    .drag-active {
+        opacity: 1 !important;
+        background: #fff !important;
+        border-radius: 0.5rem !important;
+    }
+
+    /* Drag handle köşe chip */
+    .drag-handle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        position: absolute;
+        top: -1px;
+        left: -1px;
+        background: var(--bs-body-bg, #fff);
+        border: 1px solid rgba(0, 0, 0, .12);
+        border-top-left-radius: calc(0.5rem - 1px);
+        border-bottom-right-radius: 0.375rem;
+        font-size: 0.9rem;
+        z-index: 1;
+        cursor: grab;
+        color: #adb5bd;
+        transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .drag-handle:hover {
+        color: #0d6efd;
+        background: rgba(13, 110, 253, 0.06);
+    }
+
+    .drag-active {
+    opacity: 1 !important;
+    background: #fff !important;
+    border-radius: 0.5rem !important;
+    border: 2.5px solid #a39cf0 !important;
+    box-shadow: 0 20px 50px rgba(13, 110, 253, 0.25), 0 8px 20px rgba(0,0,0,0.12) !important;
+    
+}
+</style>
+
+<script>
+    const anketVerisi = {{ anket_json|json_encode|raw }};
+    let sIndex = 0;
+
+    $(document).ready(function () {
+        if (anketVerisi && Object.keys(anketVerisi).length > 0) {
+            const data = Array.isArray(anketVerisi) ? anketVerisi : Object.values(anketVerisi);
+            data.forEach(b => addSection(b));
+            sIndex = data.length;
+        } else {
+            addSection();
+        }
+    });
+
+    function initSortable(sid) {
+        const container = document.getElementById(`q-list-${sid}`);
+        if (!container) return;
+
+        if (container.sortableInstance) {
+            container.sortableInstance.destroy();
+        }
+
+        if (typeof Sortable === 'undefined') {
+            console.error("SortableJS yüklenemedi.");
+            return;
+        }
+
+        container.sortableInstance = new Sortable(container, {
+    handle: '.drag-handle',
+    animation: 200,
+    easing: "cubic-bezier(0.25, 1, 0.5, 1)",
+    ghostClass: 'drag-ghost',
+    dragClass: 'drag-active',
+    forceFallback: false,
+    scroll: true,
+    bubbleScroll: true,
+    onStart: function (evt) {
+        document.body.style.cursor = 'grabbing';
+        evt.item.style.transform = 'scale(1.03) rotate(0.8deg)';
+        evt.item.style.zIndex = '999';
+        evt.item.style.transition = 'transform 0.15s ease, box-shadow 0.15s ease';
+    },
+    onEnd: function (evt) {
+        document.body.style.cursor = '';
+        evt.item.style.transform = '';
+        evt.item.style.zIndex = '';
+        evt.item.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
+        setTimeout(() => { evt.item.style.transition = ''; }, 200);
+        updateOrder(sid);
+    }
+});
+    }
+
+    function updateOrder(sid) {
+        const $list = $(`#q-list-${sid}`);
+
+        $list.find('.q-box').each(function (newQid, element) {
+            const $box = $(element);
+
+            $box.attr('data-qid', newQid);
+
+            const $select = $box.find('select.type-selector');
+            $select.attr('onchange', `updateType(this, ${sid}, ${newQid})`);
+
+            $box.find('input[name*="[soru]"]').attr('name', `form_element[${sid}][sorular][${newQid}][soru]`);
+            $box.find('input[name*="[placeholder]"]').attr('name', `form_element[${sid}][sorular][${newQid}][placeholder]`);
+            $box.find('input[name*="[type]"]').attr('name', `form_element[${sid}][sorular][${newQid}][type]`);
+            $box.find('input[name*="[rating_value]"]').attr('name', `form_element[${sid}][sorular][${newQid}][rating_value]`);
+
+            $box.find('.opt-cont .input-group').each(function (newOid, optElement) {
+                const $optInput = $(optElement).find('input.opt-input');
+                if ($optInput.length) {
+                    $optInput.attr('name', `form_element[${sid}][sorular][${newQid}][secenekler][${newOid}]`);
+                }
+            });
+        });
+    }
+
+    function addSection(data = null) {
+        const sid = sIndex;
+        const html = `
+        <div id="section-${sid}" class="card border-0 shadow-sm rounded-3 mb-4 overflow-hidden section-item" data-sid="${sid}">
+            <div class="card-header bg-white border-bottom py-3 d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-circle px-2 py-1">${sid + 1}</span>
+                <div class="flex-grow-1">
+                    <input type="text" name="form_element[${sid}][bolum]" value="${data ? data.bolum : ''}" placeholder="Bölüm başlığı (Opsiyonel)" class="form-control form-control-sm shadow-none fw-bold" style="font-size: 1.1rem;"/>
+                    <small class="text-muted">Eğer formu bölümler altında listelemek istemiyorsanız bölüm başlığını boş bırakın.</small>
+                </div>
+                <button type="button" onclick="removeSection(${sid})" class="btn btn-link text-danger btn-sm p-0 ms-auto shadow-none"><i class="bi bi-trash"></i> Sil</button>
+            </div>
+            <div class="card-body p-4 bg-light-subtle q-list-container" id="q-list-${sid}"></div>
+            <div class="card-footer bg-white border-0 py-3 px-4">
+                <button type="button" onclick="addRow(${sid})" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm border-0 small">
+                    <i class="bi bi-plus me-1"></i> Soru Ekle
+                </button>
+            </div>
+        </div>`;
+
+        $('#anket-container').append(html);
+        if (data && data.sorular) {
+            data.sorular.forEach(s => addRow(sid, s));
+        } else {
+            addRow(sid);
+        }
+        sIndex++;
+    }
+
+    function addRow(sid, data = null) {
+        const $list = $(`#q-list-${sid}`);
+        const qid = $list.find('.q-box').length;
+        const type = data ? data.type : 'text';
+
+        const html = `
+        <div class="q-box position-relative p-4 border rounded-3 bg-white mb-3 shadow-sm border-light" data-qid="${qid}">
+           <span class="drag-handle">
+                <i class="bi bi-arrows-move" title="soruyu taşımak için sürükleyin"></i>
+          </span>
+
+            <div class="row g-3 mt-2">
+                <div class="col-md-8">
+                    <label class="form-label small fw-bold text-muted">Soru Metni</label>
+                    <input type="text" name="form_element[${sid}][sorular][${qid}][soru]" value="${data ? data.soru : ''}" class="form-control" required/>
+                    <input type="text" name="form_element[${sid}][sorular][${qid}][placeholder]" value="${data && data.placeholder ? data.placeholder : ''}" placeholder="Kısa açıklama" class="form-control form-control-sm mt-2 text-muted" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted">Yanıt Türü</label>
+                    <div class="d-flex gap-2">
+                        <select onchange="updateType(this, ${sid}, ${qid})" class="form-select type-selector border-secondary-subtle fw-semibold">
+                            <option value="text"     ${type === 'text'     ? 'selected' : ''}>✏️ Metin Kutusu (Kısa Cevap)</option>
+                            <option value="textarea" ${type === 'textarea' ? 'selected' : ''}>📝 Metin Alanı (Paragraf)</option>
+                            <option value="radio"    ${type === 'radio'    ? 'selected' : ''}>🔘 Onay Kutusu (Yuvarlak)</option>
+                            <option value="checkbox" ${type === 'checkbox' ? 'selected' : ''}>☑️ Seçim Kutusu (Köşeli)</option>
+                            <option value="select"   ${type === 'select'   ? 'selected' : ''}>🔽 Seçim Listesi (Selectbox)</option>
+                            <option value="rating"   ${type === 'rating'   ? 'selected' : ''}>⭐ Derecelendirme (Yıldızlı)</option>
+                            <option value="date"     ${type === 'date'     ? 'selected' : ''}>📅 Tarih Seçici</option>
+                            <option value="file"     ${type === 'file'     ? 'selected' : ''}>📂 Dosya Yükleme</option>
+                        </select>
+                        <button type="button" onclick="removeRow(this, ${sid})" class="btn btn-outline-danger border-0 shadow-none px-2"><i class="bi bi-dash-circle"></i></button>
+                    </div>
+                    <input type="hidden" name="form_element[${sid}][sorular][${qid}][type]" value="${type}" />
+                </div>
+            </div>
+            <div class="opt-area mt-3"></div>
+        </div>`;
+
+        $list.append(html);
+
+        const $sel = $list.find('.q-box').last().find('select.type-selector');
+
+        let saved = null;
+        if (data && data.secenekler) {
+            saved = Array.isArray(data.secenekler) ? data.secenekler : Object.values(data.secenekler);
+        }
+        renderOptions($sel, sid, qid, saved);
+
+        initSortable(sid);
+    }
+
+    function removeRow(btn, sid) {
+        const $box = $(btn).closest('.q-box');
+        $box.remove();
+        updateOrder(sid);
+    }
+
+    function renderOptions($select, sid, qid, saved = null) {
+        const type = $select.val();
+        const $area = $select.closest('.q-box').find('.opt-area');
+        $area.empty();
+
+        if (type === 'radio' || type === 'checkbox' || type === 'select') {
+            $area.append('<div class="opt-cont"></div><button type="button" onclick="addOpt(this)" class="btn btn-link btn-sm text-primary text-decoration-none mt-2 p-0">+ Seçenek Ekle</button>');
+
+            const $cont = $area.find('.opt-cont');
+            let opts = [];
+
+            if (saved) {
+                if (Array.isArray(saved)) {
+                    opts = saved;
+                } else if (typeof saved === 'string') {
+                    opts = saved.split(',').map(s => s.trim()).filter(Boolean);
+                } else if (typeof saved === 'object') {
+                    opts = Object.values(saved);
+                }
+            }
+
+            if (opts.length > 0) {
+                opts.forEach(v => addOptInternal($cont, sid, qid, v));
+            } else {
+                addOptInternal($cont, sid, qid, '');
+                addOptInternal($cont, sid, qid, '');
+            }
+        } else if (type === 'rating') {
+            $area.html(`
+                <input type="hidden" name="form_element[${sid}][sorular][${qid}][rating_value]" value="5" />
+                <div class="alert alert-light border py-2 mb-0 mt-2">
+                    <small class="text-muted fw-bold">Derecelendirme 5 yıldız üzerinden yapılacaktır.</small>
+                </div>
+            `);
+        } else {
+            $area.html('<div class="alert alert-light border py-2 mb-0"><small class="text-muted">Kullanıcı serbest metin girecektir.</small></div>');
+        }
+    }
+
+    function updateType(el, sid, qid) {
+        $(el).closest('.col-md-4').find('input[type="hidden"]').val($(el).val());
+        renderOptions($(el), sid, qid);
+    }
+
+    function addOpt(btn) {
+        const $cont = $(btn).siblings('.opt-cont');
+        const sid = $(btn).closest('.section-item').data('sid');
+        const qid = $(btn).closest('.q-box').data('qid');
+        addOptInternal($cont, sid, qid, '');
+    }
+
+    function addOptInternal($cont, sid, qid, val = '') {
+        const oid = $cont.find('.input-group').length;
+        $cont.append(`
+            <div class="input-group input-group-sm mb-2" style="max-width: 400px;">
+                <span class="input-group-text bg-light border-secondary-subtle"><i class="bi bi-check2-circle opacity-50" style="font-size:10px;"></i></span>
+                <input type="text" name="form_element[${sid}][sorular][${qid}][secenekler][${oid}]" value="${val}" placeholder="Seçenek metni" class="form-control opt-input border-secondary-subtle" required/>
+                <button type="button" onclick="$(this).parent().remove();" class="btn btn-outline-danger border-secondary-subtle"><i class="bi bi-dash-circle small"></i></button>
+            </div>`
+        );
+    }
+
+    function removeSection(id) {
+        if (confirm('Bölümü silmek istiyor musunuz?')) $(`#section-${id}`).remove();
+    }
+</script>
+
+<script>
+$('.btn-save').on('click', function() {
+    $.ajax({
+      url: 'index.php?route=anket/eksen_form/save&user_token={{ user_token }}&form={{form}}&eksen_form_id={{eksen_form_id}}',
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-anket').serialize(),
+      success: function(json) {
+        $('.text-danger').remove();
+
+        if (json.error_permission) {
+           alerterror(json.error_permission);
+        }
+       
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+
+        if (json.error['name']) {
+         $('input[name^=\'name\']').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error['name'] +'</span>');
+        }
+
+        if (json.error['description']) {
+         $('textarea[name^=\'description\']').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error['description'] +'</span>');
+        }
+
+        if (json.error['secim']) {
+         $('select[name^=\'secim\']').after('<span class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error['secim'] +'</span>');
+        }
+
+        if (json.error.element) {
+          alerterror(json.error.element);
+        }
+
+        if (json.success) {
+         location = json.success;
+        }
+
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+ });
+</script>
+<script>
+$('#button-copy').on('click', function() {
+    const copyText = $('input[name="form_url"]').val();
+
+    // Modern kopyalama yöntemi
+    navigator.clipboard.writeText(copyText).then(() => {
+        // Tooltip konumlandırma
+        const button = $(this);
+        const tooltip = $('#copy-tooltip');
+        const offset = button.offset();
+
+        tooltip.css({
+            top: offset.top - tooltip.outerHeight() - 8,
+            left: offset.left + (button.outerWidth() / 2) - (tooltip.outerWidth() / 2)
+        });
+
+        // Göster ve sonra gizle
+        tooltip.fadeIn(200);
+        setTimeout(function() {
+            tooltip.fadeOut(300);
+        }, 2000);
+    }).catch(err => {
+        console.error('Kopyalama hatası:', err);
+    });
+});
+</script>
+<script>
+	var editor1cfg = {};
+	editor1cfg.toolbar = "basic";
+	editor1cfg.lang = "tr"; // Türkçe dil ayarı
+	editor1cfg.removeButtons = ["images", "video"];
+  editorResizeMode: "none";
+	var editor1 = new RichTextEditor("#textarea-editor", editor1cfg);
+</script>
+<script>
+$(document).ready(function () {
+	$("rte-toolbar-button[rte-cmd-name='togglemore']").css({"pointer-events": "none","opacity": "0.4"});
+	$("rte-toolbar-button[rte-tooltip='Resim Ekle']").css({ "pointer-events": "none", "opacity": "0.4" });
+	$("rte-toolbar-button[rte-tooltip='Video Ekle']").css({ "pointer-events": "none", "opacity": "0.4" });
+	$("rte-toolbar-button[rte-tooltip='Emoji Ekle']").css({ "pointer-events": "none", "opacity": "0.4" });
+});
+
+
+</script>
+<script>
+ <!--
+    $('.img-thumbnail').on('click', function() {
+        
+        $('#form-upload').remove();
+
+        $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+        $('#form-upload input[name=\'file\']').trigger('click');
+
+        if (typeof timer != 'undefined') {
+            clearInterval(timer);
+        }
+
+        timer = setInterval(function() {
+            if ($('#form-upload input[name=\'file\']').val() != '') {
+                clearInterval(timer);
+
+                $.ajax({
+                    url: 'index.php?route=tool/upload/uploadImage&user_token={{ user_token }}',
+                    type: 'post',
+                    dataType: 'json',
+                    data: new FormData($('#form-upload')[0]),
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+
+                    beforeSend: function() {
+                        $('#cover-spin').show(0);
+                    },
+                    complete: function() {
+                        $('#cover-spin').hide(0);
+                    },
+
+                    success: function(json) {
+                        if (json.error) {
+                            alerterror(json.error);
+                        }
+
+                        if (json.success) {
+                            alertsuccess(json.success);
+                            $('#input-image').val(json['image']);
+                            var imgPath = 'image/' + json['image'];  
+                            // admin tarafında çalışıyorsan:
+                            imgPath = '../' + imgPath;
+
+                            $('#src-image').attr('src', imgPath).attr('width', 220).attr('height', 147);
+                            }},
+                            error: function(xhr, ajaxOptions, thrownError) {
+                                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                            }
+                });
+            }
+        }, 500);
+    });
+</script>
+<script>
+function generateFormPreview() {
+    const $previewBody = $('#modal-preview-body');
+    $previewBody.empty();
+
+    // 1. Ana Bilgileri Topla (Başlık, Afiş, Açıklama) 
+    const formTitle = $('input[name="name"]').val() || 'Başlıksız Form';
+    
+    // Resim/Afiş kontrolü 
+    const $imgElement = $('#src-image');
+    const imgSrc = $imgElement.attr('src');
+    let imageHtml = '';
+    
+    if (imgSrc && !imgSrc.includes('no_image') && imgSrc !== '') {
+        imageHtml = `
+            <div class="text-center mb-4">
+                <img src="${imgSrc}" class="img-fluid rounded-3 shadow-sm border" style="max-height: 300px; width: 100%; object-fit: cover;" alt="Form Afişi">
+            </div>
+        `;
+    }
+
+    // RichTextEditor içeriğini güncelleyip alalım 
+    if (typeof editor1 !== 'undefined') { 
+        $('#textarea-editor').val(editor1.getHTMLCode());
+    }
+    const formDesc = $('#textarea-editor').val() || '';
+
+    // Üst Bilgi Şablonu 
+    let previewHtml = `
+        <div class="form-preview-header mb-4">
+            ${imageHtml}
+            <h2 class="fw-bold text-dark mb-2">${formTitle}</h2>
+            ${formDesc ? `<div class="text-muted p-2 bg-light rounded-3 mb-3" style="font-size: 0.95rem;">${formDesc}</div>` : ''}
+            <hr class="text-muted opacity-25">
+        </div>
+    `;
+
+    // 2. Bölümleri ve Soruları Döngüyle Çek 
+    const sections = $('.section-item');
+
+    if (sections.length === 0) {
+        previewHtml += '<p class="text-muted text-center my-4">Formda henüz hiçbir bölüm veya soru bulunmuyor.</p>';
+    } else {
+        sections.each(function() {
+            const $section = $(this);
+            const sectionTitle = $section.find('input[name*="[bolum]"]').val();
+            const $questions = $section.find('.q-box');
+
+            previewHtml += `<div class="preview-section-block mb-4 p-3 border border-light-subtle rounded-3 bg-light-subtle">`;
+            
+            if (sectionTitle) {
+                previewHtml += `<h6 class="fw-bold border-bottom pb-2 text-dark mb-3">${sectionTitle}</h6>`;
+            }
+
+            $questions.each(function(index) {
+                const $qBox = $(this);
+                const questionText = $qBox.find('input[name*="[soru]"]').val() || `Soru ${index + 1}`;
+                
+                // İSTEDİĞİNİZ KISIM: input'a yazılan kısa açıklama değerini çekiyoruz 
+                const shortDescription = $qBox.find('input[name*="[placeholder]"]').val() || '';
+                
+                const type = $qBox.find('input[type="hidden"][name*="[type]"]').val() || 'text';
+                
+                previewHtml += `<div class="mb-4 bg-white p-3 rounded-3 shadow-sm">
+                    <label class="form-label fw-bold text-secondary mb-1">${index + 1}. ${questionText}</label>`;
+
+                // EĞER KISA AÇIKLAMA DOLDURULMUŞSA: Label'ın hemen altına ekliyoruz 
+                if (shortDescription) {
+                    previewHtml += `<div class="text-muted fst-italic mb-2" style="font-size: 0.82rem; margin-top: -2px;">${shortDescription}</div>`;
+                }
+
+                // Yanıt Türü Tiplerine Göre HTML Çıktısı (Önizleme elemanları için placeholder artık boş kalabilir veya amaca uygun düzenlenebilir)
+                if (type === 'text') {
+                    previewHtml += `<input type="text" class="form-control border-secondary-subtle shadow-none" placeholder="Kullanıcı buraya kısa cevap yazacak..." disabled>`;
+                } 
+                else if (type === 'textarea') {
+                    previewHtml += `<textarea class="form-control border-secondary-subtle shadow-none" rows="3" placeholder="Kullanıcı buraya uzun paragraf yazacak..." disabled></textarea>`;
+                } 
+                else if (type === 'date') {
+                    previewHtml += `<input type="date" class="form-control border-secondary-subtle shadow-none" disabled>`;
+                } 
+                else if (type === 'file') {
+                    previewHtml += `<input type="file" class="form-control border-secondary-subtle shadow-none" disabled>`;
+                } 
+                else if (type === 'rating') {
+                    previewHtml += `
+                        <div class="text-warning fs-3 my-1">
+                            <i class="bi bi-star"></i> <i class="bi bi-star"></i> <i class="bi bi-star"></i> <i class="bi bi-star"></i> <i class="bi bi-star"></i>
+                        </div>`;
+                } 
+                else if (type === 'select') {
+                    previewHtml += `<select class="form-select border-secondary-subtle shadow-none" disabled><option>-- Seçim Yapınız --</option>`;
+                    $qBox.find('.opt-input').each(function() {
+                        const optVal = $(this).val();
+                        if(optVal) previewHtml += `<option>${optVal}</option>`;
+                    });
+                    previewHtml += `</select>`;
+                } 
+                else if (type === 'radio' || type === 'checkbox') {
+                    const inputType = type === 'radio' ? 'radio' : 'checkbox';
+                    const inputClass = type === 'radio' ? 'form-check-input rounded-circle' : 'form-check-input';
+                    
+                    $qBox.find('.opt-input').each(function(oIdx) {
+                        const optVal = $(this).val() || `Seçenek ${oIdx + 1}`;
+                        previewHtml += `
+                            <div class="form-check my-2">
+                                <input class="${inputClass}" type="${inputType}" disabled>
+                                <label class="form-check-label text-dark fw-normal ms-1">${optVal}</label>
+                            </div>`;
+                    });
+                }
+
+                previewHtml += `</div>`;
+            });
+
+            previewHtml += `</div>`;
+        });
+    }
+
+    // 3. Oluşturulan HTML'i Modal İçine Bas ve Modalı Göster
+    $previewBody.html(previewHtml);
+    
+    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+    previewModal.show();
+}
+</script>
+<script>
+$('#selectType').on('change', function() {
+  var type = $(this).val(); // personel veya birim
+
+  // Inputların name ve data-for değerlerini güncelle
+  $('.auto-complete').attr('data-for', type).attr('name', 'setting[' + type + ']').val('');
+
+  $('.auto-complete-id').attr('name', 'setting[' + type + '_id]').val('');
+});
+
+//$('#selectType').trigger('change');
+
+</script>
+<script>
+$('.auto-complete').autocomplete({
+    source: function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/gelirgroupautocomplete&user_token={{ user_token }}&bolum=' + $(this).attr('data-for') + '&filter_name=' + encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item.name,
+              value: item.id
+            };
+          }));
+        }
+      });
+    },
+    select: function(item) {
+      $(this).val(item.label);
+      
+      $(this).siblings('.auto-complete-id').val(item.value);
+  
+    }
+  });
+
+</script>
+<style>
+ .input-description {
+  width: 100%;
+  min-height: 50px;
+  border: 1px dashed #bbb;   /* açıklama kutusu havası */
+  border-radius: 6px;
+  background-color: #f9f9f9; /* hafif gri arka plan */
+  padding: 8px 10px;
+  font-size: 14px;
+  outline: none;
+  resize: vertical;          /* kullanıcı isterse dikey büyütebilir */
+}
+
+.thumbnail {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+#copy-tooltip {
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+    z-index: 1000;
+    display: none;
+    transform: translateY(-100%);
+  }
+
+.input-description::placeholder {
+  color: #999;
+  font-style: italic;        /* açıklama yazısı havası */
+}
+
+rte-floatpanel.rte-floatpanel-paragraphop {
+  display: none !important;
+}
+
+/* 1. Sürüklerken arkada kalan boş kutunun (hedefin) stili */
+    .sortable-placeholder-custom {
+        background: #f8f9fa !important;
+        border: 3px dashed #0d6efd !important; /* Belirgin mavi kesikli çizgi */
+        opacity: 0.5;
+        border-radius: 0.5rem;
+        height: 120px;
+    }
+
+    /* 2. Sürükleme esnasında mouse'un ucunda giden HAKİKİ KUTUNUN stili */
+    .sortable-drag-custom {
+        opacity: 0.85 !important;               /* Kutuyu hafif soluk yapar */
+        border: 2px solid #0d6efd !important;    /* Etrafına belirgin mavi bir border çeker */
+        box-shadow: 0 15px 30px rgba(13, 110, 253, 0.15) !important; /* Altına gölge verir */
+        background-color: #fff !important;       /* İçinin boşalmasını engeller */
+        transform: scale(1.01);                  /* Çok hafif büyüterek taşındığını hissettirir */
+    }
+
+    ul.dropdown-menu {
+  max-height: 300px; /* Maksimum yükseklik */
+  overflow-y: auto;  /* Yükseklik aşıldığında dikey scroll çıksın */
+}
+  </style>
+
+

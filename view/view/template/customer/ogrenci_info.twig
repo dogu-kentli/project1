@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="view/image/favicon.png">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+            color: #334155;
+        }
+        .main-container {
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+        .student-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: none;
+            margin-bottom: 50px;
+        }
+        .sidebar-info {
+            background: #1e293b;
+            color: white;
+            padding: 40px 25px;
+        }
+        .profile-img {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            color: #64748b;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title i {
+            margin-right: 10px;
+            color: #0d6efd;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            display: block;
+        }
+        .info-value {
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+        .badge-custom {
+            background-color: #e2e8f0;
+            color: #475569;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 6px;
+            margin-right: 5px;
+            font-size: 0.8rem;
+        }
+        .history-item {
+            border-left: 2px solid #e2e8f0;
+            padding-left: 20px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        .history-item::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #0d6efd;
+        }
+        @media print {
+            body { background: white; }
+            .main-container { margin: 0; max-width: 100%; }
+            .student-card { box-shadow: none; border: 1px solid #eee; page-break-after: always; }
+            .btn-print { display: none; }
+            .sidebar-info { background: #1e293b !important; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container main-container">
+    <div class="d-flex justify-content-end mb-4 btn-print">
+        <button onclick="window.print()" class="btn btn-primary px-4 shadow-sm">
+            <i class="fa fa-print me-2"></i> Yazdır
+        </button>
+    </div>
+
+    {% for customer in customers %}
+    <div class="student-card shadow">
+        <div class="row g-0">
+            <div class="col-md-4 sidebar-info text-center">
+                <img src="{{ customer.resim }}" class="profile-img shadow" alt="Profil">
+                <h3 class="fw-bold mb-1">{{ customer.firstname }} {{ customer.lastname }}</h3>
+                <p class="text-white-50 mb-4">{{ customer.customer_group['name'] }}</p>
+                
+                <div class="text-start mt-4 ps-3">
+                    <div class="mb-3">
+                        <small class="text-white-50 d-block">E-posta</small>
+                        <span class="d-block small text-truncate">{{ customer.email }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-white-50 d-block">Telefon</small>
+                        <span class="d-block small">{{ customer.telephone }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-white-50 d-block">TC Kimlik</small>
+                        <span class="d-block small">{{ customer.kimlikno }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-white-50 d-block">Bölge / Ülke</small>
+                        <span class="d-block small">{{ customer.bolge['name'] }} / {{ customer.country['name'] }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 p-4 p-lg-5">
+                
+                <div class="row mb-4">
+                    <div class="col-6 col-sm-4">
+                        <span class="info-label">Doğum Tarihi</span>
+                        <div class="info-value">{{ customer.dogum_tarihi }}</div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <span class="info-label">Medeni Durum</span>
+                        <div class="info-value">{% if customer.medeni_durumu == 1 %} {{ text_bekar }} {% else %} {{ text_evli }} {% endif %}</div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <span class="info-label">Kan Grubu</span>
+                        <div class="info-value"><span class="badge bg-danger">{{ customer.kan }}</span></div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <span class="info-label">Barınma</span>
+                        <div class="info-value">{% if customer.barinma == 1 %}{{ text_ev }}{% else %}{{ text_yurt }}{% endif %}</div>
+                    </div>
+                    <div class="col-12 col-sm-8">
+                        <span class="info-label">Adres</span>
+                        <div class="info-value small text-muted">{{ customer.adresi }}</div>
+                    </div>
+                </div>
+
+                <h5 class="section-title"><i class="fa fa-graduation-cap"></i> Eğitim Bilgileri</h5>
+                <div class="mb-4">
+                    <div class="fw-bold text-dark">{{ customer.universite['name'] }}</div>
+                    <div class="text-muted small">{{ customer.fakulte['name'] }} — {{ customer.bolum }}</div>
+                    <div class="mt-1"><span class="badge bg-primary">Sınıf: {{ customer.sinif }}</span></div>
+                </div>
+
+               <div class="row mb-4">
+  <!-- Diller -->
+  <div class="col-md-6">
+    <h6 class="fw-bold text-uppercase text-muted small mb-2">Diller</h6>
+    <div class="d-flex flex-wrap gap-2">
+      {% for diller in customer.bildigi_diller %}
+        <span class="badge bg-light text-dark border">
+          <i class="fa fa-language me-1"></i>{{ diller.name }}
+        </span>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- İlgi Alanları -->
+  <div class="col-md-6 mt-3 mt-md-0">
+    <h6 class="fw-bold text-uppercase text-muted small mb-2">İlgi Alanları</h6>
+    <div class="d-flex flex-wrap gap-2">
+      {% for hobiler in customer.ilgi_alanlari %}
+        <span class="badge bg-light text-dark border">
+          {{ hobiler['name'] }}
+        </span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+                <h5 class="section-title"><i class="fa fa-history"></i> Dernek Geçmişi & Burslar</h5>
+                <div class="history-list">
+                    {% for yardim in customer_yardim %}
+                    <div class="history-item">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <span class="fw-bold">
+                                    {% if yardim.tip == 1 %}Burs Yardımı ({{ yardim.kurum['name'] }})
+                                    {% elseif yardim.tip == 2 %}Nakdi Yardım ({{ yardim.description }})
+                                    {% else %}Ayni Yardım ({{ yardim.tur }}){% endif %}
+                                </span>
+                            </div>
+                            <div class="col-sm-4 text-sm-end">
+                                <small class="text-muted">{{ yardim.baslangic }} {% if yardim.bitis %}/ {{ yardim.bitis }}{% endif %}</small>
+                            </div>
+                        </div>
+                        <div class="small text-primary fw-bold">
+                            {% if yardim.tip == 3 %}{{ yardim.adet }} Adet{% else %}{{ yardim.miktar }} ₺{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if customer_sertifika %}
+                <h5 class="section-title mt-4"><i class="fa fa-certificate"></i> Sertifikalar</h5>
+                <ul class="list-unstyled small">
+                    {% for sertifika in customer_sertifika %}
+                    <li class="mb-2"><i class="fa fa-check-circle text-success me-2"></i> <b>{{ sertifika.baslik }}</b> - {{ sertifika.kurum }} ({{ sertifika.tarih }})</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+            </div>
+        </div>
+        <div class="card-footer bg-light border-0 py-3 text-center">
+            <small class="text-muted">Son Güncelleme: {{ customer.guncelleme }} | Durum: 
+                {% if customer.status == 1 %}<span class="text-success fw-bold">Aktif</span>
+                {% else %}<span class="text-danger fw-bold">Pasif</span>{% endif %}
+            </small>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+</html>

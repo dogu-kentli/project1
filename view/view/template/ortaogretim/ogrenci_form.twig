@@ -1,0 +1,816 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+
+				<!--breadcrumb-->
+				<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+					
+					<div class="ps-3">
+						<nav aria-label="breadcrumb">
+							 <ol class="breadcrumb mb-0 p-0">
+				            {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+					         {% endfor %}
+                  </ol>
+						</nav>
+					</div>
+					<div class="ms-auto">
+						<button type="button" onclick="$('#form-ogrenci').submit();" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="bi bi-save"></i> {{"Kaydet"}}</button>
+				   <a href="{{cancel}}" data-toggle="tooltip" class="btn btn-light border border-dark shadow-sm bg-white" title="{{ "Geri" }}"><i class="bi bi-arrow-counterclockwise"></i> Geri Git</a>
+				
+					</div>
+				</div>
+				<!--end breadcrumb-->
+
+        <div class="row">
+          <div class="col-12 mx-auto">
+           <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-ogrenci" class="form-horizontal">
+            <div class="card">
+							<div class="card-body">
+              
+               <input type="hidden" name="customer_group_id" value="6" class="form-control"/>
+								<ul class="nav nav-tabs nav-primary" role="tablist">
+									<li class="nav-item" role="presentation">
+										<a class="nav-link active" data-bs-toggle="tab" href="#tab-genel" role="tab" aria-selected="true">
+											<div class="d-flex align-items-center">
+												<div class="tab-icon"><i class="bx bx-user font-18 me-1"></i>
+												</div>
+												<div class="tab-title">{{ "Kişi ve Kimlik bilgileri" }}</div>
+											</div>
+										</a>
+									</li>
+									<li class="nav-item" role="presentation">
+										<a class="nav-link" data-bs-toggle="tab" href="#tab-egitim" role="tab" aria-selected="false" tabindex="-1">
+											<div class="d-flex align-items-center">
+												<div class="tab-icon"><i class="bx bx-book-reader font-18 me-1"></i>
+												</div>
+												<div class="tab-title">{{ "Eğitim Bilgileri" }}</div>
+											</div>
+										</a>
+									</li>
+									<li class="nav-item" role="presentation">
+										<a class="nav-link" data-bs-toggle="tab" href="#tab-aile" role="tab" aria-selected="false" tabindex="-1">
+											<div class="d-flex align-items-center">
+												<div class="tab-icon"><i class="bx bx-group font-18 me-1"></i>
+												</div>
+												<div class="tab-title">{{ "Aile Bilgileri" }}</div>
+											</div>
+										</a>
+									</li>
+                  <li class="nav-item" role="presentation">
+										<a class="nav-link" data-bs-toggle="tab" href="#tab-dokuman" role="tab" aria-selected="false" tabindex="-1">
+											<div class="d-flex align-items-center">
+												<div class="tab-icon"><i class="bx bx-file font-18 me-1"></i>
+												</div>
+												<div class="tab-title">{{ "Dökümanlar" }}</div>
+											</div>
+										</a>
+									</li>
+                  <li class="nav-item" role="presentation">
+										<a class="nav-link" data-bs-toggle="tab" href="#tab-gorusme" role="tab" aria-selected="false" tabindex="-1">
+											<div class="d-flex align-items-center">
+												<div class="tab-icon"><i class="bx bx-microphone font-18 me-1"></i>
+												</div>
+												<div class="tab-title">{{ "Görüşmeler" }}</div>
+											</div>
+										</a>
+									</li>
+                   <li class="nav-item" role="presentation">
+										<a class="nav-link" data-bs-toggle="tab" href="#tab-degerlendirme" role="tab" aria-selected="false" tabindex="-1">
+											<div class="d-flex align-items-center">
+												<div class="tab-icon"><i class="bx bx-like font-18 me-1"></i>
+												</div>
+												<div class="tab-title">{{ "Değerlendirme" }}</div>
+											</div>
+										</a>
+									</li>
+                   <li class="nav-item" role="presentation">
+										<a class="nav-link" data-bs-toggle="tab" href="#tab-ders" role="tab" aria-selected="false" tabindex="-1">
+											<div class="d-flex align-items-center">
+												<div class="tab-icon"><i class="bx bx-notepad font-18 me-1"></i>
+												</div>
+												<div class="tab-title">{{ "Dersler" }}</div>
+											</div>
+										</a>
+									</li>
+                   <li class="nav-item" role="presentation">
+										<a class="nav-link" data-bs-toggle="tab" href="#tab-denklik" role="tab" aria-selected="false" tabindex="-1">
+											<div class="d-flex align-items-center">
+												<div class="tab-icon"><i class="bx bx-vector font-18 me-1"></i>
+												</div>
+												<div class="tab-title">{{ "Denklik" }}</div>
+											</div>
+										</a>
+									</li>
+								</ul>
+								<div class="tab-content py-3">
+                  <div class="tab-pane fade show active" id="tab-genel" role="tabpanel">
+										<fieldset id="yonetim" class="border rounded p-3 mb-4">
+                      <legend >{{ "GENEL BİLGİLER" }}</legend>
+                      <div class="row mb-3">
+                        
+                        <div class="profile-avatar text-start">
+                          <a href="javascript:void(0);" id="thumb-image" class="thumbnail">
+                           <img src="{{thumb}}" id="thumb-img" class="border border-primary border-primary rounded-lg shadow" width="120" height="120" data-toggle="tooltip"  title="Resim eklemek için tıklayın" class="rounded-circle"></a>
+                           <input type="hidden" name="image" value="{{ image }}" id="input-image"/>
+                        </div>
+                      </div>
+
+                      <!-- Öğrenci Adı -->
+                      <div class="row mb-3">
+                        <label for="input-firstname" class="col-sm-2 col-form-label">{{ "Öğrenci Adı" }}</label>
+                        <div class="col-sm-4">
+                          <input type="text" name="firstname" value="{{ firstname }}" placeholder="Adı" id="input-firstname" class="form-control"/>
+                          {% if error_firstname %}
+                            <div class="text-danger">{{ error_firstname }}</div>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Soyadı -->
+                      <div class="row mb-3">
+                        <label for="input-lastname" class="col-sm-2 col-form-label">{{ "Soyadı" }}</label>
+                        <div class="col-sm-4">
+                          <input type="text" name="lastname" value="{{ lastname }}" placeholder="Soyadı" id="input-lastname" class="form-control"/>
+                          {% if error_lastname %}
+                            <div class="text-danger">{{ error_lastname }}</div>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Kimlik No -->
+                      <div class="row mb-3">
+                        <label for="input-kimlik_no" class="col-sm-2 col-form-label">{{ "Kimlik No" }}</label>
+                        <div class="col-sm-4">
+                          <input type="text" name="kimlikno" value="{{ kimlikno }}" placeholder="Kimlik No" id="input-kimlik_no" class="form-control"/>
+                        </div>
+                      </div>
+
+                      <!-- Telefon -->
+                      <div class="row mb-3">
+                        <label for="input-telephone" class="col-sm-2 col-form-label">{{ "Telefon" }}</label>
+                        <div class="col-sm-4">
+                          <input type="text" name="telephone" value="{{ telephone }}" placeholder="Telefon" id="input-telephone" class="form-control"/>
+                          {% if error_telephone %}
+                            <div class="text-danger">{{ error_telephone }}</div>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- E-Mail -->
+                      <div class="row mb-3">
+                        <label for="input-email" class="col-sm-2 col-form-label">{{ "E-Mail" }}</label>
+                        <div class="col-sm-4">
+                          <input type="email" name="email" value="{{ email }}" placeholder="e-posta adresi" id="input-email" class="form-control"/>
+                          {% if error_email %}
+                            <div class="text-danger">{{ error_email }}</div>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Doğum Tarihi -->
+                      <div class="row mb-3">
+                        <label for="input-dogum-tarihi" class="col-sm-2 col-form-label">{{ "Doğum Tarihi" }}</label>
+                        <div class="col-sm-4">
+                          <input type="date" name="dogum_tarihi" value="{{ dogum_tarihi }}" id="input-dogum-tarihi" class="form-control"/>
+                        </div>
+                      </div>
+
+                      <!-- Cinsiyet -->
+                      <div class="row mb-3">
+                        <label for="input-gender" class="col-sm-2 col-form-label">{{ "Cinsiyeti" }}</label>
+                        <div class="col-sm-4">
+                          <select name="gender" id="input-gender" class="form-select">
+                            <option value="">{{ "--Seçim Yapın--" }}</option>
+                            <option value="E" {% if gender == 'E' %} selected {% endif %}>{{ "Erkek" }}</option>
+                            <option value="K" {% if gender == 'K' %} selected {% endif %}>{{ "Kadın" }}</option>
+                          </select>
+                          {% if error_gender %}
+                            <div class="text-danger">{{ error_gender }}</div>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Barınma -->
+                      <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">{{ "Barınma" }}</label>
+                        <div class="col-sm-4">
+                          <div class="form-check form-check-inline">
+                            <input type="radio" name="barinma" value="1" id="barinma-ev" class="form-check-input" {% if barinma == 1 %} checked {% endif %}/>
+                            <label for="barinma-ev" class="form-check-label">{{ text_ev }}</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input type="radio" name="barinma" value="2" id="barinma-yurt" class="form-check-input" {% if barinma == 2 %} checked {% endif %}/>
+                            <label for="barinma-yurt" class="form-check-label">{{ text_yurt }}</label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Durumu -->
+                      <div class="row mb-3">
+                        <label for="input-status" class="col-sm-2 col-form-label">{{ "Durumu" }}</label>
+                        <div class="col-sm-3">
+                          <select name="status" id="input-status" class="form-select">
+                            <option value="1" {% if status == 1 %} selected {% endif %}>{{ text_enabled }}</option>
+                            <option value="0" {% if status == 0 %} selected {% endif %}>{{ text_disabled }}</option>
+                            <option value="2" {% if status == 2 %} selected {% endif %}>{{ text_end }}</option>
+                            <option value="3" {% if status == 3 %} selected {% endif %}>{{ text_beklemede }}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </fieldset>
+
+
+                    <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                      <legend class="fw-bold">{{ "ADRES BİLGİLERİ" }}</legend>
+
+                      <!-- Ülke -->
+                      <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">{{ "Ülkesi" }}</label>
+                        <div class="col-sm-4">
+                          <select name="country_id" class="form-select">
+                            {% for country in countries %}
+                              <option value="{{ country.country_id}}" {% if country.country_id == country_id %} selected {% endif %}>{{ country.name}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- İl -->
+                      <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">{{ "İl" }}</label>
+                        <div class="col-sm-4">
+                          <select name="sehir_id" onchange="sehir(this, '{{ city_id }}');" class="form-select">
+                            {% for sehir in sehirler %}
+                              <option value="{{ sehir.il_id }}" {% if sehir.il_id == sehir_id %} selected {% endif %}>{{ sehir.name }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- İlçe -->
+                      <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">{{ "İlçe" }}</label>
+                        <div class="col-sm-4">
+                          <select name="city_id" class="form-select"></select>
+                        </div>
+                      </div>
+
+                      <!-- Adres -->
+                      <div class="row mb-3">
+                        <label for="input-address-1" class="col-sm-2 col-form-label">{{ "Adresi" }}</label>
+                        <div class="col-sm-4">
+                          <input type="text" name="adres" value="{{ adres }}" placeholder="{{ entry_address_1 }}" id="input-address-1" class="form-control"/>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </div>
+
+                  <div class="tab-pane fade" id="tab-egitim" role="tabpanel">
+										 <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                      <legend >{{ "EĞİTİM BİLGİLERİ" }}</legend>
+
+                      <!-- Okulu -->
+                      <div class="row mb-3">
+                        <label for="select-lise" class="col-sm-2 col-form-label">{{ "Okulu" }}</label>
+                        <div class="col-sm-4">
+                          <select name="egitim_bilgileri[lise_ortaogretim_id]" id="select-lise" class="form-select">
+                            <option value="">* {{ "--OKUL SEÇİNİZ---" }}</option>
+                            {% for lise in liseler %}
+                              <option value="{{ lise.lise_ortaogretim_id }}" {% if egitim_bilgileri['lise_ortaogretim_id'] == lise.lise_ortaogretim_id %} selected {% endif %}>
+                                {{ lise.name }}
+                              </option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Sınıfı -->
+                      <div class="row mb-3">
+                        <label for="select-sinif" class="col-sm-2 col-form-label">{{ "Sınıfı" }}</label>
+                        <div class="col-sm-4">
+                          <select name="egitim_bilgileri[sinif]" id="select-sinif" class="form-select">
+                            <option value="">{{ "--SINIF SEÇİNİZ--" }}</option>
+                            {% for key,value in siniflar %}
+                              <option value="{{ key }}" {% if egitim_bilgileri['sinif'] == key %} selected {% endif %}>{{ value }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Burs Durumu -->
+                      <div class="row mb-3">
+                        <label for="select-burs" class="col-sm-2 col-form-label">{{ "Burs Durumu" }}</label>
+                        <div class="col-sm-4">
+                          <select name="egitim_bilgileri[burs]" id="select-burs" class="form-select">
+                            <option value="">{{ "-- Burs Durumu --" }}</option>
+                            <option value="1" {% if egitim_bilgileri['burs'] == 1 %} selected {% endif %}>{{ "Var" }}</option>
+                            <option value="2" {% if egitim_bilgileri['burs'] == 2 %} selected {% endif %}>{{ "Yok" }}</option>
+                            <option value="3" {% if egitim_bilgileri['burs'] == 3 %} selected {% endif %}>{{ "İHH Burslusu" }}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </fieldset>
+
+
+                    <fieldset id="yonetim" class="border rounded p-3 mb-2">
+                      <legend >{{ "HOBİ VE İLGİ ALANLARI" }}</legend>
+
+                      {% for custom_field in custom_fields %}
+                        {% if custom_field.location_sort == 'account14' and custom_field.type == 'checkbox' %}
+                          <div class="row mb-3">
+                            <div class="col-sm-12">
+                              <div id="input-custom-field-14" class="border rounded p-2" style="height:200px; overflow:auto;">
+                                {% for custom_field_value in custom_field.custom_field_value %}
+                                  <div class="form-check form-check-inline m-1">
+                                    <input type="checkbox"
+                                          name="custom_field[{{ custom_field.custom_field_id }}][]"
+                                          value="{{ custom_field_value.custom_field_value_id }}"
+                                          id="custom-value-{{ custom_field_value.custom_field_value_id }}"
+                                          class="form-check-input"
+                                          {% if account_custom_field[custom_field.custom_field_id] and custom_field_value.custom_field_value_id in account_custom_field[custom_field.custom_field_id] %} checked {% endif %}/>
+                                    <label for="custom-value-{{ custom_field_value.custom_field_value_id }}" class="form-check-label">
+                                      {{ custom_field_value.name }}
+                                    </label>
+                                  </div>
+                                {% endfor %}
+                              </div>
+                              <div id="error-custom-field-14" class="invalid-feedback"></div>
+                            </div>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+
+                      {% for custom_field in custom_fields %}
+                        {% if custom_field.location_sort == 'account8' and custom_field.type == 'checkbox' %}
+                          <div class="row mb-3">
+                            <div class="col-sm-12">
+                              <div id="input-custom-field-8" class="border rounded p-2" style="height:100px; overflow:auto;">
+                                {% for custom_field_value in custom_field.custom_field_value %}
+                                  <div class="form-check form-check-inline m-1">
+                                    <input type="checkbox"
+                                          name="custom_field[{{ custom_field.custom_field_id }}][]"
+                                          value="{{ custom_field_value.custom_field_value_id }}"
+                                          id="custom-value-{{ custom_field_value.custom_field_value_id }}"
+                                          class="form-check-input"
+                                          {% if account_custom_field[custom_field.custom_field_id] and custom_field_value.custom_field_value_id in account_custom_field[custom_field.custom_field_id] %} checked {% endif %}/>
+                                    <label for="custom-value-{{ custom_field_value.custom_field_value_id }}" class="form-check-label">
+                                      {{ custom_field_value.name }}
+                                    </label>
+                                  </div>
+                                {% endfor %}
+                              </div>
+                              <div id="error-custom-field-8" class="invalid-feedback"></div>
+                            </div>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </fieldset>
+                	</div>
+
+                  <div class="tab-pane fade" id="tab-aile" role="tabpanel">
+										<table id="aile-anne" class="table">
+                    <thead>
+                      <tr>
+                        <th>Anne Adı</th>
+                        <th>Soyadı</th>
+                        <th>Çalışma Durumu</th>
+                        <th>Sağlık Durumu</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <input type="text" name="anne_adi" value="{{anne_adi}}" id="input-anne-adi" placeholder="Annenizin Adı" class="form-control"/>
+                        </td>
+                        <td>
+                          <input type="text" name="anne_soyadi" value="{{anne_soyadi}}" id="input-anne-soyadi" placeholder="Annenizin Soyadı" class="form-control"/>
+                        </td>
+                        <td>
+                          <select name="is_durumu1" id="select-isdurumu1" class="form-select">
+                            <option value="1" {% if is_durumu1 == 1 %} selected {% endif %}>Çalışıyor</option>
+                            <option value="2" {% if is_durumu1 == 2 %} selected {% endif %}>Çalışmıyor</option>
+                            <option value="3" {% if is_durumu1 == 3 %} selected {% endif %}>Ev Hanımı</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select name="saglik_durumu1" id="select-saglik-1" class="form-select">
+                            <option value="1" {% if saglik_durumu1 == 1 %} selected {% endif %}>Sağ</option>
+                            <option value="2" {% if saglik_durumu1 == 2 %} selected {% endif %}>Vefat</option>
+                          </select>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <table id="aile-baba" class="table table-striped table-bordered mt-4">
+                    <thead>
+                      <tr>
+                        <th>Baba Adı</th>
+                        <th>Soyadı</th>
+                        <th>Çalışma Durumu</th>
+                        <th>Sağlık Durumu</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <input type="text" name="baba_adi" value="{{baba_adi}}" id="input-baba-adi" placeholder="Babanızın Adı" class="form-control"/>
+                        </td>
+                        <td>
+                          <input type="text" name="baba_soyadi" value="{{baba_soyadi}}" id="input-baba-soyadi" placeholder="Babanızın Soyadı" class="form-control"/>
+                        </td>
+                        <td>
+                          <select name="is_durumu2" id="select-isdurumu2" class="form-select">
+                            <option value="1" {% if is_durumu2 == 1 %} selected {% endif %}>Çalışıyor</option>
+                            <option value="2" {% if is_durumu2 == 2 %} selected {% endif %}>Çalışmıyor</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select name="saglik_durumu2" id="select-saglik-2" class="form-select">
+                            <option value="1" {% if saglik_durumu2 == 1 %} selected {% endif %}>Sağ</option>
+                            <option value="2" {% if saglik_durumu2 == 2 %} selected {% endif %}>Vefat</option>
+                          </select>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                    </div>
+
+									<div class="tab-pane fade" id="tab-dokuman" role="tabpanel">
+										 <div class="tab-pane" id="tab-dokuman">
+                     <div class="alert border-0 bg-light-info alert-dismissible fade show py-2">
+                    <div class="d-flex align-items-center">
+                      <div class="fs-3 text-info"><i class="bi bi-info-circle-fill"></i>
+                      </div>
+                      <div class="ms-3">
+                        <div class="text-dark">İzin verilen Formatlar : {{ filetype }}</div>
+                      </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                <table class="table table-bordered">
+                 <thead>
+                   <th>{{"Belge ismi"}}</th>
+                   <th>{{"Yüklenen Belge"}}</th>
+                   <th class="text-start" style="width:1%;">{{"Eylem"}}</th>
+                 </thead>
+                
+                  <tbody>
+                 {% for key, value in belgeler %}
+                  <tr>
+                    <td class="text-start">{{ value }}</td>
+                    <td class="text-start">
+                      <div class="input-group">
+                      <input type="text" name="file_name" value="{% for document in uploads %}{% if key == document.file_code %}{{ document.name }}{% endif %}{% endfor %}" id="filename{{key}}" placeholder="Belge adı" /class="form-control"  readonly/>
+                      <input type="hidden" name="file_code" value="{% for document in uploads %}{% if key == document.file_code %}{{ document.code }}{% endif %}{% endfor %}" id="filecode{{key}}" placeholder="Kodu" class="form-control" readonly/>
+                        <input type="hidden" name="file_mask" value="{% for document in uploads %}{% if key == document.file_code %}{{ document.filename }}{% endif %}{% endfor %}" id="filemask{{key}}" placeholder="Maske" class="form-control" readonly/>
+                      <a href="{% for document in uploads %}{% if key == document.file_code %}{{ document.download }}{% endif %}{% endfor %}" id="download{{key}}" data-toggle="tooltip" title="İndir"  class="btn btn-warning" type="button" {% for document in uploads %}{% if key == document.file_code %}{% else %}disabled{% endif %}{% endfor %}>İndir</a>
+                      <button id="button-document-upload" name="{{key}}" data-toggle="tooltip" title="Belge Yükle" class="btn btn-outline-info" type="button">Yükle</button>
+                    </div>
+                    </td>
+                    
+                    <td class="text-start">
+                      <button type="button" id="button-document-delete" name="{{key}}" data-toggle="tooltip" title="Belgeyi Sil" class="btn btn-danger delete{{key}}"><i class="fa fa-times"></i> Sil</button>
+                    </td>
+                  </tr>
+                   {% endfor %}
+
+                   </tbody>
+                   
+                  </table>
+                 </div>
+                  </div>
+
+									<div class="tab-pane fade" id="tab-gorusme" role="tabpanel">
+										<table class="table table-bordered" id="gorusme">
+                    <thead>
+                    <tr>
+                      <th class="text-start"> {{"Görüşme Yapan Kişi"}}</th>
+                      <th class="text-start"> {{"Görüşme Notları"}}</th>
+                      <th class="text-start"> {{"Tarih"}}</th>
+                      <th class="text-start" style="width:1%;"> {{"Eylem"}}</th>
+                      </tr>
+                    </thead>
+
+                    <tbody >
+                        {% set gorusme_row = 0 %}
+                          {% for customer_gorusme in customer_gorusmes %}
+                            <tr id="gorusme-row{{ gorusme_row }}"> 
+                              <td class="text-start" class="text-start"><input type="text" name="customer_gorusme[{{ gorusme_row }}][adsoyad]" value="{{ customer_gorusme.adsoyad }}" placeholder="{{ "Görüşme yapan kişi" }}" class="form-control gorusme-row{{ gorusme_row }}" />
+                  
+                              </td>
+                              <td class="text-start" class="text-start"><input type="text" name="customer_gorusme[{{ gorusme_row }}][description]" value="{{ customer_gorusme.description }}" placeholder="{{ "Açıklama" }}" class="form-control gorusme-row{{ gorusme_row }}" />
+                  
+                              </td>
+                              <td class="text-start">
+                                  <input type="date" name="customer_gorusme[{{ gorusme_row }}][date_record]" value="{{ customer_gorusme.date_record }}" placeholder="{{ "Tarih" }}" data-date-format="DD/MM/YYYY" class="form-control date"/>
+                              </td>
+                              <td class="text-end">
+                              <button type="button" onclick="$('#gorusme-row{{ gorusme_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Sil</button></td>
+                            </tr>
+                            {% set gorusme_row = gorusme_row + 1 %}
+                          {% endfor %}
+
+                        </tbody>
+                          <tfoot>
+                          <tr>
+                          <td colspan="3" class="text-end"></td>
+                            <td colspan="1" class="text-center"><button type="button" onclick="addGorusme();" data-toggle="tooltip" title="{{ "Ekle" }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus-lg"></i></button></td>
+                          </tr>
+                          </tfoot>
+
+                        </table>
+                	</div>
+
+									<div class="tab-pane fade" id="tab-degerlendirme" role="tabpanel">
+                     <table id="degerlendirme" class="table table-bordered "> 
+                      <thead class="bg-light">
+                      <tr>
+                        <th class="text-start"> {{"Değerlendiren"}}</th>
+                        <th class="text-start"> {{"Değerlendirme"}}</th>
+                        <th class="text-start"> {{"Tarih"}}</th>
+                        <th class="text-centr" style="width:1%;"> {{"Eylem"}}</th>
+                      </tr>
+                    </thead>   				
+                  <tbody>
+                    {% set degerlendirme_row = 0 %}
+                    {% for customer_degerlen in customer_degerlens %}
+                      <tr id="degerlendirme-row{{ degerlendirme_row }}"> 
+                        <td class="text-start"><input type="text" name="customer_degerlen[{{ degerlendirme_row }}][name]" value="{{ customer_degerlen.name }}" placeholder="{{ entry_degerlendiren }}" class="form-control degerlendirme-row{{ degerlendirme_row }}"  >
+					
+						         </td>
+                        <td class="text-start">
+                        <input type="text" name="customer_degerlen[{{ degerlendirme_row }}][description]" value="{{ customer_degerlen.description }}" placeholder="{{ entry_degerlendirmenotu }}" class="form-control degerlendirme-row{{ degerlendirme_row }}" />
+					
+						          </td>
+                        <td class="text-start" >
+                        
+                        <input type="date" name="customer_degerlen[{{ degerlendirme_row }}][date_record]" value="{{ customer_degerlen.date_record }}" placeholder="{{ entry_date }}" data-date-format="DD/MM/YYYY" class="form-control"/>
+                         
+                        
+						          
+                        </td>
+						             <td class="text-start">
+						           
+						             <button type="button" onclick="$('#degerlendirme-row{{ degerlendirme_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Sil</button>
+                         </td>
+                      </tr>
+                      {% set degerlendirme_row = degerlendirme_row + 1 %}
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="3"><button type="submit" form="form-customer" class="btn btn-default" type="button"><i class="fa fa-save"></i></button></td>
+                      <td class="text-center"><button type="button" onclick="addDegerlendirme();" data-toggle="tooltip" title="{{ button_degerlendirme_add }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus-lg"></i></button></td>
+                    </tr>
+                  </tfoot>
+                </table> 
+
+									</div>
+
+                   <div class="tab-pane fade" id="tab-ders" role="tabpanel">
+										<p>...</p>
+									</div>
+
+                  <div class="tab-pane fade" id="tab-denklik" role="tabpanel">
+										<p>...</p>
+									</div>
+
+								</div>
+               
+							
+              </div>
+						</div>
+            
+           </form>
+          </div>
+        </div>
+				{{footer}}
+			</main>
+      <script type="text/javascript"><!--
+function addGorusme() {
+  var gorusme_row = $('#gorusme tbody tr').length;
+   
+  gorusme_row = gorusme_row + 1;
+
+  html = '<tr id="gorusme-row' + gorusme_row + '">';
+	html += ' <td class="text-start"><input type="text" name="customer_gorusme[' + gorusme_row + '][adsoyad]" value="" placeholder="{{ "Görüşmeyi Yapan kişi" }}" class="form-control" /></td>';
+	html += ' <td class="text-start"><input type="text" name="customer_gorusme[' + gorusme_row + '][description]" value="" placeholder="{{ "Açıklama" }}" class="form-control" /></td>';
+	html += ' <td class="text-start" ><input type="date" name="customer_gorusme[' + gorusme_row + '][date_record]" value="" placeholder="{{ "Tarihi" }}" data-date-format="DD/MM/YYYY" class="form-control" /></td>';
+	html += ' <td class="text-end"><button type="button" onclick="$(\'#gorusme-row' + gorusme_row + '\').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Sil</button></td>';
+	html += '</tr>';
+
+  $('#gorusme tbody').append(html);
+
+  gorusme_row++;
+}
+
+function addDegerlendirme() {
+  var degerlendirme_row = $('#degerlendirme tbody tr').length;
+   
+  degerlendirme_row = degerlendirme_row + 1;
+
+  html = '<tr id="degerlendirme-row' + degerlendirme_row + '">';
+	html += '  <td class="text-start"><input type="text" name="customer_degerlen[' + degerlendirme_row + '][name]" value="" placeholder="{{ entry_degerlendiren }}" class="form-control" /></td>';
+	html += '  <td class="text-start"><input type="text" name="customer_degerlen[' + degerlendirme_row + '][description]" value="" placeholder="{{ entry_degerlendirmenotu }}" class="form-control" /></td>';
+	html += '  <td class="text-start" ><input type="date" name="customer_degerlen[' + degerlendirme_row + '][date_record]" value="" placeholder="{{ entry_date }}" data-date-format="DD/MM/YYYY" class="form-control" /></td>';
+	html += '  <td class="text-centr"><button type="button" onclick="$(\'#degerlendirme-row' + degerlendirme_row + '\').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Sil</button></td>';
+	html += '</tr>';
+
+	$('#degerlendirme tbody').append(html);
+
+	degerlendirme_row++;
+}
+
+//--></script>
+<script type="text/javascript"><!--
+function sehir(element, city_id) {
+	$.ajax({
+		url: 'index.php?route=customer/customer/sehir&user_token={{ user_token }}&sehir_id=' + element.value,
+		dataType: 'json',
+		beforeSend: function() {
+			$('select[name=\'sehir_id\']').prop('disabled', true);
+		},
+		complete: function() {
+			$('select[name=\'sehir_id\']').prop('disabled', false);
+		},
+		success: function(json) {
+
+			html = '<option value="">{{ text_select }}</option>';
+
+			if (json['city'] && json['city'] != '') {
+				for (i = 0; i < json['city'].length; i++) {
+					html += '<option value="' + json['city'][i]['ilce_id'] + '"';
+
+					if (json['city'][i]['ilce_id'] == city_id) {
+						html += ' selected="selected"';
+					}
+
+					html += '>' + json['city'][i]['name'] + '</option>';
+				}
+			} else {
+				html += '<option value="0">{{ text_none }}</option>';
+			}
+
+			$('select[name=\'city_id\']').html(html);
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+}
+
+$('select[name$=\'sehir_id\']').trigger('change');
+//--></script>
+
+<script>
+$('#kimlikno').popover({
+  trigger: 'focus'
+})
+//--></script>
+
+<script type="text/javascript"><!--
+$('.btn-close').on('click', function() {
+  $('#modal-new-field').hide();
+});
+//--></script>
+
+
+
+<script>
+ $('button[id=\'button-document-upload\']').on('click', function() {
+  var id = $(this).attr('name');
+  
+  var bolum = 'personel';
+
+	$('#form-upload').remove();
+
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+       
+			$.ajax({
+				url: 'index.php?route=tool/upload/upload&user_token={{ user_token }}&customer_id={{customer_id}}&file_code=' + id,
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+        beforeSend: function() {
+					$('.button' + id).html('Bekleyin...');
+				},
+				
+				success: function(json) {
+          $('.alert-dismissible').remove(); 
+					if (json.error) {
+             $('.button' + id).html('<i class="fa fa-upload"></i> Dosya Yükle');
+            $('.container-fluid').prepend('<div class="alert alert-fixed alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error + '</div>');
+					}
+
+					if (json.success) {
+            $('.button' + id).html('<i class="fa fa-check"></i> Yüklendi');
+            $('.button' + id).prop('disabled',true);
+             $('.container-fluid').prepend('<div class="alert success-fixed alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.success + '</div>');
+            
+						$('#filename' + id).val(json['filename']);
+            $('#filecode' + id).val(json['code']);
+             $('#filemask' + id).val(json['mask']);
+              $('#download' + id).removeAttr('disabled');
+             $('.delete' + id).removeAttr('disabled');
+            $('#download' + id).attr('href',json['download']);
+					}
+				 },
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+</script>
+
+<script>
+ $('button[id=\'button-document-delete\']').on('click', function() {
+     var id =  $(this).attr('name');
+     $.ajax({
+      url: 'index.php?route=tool/upload/deleteUpload&user_token={{ user_token }}&customer_id={{customer_id}}&key=' + id,
+      type: 'post',
+      dataType: 'json',
+      data : 'file=' + $('#filemask' + id).val(),
+      success: function(json) {
+        $('.alert-dismissible').remove();
+
+        if (json.success) {
+          $('.container-fluid').prepend('<div class="alert success-fixed alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.success + '</div>');
+          $('#filename' + id).val('');
+          $('.button' + id).prop('disabled',false);
+          $('#download' + id).attr('disabled','disabled');
+          $('.delete' + id).attr('disabled','disabled');
+          $('.button' + id).html('<i class="fa fa-upload"></i> Dosya Yükle');
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+ </script>
+ <script>
+$('#thumb-image').on('click', function() {
+
+  $('#form-upload').remove();
+
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+
+			$.ajax({
+				url: 'index.php?route=tool/upload/uploadImage&user_token={{ user_token }}',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				
+				success: function(json) {
+					if (json.error) {
+						alert(json.error);
+					}
+
+					if (json.success) {
+						alert(json.success);
+						$('#input-image').val(json['image']);
+						$('#thumb-img').attr('src',json['thumb']);
+	
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+
+</script>

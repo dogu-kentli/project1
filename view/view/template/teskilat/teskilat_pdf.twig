@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ title }}</title>
+    <base href="{{ base }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <link rel="icon" type="image/png" href="view/image/favicon.png">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+            --success-color: #27ae60;
+            --info-color: #f39c12;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; background-color: #f4f7f6; margin: 0; padding: 0; }
+        .report-wrapper { background: white; max-width: 1100px; margin: 20px auto; padding: 40px; box-shadow: 0 0 20px rgba(0,0,0,0.1); border-radius: 8px; }
+        
+        /* Header */
+        .report-header { border-bottom: 3px solid var(--primary-color); padding-bottom: 20px; margin-bottom: 30px; position: relative; }
+        .logo-area { text-align: center; margin-bottom: 20px; }
+        .signature-box { border-left: 4px solid var(--accent-color); padding-left: 20px; margin: 20px 0; color: #555; }
+        
+        /* Typography */
+        h2 { text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
+        .section-title { 
+            background: var(--primary-color); color: white; padding: 12px 18px; 
+            border-radius: 6px; margin: 30px 0 15px 0; font-size: 1rem; 
+            display: flex; align-items: center; font-weight: bold;
+        }
+        .section-title i { margin-right: 12px; font-size: 1.2rem; }
+
+        .edu-subsection-title {
+            font-size: 0.85rem; font-weight: 800; color: var(--accent-color);
+            margin: 20px 0 10px 5px; text-transform: uppercase; border-bottom: 1px solid #eee;
+            padding-bottom: 5px; display: block; width: 100%;
+        }
+
+        .info-note {
+            background: #fff9e6; border-left: 4px solid var(--info-color);
+            padding: 10px 15px; margin: 10px 0; font-size: 0.85rem; color: #856404;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        /* Stats Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        .stat-card { 
+            background: var(--bg-light); border: 1px solid var(--border-color); 
+            padding: 15px; text-align: center; border-radius: 10px;
+            display: flex; flex-direction: column; justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .stat-card span { display: block; font-size: 0.70rem; color: #7f8c8d; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; line-height: 1.2; }
+        .stat-card strong { font-size: 1.2rem; color: var(--primary-color); }
+
+        /* Custom Card Helpers */
+        .full-width { grid-column: 1 / -1; }
+        .border-left-primary { border-left: 5px solid var(--accent-color) !important; }
+        .border-left-success { border-left: 5px solid var(--success-color) !important; }
+        .money-card strong::after { content: ''; font-size: 0.9rem; }
+
+        /* Social Media Specific */
+        .social-icon { font-size: 24px; margin-bottom: 8px; }
+        .social-name { font-weight: bold; font-size: 13px; display: block; margin-bottom: 10px; color: #555; }
+        .social-data { display: flex; justify-content: space-around; border-top: 1px solid #eee; padding-top: 10px; width: 100%; }
+        .social-data div { text-align: center; }
+        .social-data span { font-size: 10px; color: #888; display: block; margin-bottom: 2px; }
+        
+        .border-instagram { border-top: 4px solid #E1306C !important; }
+        .border-facebook { border-top: 4px solid #1877F2 !important; }
+        .border-x { border-top: 4px solid #000000 !important; }
+        .border-youtube { border-top: 4px solid #FF0000 !important; }
+
+        @media print {
+            body { background: white; }
+            .report-wrapper { box-shadow: none; margin: 0; width: 100%; padding: 20px; }
+            #btnPrint { display: none; }
+            .section-title { -webkit-print-color-adjust: exact; background-color: #2c3e50 !important; color: white !important; }
+            .stat-card { -webkit-print-color-adjust: exact; background-color: #f8f9fa !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="row" align="right" style="margin:20px 100px 0 0;">
+    <button type="button" id="btnPrint" class="btn btn-info" style="cursor:pointer; padding:10px 20px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold; transition: 0.3s;"><i class="fa fa-file-pdf"></i> PDF İNDİR / YAZDIR</button>
+</div>
+
+<div class="report-wrapper" id="teskilat-raporu">
+    <div class="report-header">
+        <div class="logo-area">
+            {% if store_logo %} <img src="{{ store_logo }}" style="max-height: 80px;"/> {% else %} <img src="view/image/logo.png" style="max-height: 80px;" /> {% endif %}
+        </div>
+        <div class="signature-box">
+            <h4 style="margin:0 0 5px 0;">Kıymetli Dernek Başkanım;</h4>
+            <p style="margin:0;">Kurumunuzun aylık raporunu zamanında ve eksiksiz doldurduğunuz için teşekkür ederiz.</p>
+            <div style="margin-top:15px; font-size: 0.9rem;">
+                <strong>Abdullah Muhammed İslam</strong> / Genel Başkan
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 30px;">
+            <h2 style="margin:0; color: var(--primary-color);">{{ name }}</h2>
+            <h4 style="margin:5px 0; color: var(--accent-color); text-transform: uppercase;">{{ donemi }} AYI FAALİYET RAPORU</h4>
+        </div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-university"></i> YÖNETİM / İCRA KURULU TOPLANTISI</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>KAÇ ADET YAPILDI? <br>(ERKEK)</span><strong>{{teskilat_raporu.icra_kurulu.adet1}}</strong></div>
+        <div class="stat-card"><span>ORTALAMA KATILIM SAYISI <br>(ERKEK)</span><strong>{{teskilat_raporu.icra_kurulu.katilim1}}</strong></div>
+        <div class="stat-card"><span>KAÇ ADET YAPILDI? <br>(HANIM)</span><strong>{{teskilat_raporu.icra_kurulu.adet2}}</strong></div>
+        <div class="stat-card"><span>ORTALAMA KATILIM <br>SAYISI (HANIM)</span><strong>{{teskilat_raporu.icra_kurulu.katilim2}}</strong></div>
+    </div>
+    
+    <div class="section-title"><i class="fa fa-user-graduate"></i> ÖĞRENCİ SAYILARI</div>
+   
+    <div class="stats-grid">
+        <div class="stat-card"><span>HEDEF <br>(ERKEK)</span><strong>{{teskilat_raporu.ogrenci_sayisi.hedef1}}</strong></div>
+        <div class="stat-card"><span>MEVCUT <br>(ERKEK)</span><strong>{{teskilat_raporu.ogrenci_sayisi.mevcut1}}</strong></div>
+        <div class="stat-card"><span>HEDEF <br>(HANIM)</span><strong>{{teskilat_raporu.ogrenci_sayisi.hedef2}}</strong></div>
+        <div class="stat-card"><span>MEVCUT <br>(HANIM)</span><strong>{{teskilat_raporu.ogrenci_sayisi.mevcut2}}</strong></div>
+    </div>
+    <div class="section-title"><i class="fa fa-user-graduate"></i> DERNEĞİN/TEMSİLCİLİĞİN ÖĞRENCİ EVİ SAYILARI</div>
+   
+    <div class="stats-grid">
+        <div class="stat-card"><span>ERKEK ÖĞRENCİ EVİ SAYISI</span><strong>{{teskilat_raporu.ogrenci_evi_sayisi.sayi1}}</strong></div>
+        <div class="stat-card"><span>EV(LER)DE KALAN SAYISI</span><strong>{{teskilat_raporu.ogrenci_evi_sayisi.kalan1}}</strong></div>
+        <div class="stat-card"><span>HANIM EV SAYISI</span><strong>{{teskilat_raporu.ogrenci_evi_sayisi.sayi2}}</strong></div>
+        <div class="stat-card"><span>EV(LER)DE KALAN SAYISI</span><strong>{{teskilat_raporu.ogrenci_evi_sayisi.kalan2}}</strong></div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-user-graduate"></i> İRTİBATLI OLUNAN ÖĞRENCİ EVİ SAYILARI</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>ERKEK ÖĞRENCİ EVİ SAYISI</span><strong>{{teskilat_raporu.irtibatli_ogrenci_evi_sayisi.erkek}}</strong></div>
+        <div class="stat-card"><span>HANIM ÖĞRENCİ EVİ SAYISI</span><strong>{{teskilat_raporu.irtibatli_ogrenci_evi_sayisi.kadin}}</strong></div>
+      
+    </div>
+
+    <div class="section-title"><i class="fa fa-user-graduate"></i>İRTİBATLI OLUNAN ÖĞRENCİ BİRLİĞİ / ÖĞRENCİ KULÜBÜ SAYISI</div>
+    <div class="stats-grid">
+        <div class="stat-card"><strong>{{teskilat_raporu.irtibatli_ogrenci_birligi_sayisi.sayi}}</strong></div>
+       
+    </div>
+
+    <div class="section-title"><i class="fa fa-user-graduate"></i>ÜLKE TEMSİLCİSİ SAYILARI</div>
+    <div class="stats-grid">
+        <div class="stat-card"><strong>{{teskilat_raporu.ulke_temsilcilik.sayi}}</strong></div>
+        
+    </div>
+
+    <div class="section-title"><i class="fa fa-user-graduate"></i>BURSLU ÖĞRENCİ SAYILARI</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>ERKEKLER</span><strong>{{teskilat_raporu.burslu_ogrenci_sayisi.erkek}}</strong></div>
+        <div class="stat-card"><span>HANIMLAR</span><strong>{{teskilat_raporu.burslu_ogrenci_sayisi.kadin}}</strong></div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-book-open"></i> EĞİTİM ÇALIŞMALARI</div>
+    <div class="edu-subsection-title">SOHBETLER</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>PROGRAM SAYISI<br> ERKEKLER</span><strong>{{teskilat_raporu.egitim_sohbetler.program1}}</strong></div>
+        <div class="stat-card"><span>ORTALAMA KATILIMCI SAYISI <br> ERKEKLER</span><strong>{{teskilat_raporu.egitim_sohbetler.katilim1}}</strong></div>
+        <div class="stat-card"><span>PROGRAM SAYISI<br> HANIMLAR</span><strong>{{teskilat_raporu.egitim_sohbetler.program2}}</strong></div>
+        <div class="stat-card"><span>ORTALAMA KATILIMCI SAYISI <br> HANIMLAR</span><strong>{{teskilat_raporu.egitim_sohbetler.katilim2}}</strong></div>
+    </div>
+
+    <div class="edu-subsection-title">KİTAP TAHLİLİ</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>PROGRAM SAYISI<br> ERKEKLER</span><strong>{{teskilat_raporu.egitim_kitap.program1}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> ERKEKLER</span><strong>{{teskilat_raporu.egitim_kitap.katilim1}}</strong></div>
+        <div class="stat-card"><span>PROGRAM SAYISI<br> HANIMLAR</span><strong>{{teskilat_raporu.egitim_kitap.program2}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> HANIMLAR</span><strong>{{teskilat_raporu.egitim_kitap.katilim2}}</strong></div>
+    </div>
+
+    <div class="edu-subsection-title">SEMİNER/KONFERANS</div>
+   <div class="stats-grid">
+        <div class="stat-card"><span>PROGRAM SAYISI<br> ERKEKLER</span><strong>{{teskilat_raporu.egitim_seminer.program1}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> ERKEKLER</span><strong>{{teskilat_raporu.egitim_seminer.katilim1}}</strong></div>
+        <div class="stat-card"><span>PROGRAM SAYISI<br> HANIMLAR</span><strong>{{teskilat_raporu.egitim_seminer.program2}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> HANIMLAR</span><strong>{{teskilat_raporu.egitim_seminer.katilim2}}</strong></div>
+    </div>
+
+    <div class="edu-subsection-title">ATÖLYE VE MESLEKİ ÇALIŞMALAR</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>PROGRAM SAYISI<br> ERKEKLER</span><strong>{{teskilat_raporu.egitim_meslek.program1}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> ERKEKLER</span><strong>{{teskilat_raporu.egitim_meslek.katilim1}}</strong></div>
+        <div class="stat-card"><span>PROGRAM SAYISI<br> HANIMLAR</span><strong>{{teskilat_raporu.egitim_meslek.program2}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> HANIMLAR</span><strong>{{teskilat_raporu.egitim_meslek.katilim2}}</strong></div>
+    </div>
+
+     <div class="edu-subsection-title">DİĞER EĞİTİM ÇALIŞMALARI</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>PROGRAM SAYISI<br> ERKEKLER</span><strong>{{teskilat_raporu.egitim_diger.program1}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> ERKEKLER</span><strong>{{teskilat_raporu.egitim_diger.katilim1}}</strong></div>
+        <div class="stat-card"><span>PROGRAM SAYISI<br> HANIMLAR</span><strong>{{teskilat_raporu.egitim_diger.program2}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> HANIMLAR</span><strong>{{teskilat_raporu.egitim_diger.katilim2}}</strong></div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-users"></i> SOSYAL ÇALIŞMALAR</div>
+    <div class="edu-subsection-title">GEZİ (ŞEHİR İÇİ/DIŞI TÜM GEZİLER)</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>PROGRAM SAYISI<br> ERKEKLER</span><strong>{{teskilat_raporu.sosyal_calismalar_gezi.program1}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> ERKEKLER</span><strong>{{teskilat_raporu.sosyal_calismalar_gezi.katilim1}}</strong></div>
+        <div class="stat-card"><span>PROGRAM SAYISI<br> HANIMLAR</span><strong>{{teskilat_raporu.sosyal_calismalar_gezi.program2}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> HANIMLAR</span><strong>{{teskilat_raporu.sosyal_calismalar_gezi.katilim2}}</strong></div>
+    </div>
+
+    <div class="edu-subsection-title">SPORTİF ETKİNLİKLER</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>PROGRAM SAYISI<br> ERKEKLER</span><strong>{{ teskilat_raporu.sosyal_calismalar_spor.program1 }}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> ERKEKLER</span><strong>{{ teskilat_raporu.sosyal_calismalar_spor.katilim1 }}</strong></div>
+        <div class="stat-card"><span>PROGRAM SAYISI<br> HANIMLAR</span><strong>{{ teskilat_raporu.sosyal_calismalar_spor.program2 }}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI<br> HANIMLAR</span><strong>{{ teskilat_raporu.sosyal_calismalar_spor.katilim2 }}</strong></div>
+    </div>
+
+    <div class="edu-subsection-title">KÜLTÜR-SANAT FAALİYETLERİ</div>
+     <div class="stats-grid">
+        <div class="stat-card"><span>PROGRAM SAYISI<br> ERKEKLER</span><strong>{{teskilat_raporu.sosyal_calismalar_sanat.program1}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> ERKEKLER</span><strong>{{teskilat_raporu.sosyal_calismalar_sanat.katilim1}}</strong></div>
+        <div class="stat-card"><span>PROGRAM SAYISI<br> HANIMLAR</span><strong>{{teskilat_raporu.sosyal_calismalar_sanat.program2}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> HANIMLAR</span><strong>{{teskilat_raporu.sosyal_calismalar_sanat.katilim2}}</strong></div>
+    </div>
+
+    <div class="edu-subsection-title">DİĞER SOSYAL ÇALIŞMALAR</div>
+     <div class="stats-grid">
+        <div class="stat-card"><span>PROGRAM SAYISI<br> ERKEKLER</span><strong>{{teskilat_raporu.sosyal_calismalar_diger.program1}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> ERKEKLER</span><strong>{{teskilat_raporu.sosyal_calismalar_diger.katilim1}}</strong></div>
+        <div class="stat-card"><span>PROGRAM SAYISI<br> HANIMLAR</span><strong>{{teskilat_raporu.sosyal_calismalar_diger.program2}}</strong></div>
+        <div class="stat-card"><span>KATILIMCI SAYISI <br> HANIMLAR</span><strong>{{teskilat_raporu.sosyal_calismalar_diger.katilim2}}</strong></div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-handshake"></i> DANIŞMANLIK VE REHBERLİK ÇALIŞMALARI</div>
+    
+    <div class="stats-grid">
+        <div class="stat-card"><span>AKADEMİK YARDIMLARIN SAYISI</span><strong>{{ teskilat_raporu.rehberlik_calismalari.akademik }}</strong></div>
+        <div class="stat-card"><span>SAĞLIK YARDIMLARI SAYISI</span><strong>{{ teskilat_raporu.rehberlik_calismalari.saglik }}</strong></div>
+        <div class="stat-card"><span>BARINMA YARDIMLARI SAYISI</span><strong>{{ teskilat_raporu.rehberlik_calismalari.barinma }}</strong></div>
+        <div class="stat-card"><span>RESMİ İŞLEM YARDIMI SAYISI</span><strong>{{ teskilat_raporu.rehberlik_calismalari.yardim }}</strong></div>
+        <div class="stat-card"><span>DİĞER YARDIMLAR SAYISI</span><strong>{{ teskilat_raporu.rehberlik_calismalari.diger }}</strong></div>
+    </div>
+
+    <div class="section-title"><i class="fa fa-lira-sign"></i> KURUMSAL İLİŞKİLER</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>GİDİLEN KURUMSAL ZİYARET SAYISI</span><strong>{{teskilat_raporu.kurumsal_iliskiler.gidilen}}</strong></div>
+        <div class="stat-card"><span>GELEN KURUMSAL ZİYARET SAYISI</span><strong>{{ teskilat_raporu.kurumsal_iliskiler.gelen }}</strong></div>
+        
+    </div>
+
+    <div class="section-title"><i class="fa fa-lira-sign"></i> FON ÇALIŞMALARI</div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>AİDAT VEREN KİŞİ SAYISI</span><strong>{{teskilat_raporu.fon_calismalari.aidat}}</strong></div>
+        <div class="stat-card"><span>MEVCUT KUMBARA SAYISI</span><strong>{{teskilat_raporu.fon_calismalari.kumbara}}</strong></div>
+        <div class="stat-card"><span>BİREYSEL BAĞIŞÇI SAYISI</span><strong>{{teskilat_raporu.fon_calismalari.bagisci}}</strong></div>
+    </div>
+
+    <div class="edu-subsection-title">NAKDİ GELİRLER</div>
+    <div class="stats-grid">
+        <div class="stat-card money-card"><span>ZEKAT GELİRLERİ</span><strong>{{ teskilat_raporu.fon_calismalari.zekat }}</strong></div>
+        <div class="stat-card money-card"><span>PROJE GELİRLERİ</span><strong>{{ teskilat_raporu.fon_calismalari.proje }}</strong></div>
+        <div class="stat-card money-card"><span>SERBEST (DİĞER) BAĞIŞ</span><strong>{{ teskilat_raporu.fon_calismalari.serbest }}</strong></div>
+        <div class="stat-card money-card"><span>AYNİ GELİR (YAKLAŞIK MİKTAR)</span><strong>{{ teskilat_raporu.fon_calismalari.ayni }}</strong></div>
+    </div>
+
+    <div class="edu-subsection-title">MALİ ZİYARET SAYISI</div>
+    <div class="stats-grid">
+        <div class="stat-card money-card"><strong>{{teskilat_raporu.fon_calismalari.mali_ziyaret}}</strong></div>
+        
+    </div>
+
+    <div class="section-title"><i class="fab fa-share-alt"></i> SOSYAL MEDYA HESAPLARI</div>
+    <div class="stats-grid">
+        <div class="stat-card border-instagram">
+            <i class="fab fa-instagram social-icon" style="color: #E1306C;"></i>
+            <span class="social-name">INSTAGRAM</span>
+            <div class="social-data">
+                <div><span>Takipçi</span><strong>{{ teskilat_raporu.sosyal_hesaplar.instagram_takipci }}</strong></div>
+                <div><span>İçerik</span><strong>{{ teskilat_raporu.sosyal_hesaplar.instagram_icerik }}</strong></div>
+            </div>
+        </div>
+        <div class="stat-card border-facebook">
+            <i class="fab fa-facebook-f social-icon" style="color: #1877F2;"></i>
+            <span class="social-name">FACEBOOK</span>
+            <div class="social-data">
+                <div><span>Takipçi</span><strong>{{ teskilat_raporu.sosyal_hesaplar.facebook_takipci }}</strong></div>
+                <div><span>İçerik</span><strong>{{ teskilat_raporu.sosyal_hesaplar.facebook_icerik }}</strong></div>
+            </div>
+        </div>
+        <div class="stat-card border-x">
+            <i class="fab fa-x-twitter social-icon" style="color: #000;"></i>
+            <span class="social-name">X (TWITTER)</span>
+            <div class="social-data">
+                <div><span>Takipçi</span><strong>{{ teskilat_raporu.sosyal_hesaplar.twitter_takipci }}</strong></div>
+                <div><span>İçerik</span><strong>{{ teskilat_raporu.sosyal_hesaplar.twitter_icerik }}</strong></div>
+            </div>
+        </div>
+        <div class="stat-card border-youtube">
+            <i class="fab fa-youtube social-icon" style="color: #FF0000;"></i>
+            <span class="social-name">YOUTUBE</span>
+            <div class="social-data">
+                <div><span>Takipçi</span><strong>{{ teskilat_raporu.sosyal_hesaplar.youtube_takipci }}</strong></div>
+                <div><span>İçerik</span><strong>{{ teskilat_raporu.sosyal_hesaplar.youtube_icerik }}</strong></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#btnPrint').click(function () {
+        window.print();
+    });
+</script>
+
+</body>
+</html>

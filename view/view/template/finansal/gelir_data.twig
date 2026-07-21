@@ -1,0 +1,467 @@
+<div class="table-responsive-sm">
+    <form id="form-gelir">
+        <table class="table table-bordered align-middle mb-0" style="font-size: 12px;">
+            <thead class="align-middle text-white" style="background-color: #018bd3; font-weight: bold;">
+                <tr>
+                    <th class="text-center" style="width: 50px;">...</th>
+                    <th>Bağışçı / Birim</th>
+                    <th>Tarih / Açıklama</th>
+                    <th>Bölüm / Proje</th>
+                    <th>Hesap / Tür</th>
+                    <th>Fon / Yöntem</th>
+                    <th>Gider Kategorisi</th>
+                    <th class="text-center" style="width: 120px;">Tutar</th>
+                    <th class="text-center" style="width: 100px;">Eylemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <input type="hidden" name="filter_url" value="{{mali_gelir_link}}" class="form-control" />
+                
+                {% set gelir_row = 0 %}
+                {% for gelir in gelir_data %}
+                <tr id="gelir-row{{ gelir_row }}">
+                    
+                    <!-- 1. SÜTUN: SÜRÜKLE & SEÇ -->
+                    <td class="text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-arrows-move text-secondary fs-6" style="cursor: move;" title="Taşı"></i>
+                            <input type="checkbox" class="form-check-input m-0 row-checkbox" name="select[]" value="{{gelir.mali_id}}" style="cursor: pointer;">
+                        </div>
+                    </td>
+
+                    <!-- 2. SÜTUN: BAĞIŞÇI (AD SOYAD) & BİRİM -->
+                    <td>
+                        <input type="hidden" name="data_gelir[{{gelir_row}}][mali_id]" value="{{gelir.mali_id}}" />
+                        <div class="edit-mode" style="display:none;">
+                            <input type="text" name="data_gelir[{{gelir_row}}][adsoyad]" value="{{gelir.name}}" placeholder="Ad Soyad" data-for="adsoyad" class="form-control auto-complate form-control-sm mb-1" />
+                            <input type="hidden" name="data_gelir[{{gelir_row}}][bagisci_id]" value="{{gelir.bagisci_id}}" />
+                            
+                            <input type="text" name="data_gelir[{{gelir_row}}][birim]" value="{{gelir.birim}}" data-for="8" placeholder="Birim" class="form-control auto-complate form-control-sm" required />
+                            <input type="hidden" name="data_gelir[{{gelir_row}}][birim_id]" value="{{gelir.birim_id}}" />
+                        </div>
+                        <div class="view-mode">
+                            <strong class="d-block text-dark">{{gelir.name}}</strong>
+                            <small class="text-muted d-block" style="font-size: 11px;">
+                                <i class="bi bi-tag me-1"></i>Birim: {{gelir.birim}}
+                            </small>
+                        </div>
+                    </td>
+
+                    <!-- 3. SÜTUN: TARİH & AÇIKLAMA -->
+                    <td>
+                        <div class="edit-mode" style="display:none;">
+                            <input type="date" name="data_gelir[{{gelir_row}}][date]" value="{{gelir.date}}" class="form-control form-control-sm mb-1" />
+                            <textarea name="data_gelir[{{gelir_row}}][description]" placeholder="Açıklama" class="form-control form-control-sm" rows="1">{{gelir.description_long}}</textarea>
+                        </div>
+                        <div class="view-mode">
+                            <span class="d-block fw-bold text-secondary mb-1" style="font-size: 12px;">{{gelir.date|date("d.m.Y")}}</span>
+                            <span class="d-block text-dark text-truncate" style="max-width: 180px;" title="{{gelir.description_long}}">
+                                {{gelir.description|default('-')}}
+                            </span>
+                        </div>
+                    </td>
+
+                    <!-- 4. SÜTUN: BÖLÜM & PROJE -->
+                    <td>
+                        <div class="edit-mode" style="display:none;">
+                            <select name="data_gelir[{{gelir_row}}][bolum]" onchange="selectBolum(this.value,'{{gelir_row}}');" class="form-select form-select-sm mb-1">
+                                {% for key,value in bolumler %}
+                                <option value="{{key}}" {% if gelir.bolum == key %} selected {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="text" name="data_gelir[{{gelir_row}}][proje]" value="{{gelir.proje}}" data-for="7" placeholder="Proje" class="form-control auto-complate form-control-sm" required />
+                            <input type="hidden" name="data_gelir[{{gelir_row}}][proje_id]" value="{{gelir.proje_id}}" />
+                        </div>
+                        <div class="view-mode">
+                            <span class="badge bg-light text-dark border mb-1" style="font-size: 11px;">{{ bolumler[gelir.bolum] }}</span>
+                            <small class="text-muted text-truncate d-block" style="max-width: 140px;" title="{{gelir.proje}}">{{gelir.proje}}</small>
+                        </div>
+                    </td>
+
+                    <!-- 5. SÜTUN: HESAP & TÜR -->
+                    <td>
+                        <div class="edit-mode" style="display:none;">
+                            <input type="text" name="data_gelir[{{gelir_row}}][hesap]" value="{{gelir.hesap}}" placeholder="Hesap" data-for="1" class="form-control auto-complate form-control-sm mb-1" required />
+                            <input type="hidden" name="data_gelir[{{gelir_row}}][hesap_id]" value="{{gelir.hesap_id}}" />
+                            <input type="text" name="data_gelir[{{gelir_row}}][tur]" value="{{gelir.tur}}" placeholder="Tür" data-for="2" class="form-control auto-complate form-control-sm" required />
+                            <input type="hidden" name="data_gelir[{{gelir_row}}][tur_id]" value="{{gelir.tur_id}}" />
+                        </div>
+                        <div class="view-mode">
+                            <span class="d-block text-dark">{{gelir.hesap}}</span>
+                            <small class="text-muted d-block">{{gelir.tur}}</small>
+                        </div>
+                    </td>
+
+                    <!-- 6. SÜTUN: FON & GEL/GİD ŞEKLİ -->
+                    <td>
+                        <div class="edit-mode" style="display:none;">
+                            <input type="text" name="data_gelir[{{gelir_row}}][fon]" value="{{gelir.fon}}" placeholder="Fon" data-for="4" class="form-control auto-complate form-control-sm mb-1" required />
+                            <input type="hidden" name="data_gelir[{{gelir_row}}][fon_id]" value="{{gelir.fon_id}}" />
+                            <input type="text" name="data_gelir[{{gelir_row}}][gelir_sekli]" value="{{gelir.gelir_sekli}}" data-for="5" placeholder="Yöntem" class="form-control auto-complate form-control-sm" required />
+                            <input type="hidden" name="data_gelir[{{gelir_row}}][gelir_sekli_id]" value="{{gelir.gelir_sekli_id}}" />
+                        </div>
+                        <div class="view-mode">
+                            <span class="d-block text-dark">{{gelir.fon}}</span>
+                            <small class="text-muted d-block">{{gelir.gelir_sekli}}</small>
+                        </div>
+                    </td>
+
+                    <!-- 7. SÜTUN: GİDER KATEGORİSİ -->
+                    <td>
+                        <div class="edit-mode" style="display:none;">
+                            <input type="text" name="data_gelir[{{gelir_row}}][gider_category]" value="{{gelir.gider_category}}" data-for="6" placeholder="Kategori" class="form-control auto-complate form-control-sm">
+                            <input type="hidden" name="data_gelir[{{gelir_row}}][gider_category_id]" value="{{gelir.gider_category_id}}" />
+                        </div>
+                        <div class="view-mode">
+                            <span class="text-truncate d-block" style="max-width: 120px;">{{gelir.gider_category}}</span>
+                        </div>
+                    </td>
+
+                    <!-- 8. SÜTUN: TUTAR (TEK VE NET) -->
+                    <td class="text-end">
+                        <div class="edit-mode" style="display:none;">
+                            <div class="">
+                                <input type="text" name="data_gelir[{{gelir_row}}][currency]" value="{{gelir.currency}}" data-for="currency" class="form-control auto-complate text-center fw-bold text-success"  required />
+                                <input type="text" name="data_gelir[{{gelir_row}}][tutar]" value="{{gelir.tutar}}" data-mask="#.##,00" class="form-control" style="color:{{gelir.color}};" required />
+                            </div>
+                            <input type="hidden" name="data_gelir[{{gelir_row}}][kur]" value="{{gelir.kur}}" />
+                        </div>
+                        <div class="view-mode font-monospace">
+                            <span class="fs-6 " style="color:{{gelir.color}};">
+                                {{gelir.math_sembol}}{{gelir.tutar}} <span class="text-dark small fw-normal">{{gelir.currency}}</span>
+                            </span>
+                        </div>
+                    </td>
+
+                    <!-- 9. SÜTUN: EYLEMLER -->
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+                            <button type="button" onclick="gelirSave();" class="btn btn-success btn-sm btn-save{{gelir_row}} btn-save" style="display:none;" title="Kaydet">
+                                <i class="bi bi-save"></i>
+                            </button>
+                            <button type="button" id="btn-edit{{gelir_row}}" onclick="editGelir('{{gelir_row}}');" class="btn btn-outline-info btn-sm" title="Düzenle">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button type="button" onclick="remove('{{gelir.mali_id}}');" class="btn btn-outline-danger btn-sm" title="Sil">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% set gelir_row = gelir_row + 1 %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+ <script type="text/javascript">
+ $('#cover-spin').hide(0);
+  var gelir_row = {{ gelir_row }};
+  function addGelir() {
+    html = '<tr id="gelir-row' + gelir_row + '" class="post-field align-middle bg-light-info">';
+    
+    // 1. SÜTUN: SÜRÜKLE & SEÇ
+    html += ' <td class="text-center">';
+    html += '   <div class="d-flex align-items-center justify-content-center gap-2">';
+    html += '     <i class="fa fa-arrows-v" style="font-size:16px; cursor: move;"></i>';
+    html += '     <input type="checkbox" class="form-check-input m-0 row-checkbox" name="select[]" value="0" style="cursor: pointer;">';
+    html += '   </div>';
+    html += ' </td>';
+
+    // 2. SÜTUN: BAĞIŞÇI (AD SOYAD) & BİRİM
+    html += ' <td class="text-left">';
+    html += '   <input name="mali_id" type="hidden" value="0"/>';
+    html += '   <input type="text" name="data_gelir[' + gelir_row + '][adsoyad]" data-for="adsoyad" value="" placeholder="{{ "Bağışçı / Ad Soyad" }}" class="form-control input-sm auto-complate mb-1" required/>';
+    html += '   <input type="hidden" name="data_gelir[' + gelir_row + '][bagisci_id]" value="" class="input-hidden"/>';
+    html += '   <input type="text" name="data_gelir[' + gelir_row + '][birim]" value="" data-for="8" placeholder="{{ "Birim" }}" class="form-control input-sm auto-complate" required/>';
+    html += '   <input type="hidden" name="data_gelir[' + gelir_row + '][birim_id]" value="" class="input-hidden"/>';
+    html += ' </td>';
+
+    // 3. SÜTUN: TARİH & AÇIKLAMA
+    html += ' <td class="text-left">';
+    html += '   <input type="date" name="data_gelir[' + gelir_row + '][date]" value="{{bugun}}" placeholder="{{ "Tarih" }}" class="form-control input-sm auto-complate mb-1" required/>';
+    html += '   <textarea name="data_gelir[' + gelir_row + '][description]" placeholder="{{ "Açıklama" }}" class="form-control input-sm" rows="1"></textarea>';
+    html += ' </td>';
+
+    // 4. SÜTUN: BÖLÜM & PROJE
+    html += ' <td class="text-left">';
+    html += '   <select name="data_gelir[' + gelir_row + '][bolum]" onchange="selectBolum(this.value,' + gelir_row + ');" class="form-select input-sm select-bolum mb-1">';
+                {% for key,value in bolumler %}
+    html += '     <option value="{{key}}">{{value}}</option>';
+                {% endfor %}
+    html += '   </select>';
+    html += '   <input type="text" name="data_gelir[' + gelir_row + '][proje]" value="" data-for="7" placeholder="{{ "Proje" }}" class="form-control input-sm auto-complate" required/>';
+    html += '   <input type="hidden" name="data_gelir[' + gelir_row + '][proje_id]" value="" class="input-hidden"/>';
+    html += ' </td>';
+
+    // 5. SÜTUN: HESAP & TÜR
+    html += ' <td class="text-left">';
+    html += '   <input type="text" name="data_gelir[' + gelir_row + '][hesap]" value="" data-for="1" title="hesap" placeholder="{{ "Hesaplar" }}" class="form-control input-sm auto-complate mb-1" required/>';
+    html += '   <input type="hidden" name="data_gelir[' + gelir_row + '][hesap_id]" value="" class="input-hidden"/>';
+    html += '   <input type="text" name="data_gelir[' + gelir_row + '][tur]" value="" data-for="2" for2="3" placeholder="{{ "Tür" }}" class="form-control input-sm auto-complate" required/>';
+    html += '   <input type="hidden" name="data_gelir[' + gelir_row + '][tur_id]" value="" class="input-hidden"/>';
+    html += ' </td>';
+
+    // 6. SÜTUN: FON & GELİR ŞEKLİ (YÖNTEM)
+    html += ' <td class="text-left">';
+    html += '   <input type="text" name="data_gelir[' + gelir_row + '][fon]" value="" data-for="4" placeholder="{{ "Fon" }}" class="form-control input-sm auto-complate mb-1" required/>';
+    html += '   <input type="hidden" name="data_gelir[' + gelir_row + '][fon_id]" value="" class="input-hidden"/>';
+    html += '   <input type="text" name="data_gelir[' + gelir_row + '][gelir_sekli]" value="" data-for="5" placeholder="{{ "Gelir Şekli" }}" class="form-control input-sm auto-complate" required/>';
+    html += '   <input type="hidden" name="data_gelir[' + gelir_row + '][gelir_sekli_id]" value="" class="input-hidden"/>';
+    html += ' </td>';
+
+    // 7. SÜTUN: GİDER KATEGORİSİ
+    html += ' <td class="text-left">';
+    html += '   <input type="text" name="data_gelir[' + gelir_row + '][gider_category]" data-for="6" value="" placeholder="{{ "Gider Kategorisi" }}" class="form-control input-sm auto-complate" required/>';
+    html += '   <input type="hidden" name="data_gelir[' + gelir_row + '][gider_category_id]" class="input-hidden"/>';
+    html += ' </td>';
+
+    // 8. SÜTUN: TUTAR (Grup Halinde Tek Sütun)
+    html += ' <td class="text-end">';
+    html += '   <div class="input-group input-group-sm">';
+    html += '     <input type="text" name="data_gelir[' + gelir_row + '][currency]" value="" data-for="currency" placeholder="Döviz" id="field-cins' + gelir_row + '" class="form-control auto-complate text-center fw-bold text-success" style="max-width: 55px;" required/>';
+    html += '     <input type="text" name="data_gelir[' + gelir_row + '][tutar]" value="" placeholder="{{ "Tutar" }}" data-mask="#.##,00" class="form-control" required/>';
+    html += '   </div>';
+    html += '   <input type="hidden" name="data_gelir[' + gelir_row + '][kur]" value="" class="input-hidden-kur"/>';
+    html += ' </td>';
+
+    // 9. SÜTUN: EYLEMLER (Kaydet / Sil)
+    html += ' <td class="text-center">';
+    html += '   <div class="d-flex justify-content-center gap-1">';
+    html += '     <button type="button" id="btn-save' + gelir_row + '" onclick="gelirSave();" data-toggle="tooltip" title="{{ "Düzenleme" }}" class="btn btn-success btn-sm"><i class="bi bi-save"></i></button>';
+    html += '     <button type="button" onclick="$(\'#gelir-row' + gelir_row + '\').remove()" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-outline-danger btn-sm"><i class="bi bi-x-circle"></i></button>';
+    html += '   </div>';
+    html += ' </td>';
+    
+    html += '</tr>';
+        
+    $('#tab-data table tbody').append(html);
+
+    gelirautocomplete(gelir_row);
+
+    $('select[name="data_gelir[' + gelir_row + '][bolum]"]').trigger('change');
+    $('#button-gelir').show();
+    $('#btn-edit' + gelir_row).hide();
+    $('#btn-save' + gelir_row).show();
+
+    $('html, body').animate({scrollTop: $('#tab-data table tbody tr:last').offset().top}, 500);
+     
+    gelir_row++;
+  }
+</script>
+
+<script type="text/javascript">
+function gelirSave() {
+  var url_filter = $('input[name^="filter_url"]').val();
+  var error = '';
+  $('#tab-data').find('.auto-complate').each(function(index, element) {
+    const $element = $(element);
+    const value = $element.val().trim();
+    const isRequired = $element.prop('required');
+
+    if (isRequired && value === '') {
+      $element.find('span').hide();
+      $element.show();
+      $element.css('border-color', 'red');
+
+      //error = "Lütfen kırmızı renkle belirtilmiş alanları doldurunuz.";
+    } else {
+      $element.css('border-color', '');
+    }
+  });
+
+  if (error) {
+    alerterror(error);
+    return;
+  }
+
+  $.ajax({
+    url: 'index.php?route=finansal/gelir/save&user_token={{ user_token }}',
+    type: 'post',
+    dataType: 'json',
+    data: $('#form-gelir .post-field').find('input,select,textarea').serialize(),
+        success: function(json) {
+            if (json.error.warning) {
+               alerterror(json.error.warning);
+            }
+            
+            if (json.success) {
+             $('#tab-data').load(url_filter, initializeDragDrop);
+             $('input[name^=\'form\']').val(json['form']);
+      
+              alertsuccess(json.success);
+            }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+        });
+    }
+    
+
+function gelirautocomplete(gelir_row) {
+  $('#tab-data .auto-complate').autocomplete({
+  
+    source: function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/gelirgroupautocomplete&user_token={{ user_token }}&bolum=' + $(this).attr('data-for') + '&filter_name=' + encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item.name,
+              label2: item.disabled,
+              value: item.id
+            };
+          }));
+        }
+      });
+    },
+    select: function(item) {
+      if (item.value == 'new') {
+        $('#modal-bagisci').modal('show');
+        return false;
+      }
+
+      if (item.label !== 'TRY' && $(this).attr('data-for') === 'currency') {
+        $(this).closest('td').find('.input-hidden-kur').val($('#currency' + item.label).attr('for'));
+      }
+
+      $(this).val(item.label);
+      
+      $(this).closest('td').find('.input-hidden').val(item.value);
+    }
+  });
+}
+</script>
+<script>
+function editGelir(rowId) {
+    // Önce tüm satırları resetle
+    $('tbody tr').each(function() {
+        $(this).removeClass('post-field');
+         $(this).removeClass('bg-light-info');
+        $(this).find('.edit-mode').hide().removeClass('active-row post-field');
+        $(this).find('.view-mode').show();
+        $('[id^="btn-edit"]').show();
+        $(this).find('.btn-save').hide();
+    });
+
+    // Şimdi sadece seçilen satırı aktif et
+    var $row = $('#gelir-row' + rowId);
+   
+    $row.find('.edit-mode').show().addClass('active-row post-field');
+    $row.find('.view-mode').hide();
+    $row.addClass('post-field');
+
+    // Butonları ayarla
+    $row.find('#btn-edit' + rowId).hide();
+    $row.find('.btn-save' + rowId).show();
+    $row.addClass('bg-light-info');
+
+    // Ekstra fonksiyonlar
+    gelirautocomplete(rowId);
+    $('#button-gelir').show();
+    // autoExpandTextarea($row.find('textarea'));
+}
+
+function autoExpandTextarea($textarea) {
+  $textarea.css('height', 'auto');
+  $textarea.css('height', $textarea.prop('scrollHeight') + 'px');
+}
+</script>
+
+<script>
+function selectBolum(bolum, rowId) {
+  $('#form-gelir input').attr('required', true);
+  const $name = $('input[name="data_gelir[' + rowId + '][adsoyad]"]');
+  const $tur = $('input[name="data_gelir[' + rowId + '][tur]"]');
+  const $gider_category = $('input[name="data_gelir[' + rowId + '][gider_category]"]');
+   
+  if (bolum == 2) {
+    $name.val('');
+    $name.prop('disabled', false);
+    $name.removeAttr('required');
+    $gider_category.prop('required', true);
+    $gider_category.prop('disabled', false);
+    $tur.attr('data-for', '3');
+  } else if (bolum == 1) {
+    $name.prop('disabled', false);
+    $name.prop('required', false);
+    $gider_category.val('');
+    $gider_category.prop('disabled', true);
+    $tur.attr('data-for', '2');
+  }else{
+   $('#form-gelir input').removeAttr('required');
+  }
+}
+$('.select-bolum').trigger('change');
+</script>
+
+<script>
+$(function () {
+    // Popover'ı başlat
+    $('#date-range-display').popover({
+        html: true,
+        placement: 'bottom',
+        title: 'Tarih Aralığı Seçin',
+        content: function () {
+            return $('#popover-content').html();
+        }
+    });
+
+    // Popover dışına tıklandığında kapatma (opsiyonel)
+    $('body').on('click', function (e) {
+        if ($(e.target).data('toggle') !== 'popover' && $(e.target).parents('.popover').length === 0) {
+            $('[data-toggle="popover"]').popover('hide');
+        }
+    });
+});
+
+// Uygula butonuna basıldığında çalışacak fonksiyon
+function applyDateFilter() {
+    // Popover içindeki inputlardan değerleri al (Popover clone oluşturduğu için özel seçici gerekir)
+    var start = $('.popover #popover_start').val();
+    var end = $('.popover #popover_end').val();
+
+    if(start && end) {
+        $('#date-range-display').val(1);
+        $('#date-range-display').trigger('change');
+    }
+  
+    $('#date-range-display').popover('hide');
+}
+</script>
+<style>
+.btn-xs {
+  padding: .25rem .4rem;   /* daha dar iç boşluk */
+  font-size: .75rem;       /* daha küçük yazı */
+  line-height: 1.2;        /* satır yüksekliği */
+  border-radius: .2rem;    /* köşe yuvarlama */
+}
+a.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  cursor: default;
+}
+
+span.disabled {
+  opacity: 0.6;
+}
+.bg-light-danger {
+  background-color: #fff7f7ff !important;
+}
+
+ul.dropdown-menu {
+  max-height: 300px; /* Maksimum yükseklik */
+  overflow-y: auto;  /* Yükseklik aşıldığında dikey scroll çıksın */
+}
+</style>

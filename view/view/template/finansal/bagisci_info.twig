@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <base href="{{ base }}" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --bg-body: #f4f7fe;
+        }
+
+        body { 
+            background-color: var(--bg-body); 
+            font-family: 'Inter', sans-serif;
+            color: #2b3674;
+        }
+
+        /* Modern Dashboard Kartı */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            padding: 2.5rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Başlık Alanı - Mobil Uyumlu Flex */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Mobilde alt alta geçmesi için */
+            gap: 15px;      /* Elemanlar arası boşluk */
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .page-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            color: var(--secondary-color);
+            margin: 0;
+        }
+
+        /* Özel Buton Tasarımı */
+        .btn-modern-pdf {
+            background: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3);
+            white-space: nowrap; /* Metnin kırılmasını önler */
+        }
+
+        .btn-modern-pdf:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 75, 43, 0.4);
+            color: white;
+        }
+
+        /* Tablo Stilleri */
+        #staj-listesi table {
+            border-radius: 12px;
+            overflow: hidden;
+            border: none !important;
+            width: 100%;
+        }
+
+        #staj-listesi th {
+            background-color: #f8f9fa !important;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: #a3aed0;
+            padding: 15px;
+            border-bottom: 1px solid #f1f1f1;
+            white-space: nowrap; /* Başlıklar mobilde sıkışmasın */
+        }
+
+        #staj-listesi td {
+            padding: 15px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 0.9rem;
+        }
+
+        /* --- MOBİL ÖZEL AYARLAR --- */
+        @media (max-width: 768px) {
+            .glass-card {
+                padding: 1.25rem; /* Kenar boşluklarını daralt */
+                margin-top: 1rem;
+                border-radius: 15px;
+            }
+            .header-section {
+                flex-direction: column; /* Mobilde başlık üstte, buton altta */
+                align-items: flex-start;
+                text-align: left;
+            }
+            .btn-modern-pdf {
+                width: 100%; /* Butonu mobilde tam genişlik yap */
+                text-align: center;
+            }
+            .page-title {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .glass-card { box-shadow: none; border: none; padding: 0; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid container-lg mb-5">
+    <div class="glass-card shadow-sm">
+        <div class="header-section no-print">
+            <div>
+                <h1 class="page-title">Bağışçı Geçmişi</h1>
+                <small class="text-muted d-block mt-1">Sistem üzerindeki kayıtlı tüm bağış hareketleri.</small>
+            </div>
+            
+            <button type="button" onclick="pdfPrint()" class="btn btn-modern-pdf">
+                <i class="fa-solid fa-file-pdf me-2"></i>PDF DÖKÜM AL
+            </button>
+        </div>
+
+        <div class="content-body">
+            <div id="staj-listesi" class="table-responsive">
+                {{ html }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function pdfPrint() {
+    const content = document.getElementById('staj-listesi').innerHTML;
+    const printWindow = window.open('', '_blank');
+
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Döküm - {{ title }}</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <style>
+                    body { font-family: 'Inter', sans-serif; padding: 30px; color: #333; }
+                    .print-header { border-bottom: 3px solid #4361ee; margin-bottom: 30px; padding-bottom: 10px; }
+                    table { width: 100% !important; border-collapse: collapse !important; }
+                    th { background-color: #f8f9fa !important; color: #4361ee !important; font-size: 12px; border: 1px solid #dee2e6 !important; padding: 10px; }
+                    td { font-size: 11px; border: 1px solid #dee2e6 !important; padding: 8px; }
+                    @media print { body { -webkit-print-color-adjust: exact; } }
+                </style>
+            </head>
+            <body>
+                <div class="print-header">
+                    <h2 style="margin:0;">BAĞIŞÇI KAYIT DÖKÜMÜ</h2>
+                    <p style="margin:5px 0 0 0;">{{ title }}</p>
+                    <small>Tarih: ${new Date().toLocaleString('tr-TR')}</small>
+                </div>
+                ${content}
+                <script>
+                    window.onload = function() {
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 500);
+                    };
+                <\/script>
+            </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

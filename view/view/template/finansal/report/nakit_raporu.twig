@@ -1,0 +1,46 @@
+
+   <br><div class="card">
+   <div class="card-header"><i class="fa-solid fa-list"></i> {{ "Nakit Akışı Raporu" }}</div>
+      <div class="card-body">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th class="text-left">{{ "Kasa/Hesap (Gelir-Gider)" }}</th>
+            <th class="text-right" style="width:15%">{{ "Gider Toplamı" }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if reports %}
+            {% for report in reports %}
+              <tr>
+                <td class="text-left">{{ report.name }}</td>
+                <td class="text-right">{{ report.total_gelir }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td class="text-center" colspan="3">{{ text_no_results }}</td>
+            </tr>
+          {% endif %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="text-right"><strong>{{ "Genel Toplam :" }}</strong></td>
+
+            <td class="text-right"><strong>{{ gider_toplam }}</strong></td> 
+          </tr>
+        </tfoot>
+      </table>
+      <div class="row ">
+      <div class="col-sm-6 text-start">{{ pagination }}</div>
+      <div class="col-sm-6 text-right">{{ results }}</div>
+    </div>
+   </div>
+
+
+   
+</div>
+
+</div>
+    
+  

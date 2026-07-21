@@ -1,0 +1,315 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+        <div class="ms-auto">
+            <button type="submit" form="form-basvuru" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> Kaydet</button>
+            <a href="{{cancel}}" class="btn btn-light btn-sm border border-dark shadow-sm bg-white"><i class="bi bi-arrow-counterclockwise"></i> Geri</a>
+        </div>
+    </div>
+
+    <div id="alert"></div>
+
+    <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-basvuru">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-none bg-light border">
+                    <div class="card-body row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-secondary">{{ entry_name }}</label>
+                            <input type="text" name="name" value="{{ name }}" id="input-name" class="form-control" placeholder="{{ entry_name }}" required />
+                            {% if error_name %}<div class="text-danger small">{{ error_name }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Başlangıç Tarihi</label>
+                            <input type="date" name="date_start" value="{{ date_start }}" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Bitiş Tarihi</label>
+                            <input type="date" name="date_end" value="{{ date_end }}" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-secondary">Kontenjan</label>
+                            <input type="number" name="kontenjan" value="{{ kontenjan }}" id="input-kontenjan" class="form-control" placeholder="Kontenjan miktarını giriniz" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-secondary">Açıklama</label>
+                            <textarea name="description" id="textarea-editor" style="height: 300px; overflow-y:auto;" class="form-control" placeholder="Başvuru ile ilgili detaylı açıklama yazınız">{{description}}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-secondary">Durum (Aktif/Pasif)</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="status" value="1" id="statusSwitch" style="width:2.5rem;height:1.2rem;" {{ status ? 'checked' : '' }}>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-none bg-light border ">
+                    <div class="card-body row g-3">
+                        <div class="col-12 text-center">
+                            <label class="form-label d-block fw-bold small text-secondary">Afiş</label>
+                            <a href="javascript:void(0);" id="thumb-image">
+                                <img src="{{ thumb }}" id="thumb-img" class="img-thumbnail shadow-sm bg-white" style="width:120px; height:120px; object-fit: cover;">
+                            </a>
+                            <input type="hidden" name="banner_image" value="{{image}}" id="input-image" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-secondary">Görünürlük Seçimi</label>
+                            <select name="secim" class="form-select form-select-sm">
+                               {% if user_store_id == 0 %}
+                                <option value="1" {% if secim == 1 %} selected="selected" {% endif %}>Tüm Dernek ve Temsilcilikler</optin>
+                                <option value="2" {% if secim == 2 %} selected="selected" {% endif %}>Seçili Dernek ve Temsilcilikler</optin>
+                                <option value="3" {% if secim == 3 %} selected="selected" {% endif %}>İHH Projeli Öğrenciler</optin>
+                                <option value="4" {% if secim == 4 %} selected="selected" {% endif %}>Link Verilen Öğrenciler</optin>
+                                {% else %}
+                                <option value="5" {% if secim == 2 %} selected="selected" {% endif %}>Dernek Öğrencileri</optin>
+                                <option value="4" {% if secim == 4 %} selected="selected" {% endif %}>Link Verilen Öğrenciler</optin>
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        <div id="copy-area" class="col-12" style="display:none;">
+                            <label class="form-label fw-bold small text-secondary">Paylaşım Linki</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="form_url_input" value="{{ form_url }}" class="form-control bg-white" readonly>
+                                <button type="button" id="button-copy" class="btn btn-outline-primary">Kopyala</button>
+                            </div>
+                            <small id="copy-status" class="text-success" style="display:none;">Link kopyalandı!</small>
+                        </div>
+
+                        <div id="dernekler" class="col-12" style="display:none;">
+                            <label class="form-label fw-bold small text-secondary">Dernek / Temsilcilik</label>
+                            <div class="border rounded p-2 bg-white" style="max-height: 140px; overflow-y: auto;">
+                                {% for store in stores %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="store_ids[]" value="{{ store.store_id }}" {{ store.store_id in store_ids ? 'checked' : '' }}>
+                                    <label class="form-check-label small">{{ store.name }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="col-12 pt-2">
+                            <label class="form-label fw-bold small text-secondary">Banka Bilgileri Ne Zaman İstensin?</label>
+                            <div class="form-check small">
+                                <input class="form-check-input" type="radio" name="bank_select" id="bank1" value="1" {{ bank_select == 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="bank1">Başvuru Formunda</label>
+                            </div>
+                            <div class="form-check small">
+                                <input class="form-check-input" type="radio" name="bank_select" id="bank2" value="2" {{ bank_select == 2 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="bank2">Başvuru Onaylanınca</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-4">
+            <fieldset class="border p-3 rounded bg-white shadow-sm">
+                <legend class="float-none w-auto px-2 fw-bold text-primary small">İSTENİLEN BELGELER</legend>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle" id="documentTable" style="font-size: 0.9rem;">
+                        <thead class="table-light">
+                            <tr class="text-secondary" style="font-weight: 500;">
+                                <th style="width: 20%;">Belge Adı</th>
+                                <th>Açıklama</th>
+                                <th style="width: 15%;">Görünüm</th>
+                                <th class="text-center" style="width: 8%;">İndirme</th>
+                                <th style="width: 20%;">Örnek Belge</th>
+                                <th class="text-center" style="width: 8%;">Zorunlu</th>
+                                <th class="text-end" style="width: 5%;">Eylem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="document-body">
+                            {% set document_row = 0 %}
+                            {% for belge in document %}
+                            <tr id="document-row-{{ document_row }}">
+                                <td><input type="text" name="document[{{ document_row }}][belge_adi]" class="form-control form-control-sm" value="{{ belge.belge_adi }}" placeholder="Belge adı giriniz" required></td>
+                                <td><input type="text" name="document[{{ document_row }}][description]" class="form-control form-control-sm" value="{{ belge.description }}" placeholder="Kısa not veya açıklama"></td>
+                                <td>
+                                    <select name="document[{{ document_row }}][file_display]" class="form-select form-select-sm">
+                                        <option value="1" {{ belge.file_display == 1 ? 'selected' : '' }}>İlk Başvuruda</option>
+                                        <option value="2" {{ belge.file_display == 2 ? 'selected' : '' }}>Onaylandığında</option>
+                                    </select>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" name="document[{{ document_row }}][download]" value="1" class="form-check-input" {{ belge.download == 1 ? 'checked' : '' }} onclick="toggleDownloadField({{ document_row }}, this)">
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm" id="download-wrapper-{{ document_row }}" style="{{ belge.download == 1 ? '' : 'display:none;' }}">
+                                        <input type="text" name="document[{{ document_row }}][download_file]" id="input-file-{{ document_row }}" class="form-control" value="{{ belge.download_file }}" readonly placeholder="Dosya yok">
+                                        <button type="button" class="btn btn-outline-info" onclick="documentUpload({{ document_row }})"><i class="bi bi-upload"></i></button>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" name="document[{{ document_row }}][required]" value="1" class="form-check-input" {{ belge.required == 1 ? 'checked' : '' }}>
+                                </td>
+                                <td class="text-end">
+                                    <button type="button" onclick="$('#document-row-{{ document_row }}').remove();" class="btn btn-outline-danger btn-sm border-0"><i class="bi bi-trash"></i> Sil</button>
+                                </td>
+                            </tr>
+                            {% set document_row = document_row + 1 %}
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6"></td>
+                                <td class="text-end pt-3">
+                                    <button type="button" onclick="addDocumentRow();" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus-lg"></i> Satır Ekle</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </fieldset>
+        </div>
+    </form>
+    {{ footer }}
+</main>
+
+<script>
+// --- Seçim ve Kopyalama Mantığı ---
+$('select[name="secim"]').on('change', function() {
+    const val = $(this).val();
+    $('#dernekler').toggle(val == '2');
+    $('#copy-area').toggle(val == '4');
+}).trigger('change');
+
+$('#button-copy').on('click', function() {
+    const copyText = document.getElementById("form_url_input");
+    copyText.select();
+    document.execCommand("copy");
+    $('#copy-status').fadeIn().delay(1500).fadeOut();
+});
+
+// --- Dinamik Belge Satırı ---
+let docRow = {{ document_row }};
+function addDocumentRow() {
+    let html = `<tr id="document-row-${docRow}">`;
+    html += `<td><input type="text" name="document[${docRow}][belge_adi]" class="form-control form-control-sm" placeholder="Örn: Kimlik Fotokopisi" required></td>`;
+    html += `<td><input type="text" name="document[${docRow}][description]" class="form-control form-control-sm" placeholder="Açıklama giriniz"></td>`;
+    html += `<td><select name="document[${docRow}][file_display]" class="form-select form-select-sm"><option value="1">İlk Başvuruda</option><option value="2">Onaylandığında</option></select></td>`;
+    html += `<td class="text-center"><input type="checkbox" name="document[${docRow}][download]" value="1" class="form-check-input" onclick="toggleDownloadField(${docRow}, this)"></td>`;
+    html += `<td><div class="input-group input-group-sm" id="download-wrapper-${docRow}" style="display:none;"><input type="text" name="document[${docRow}][download_file]" id="input-file-${docRow}" class="form-control" readonly placeholder="Dosya yükleyin"><button type="button" class="btn btn-outline-info" onclick="documentUpload(${docRow})"><i class="bi bi-upload"></i></button></div></td>`;
+    html += `<td class="text-center"><input type="checkbox" name="document[${docRow}][required]" value="1" class="form-check-input" checked></td>`;
+    html += `<td class="text-end"><button type="button" onclick="$('#document-row-${docRow}').remove();" class="btn btn-outline-danger btn-sm border-0"><i class="bi bi-trash"></i> Sil</button></td>`;
+    html += `</tr>`;
+    
+    $('#document-body').append(html);
+    docRow++;
+}
+
+function toggleDownloadField(row, checkbox) {
+    $(`#download-wrapper-${row}`).toggle(checkbox.checked);
+}
+
+// --- Dosya Yükleme ---
+function documentUpload(row) {
+    $('#form-upload').remove();
+    $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+    $('#form-upload input[name="file"]').trigger('click');
+
+    let timer = setInterval(function() {
+        if ($('#form-upload input[name="file"]').val() != '') {
+            clearInterval(timer);
+            $.ajax({
+                url: 'index.php?route=localisation/basvuru_burs/upload&user_token={{ user_token }}',
+                type: 'post',
+                dataType: 'json',
+                data: new FormData($('#form-upload')[0]),
+                cache: false, contentType: false, processData: false,
+                success: function(json) {
+                    if (json.success) {
+                        $(`#input-file-${row}`).val(json['filename']);
+                        alert('Dosya Başarıyla Yüklendi');
+                    }
+                    if (json.error) alert(json.error);
+                }
+            });
+        }
+    }, 500);
+}
+
+// --- RichTextEditor Başlatma ---
+$(document).ready(function() {
+    if (typeof RichTextEditor !== 'undefined') {
+        var editorCfg = {
+            toolbar: "basic",
+            lang: "tr",
+            removeButtons: ["images", "video"],
+            editorResizeMode: "none"
+        };
+        new RichTextEditor("#textarea-editor", editorCfg);
+    }
+});
+</script>
+<!--RESİM UPLOAD AND PREVIEW//-->
+<script type="text/javascript"><!--
+  $('#thumb-image').on('click', function() {
+ 
+  $('#form-upload').remove();
+
+	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+	$('#form-upload input[name=\'file\']').trigger('click');
+
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+
+			$.ajax({
+				url: 'index.php?route=tool/upload/uploadImage&user_token={{ user_token }}',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,
+				
+				success: function(json) {
+					if (json.error) {
+						alert(json.error);
+					}
+
+					if (json.success) {
+						alert(json.success);
+						$('#input-image').val(json['image']);
+						$('#thumb-img').attr('src',json['thumb']);
+	
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
+		}
+	}, 500);
+});
+
+//--></script>
+<style>
+    /* Tablo Metin Kalınlığı ve Düzeni */
+    .table thead th { font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+    .table tbody td { font-weight: 400; }
+    .form-control::placeholder { color: #adb5bd; font-size: 0.85rem; }
+    .thumbnail img:hover { border: 1px solid #0d6efd; cursor: pointer; }
+</style>
+

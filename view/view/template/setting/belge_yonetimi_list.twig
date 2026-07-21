@@ -1,0 +1,88 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">Belge Yönetim Listesi</h5>
+            <div class="ms-auto">
+              <a href="{{ add }}" type="button" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg"></i>
+              </a>
+              
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-information">
+                    
+
+                        <div class="table-responsive-sm">
+                             <table class="table table-bordered table-striped align-middle mb-0 ">
+                           <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                     <tr>
+                                      <th style="width: 1px;" class="text-center">
+                                      <input type="checkbox" class="form-check-input" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></th>
+                                      <th class="text-start">{{ "Başlık" }}</th>
+                                      <th class="text-start">{{ "Açıklama" }}</th>
+                                      <th class="text-start"><{{ "Toplam" }}</th>
+                                      <th class="text-end" style="width:1%;">{{ "Durumu" }}</th>
+                                      <th colspan="2" class="text-end" style="width:1%;">{{ "Eylem" }}</th>
+                                    </tr>
+                                   </thead>
+                                   <tbody >
+                                  {% if dokumanlar %}
+                                  {% for dokuman in dokumanlar %}
+                                  <tr>
+                                    <td class="text-center">
+                                      
+                                      <input type="checkbox" class="form-check-input" name="selected[]" value="{{ dokuman.belge_group_id }}" />
+                                     </td>
+                                    <td class="text-start">{{ dokuman.name }}</td>
+                                    <td class="text-start">{{ dokuman.description }}</td>
+                                    <td class="text-center">{{ dokuman.total }}</td>
+                                    <td class="text-start"><span class="badge {% if dokuman.status == 'Aktif' %} bg-success {% else %} bg-danger {% endif %}">{{ dokuman.status }}</td>
+                                    <td class="text-end"><a href="{{ dokuman.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a></td>
+                                    <td class="text-end"><a href="{{ dokuman.info }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-warning btn-sm"><i class="bi bi-person-x"></i></a></td>
+                                  </tr>
+                                  {% endfor %}
+                                  {% else %}
+                                  <tr>
+                                    <td class="text-center" colspan="6">{{ text_no_results }}</td>
+                                  </tr>
+                                  {% endif %}
+                                   </tbody>
+                                 </table>
+                        </div>
+
+                       <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                </form>
+            </div>
+        </div>
+
+
+   
+
+    {{footer}}
+</main>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

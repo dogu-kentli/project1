@@ -1,0 +1,356 @@
+    <div class="table-responsive-sm">
+        <form id="form-developer">
+            <input type="hidden" name="filter_url" value="{{filter_url}}">
+            <table id="table-odeme" class="table table-bordered align-middle mb-0 table-sm">
+
+                <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                    <tr>
+                        <th class="text-center" style="width:1%"> {{ "ID:" }}</th>
+                        <th class="text-center " style="width:15%">
+                            {{"Ad Soyad"}}
+                        </th>
+                        <th class="text-center" style="width:15%">
+                            {{"Kurum/Birim"}} {{store_id}}
+                        </th>
+
+                        <th class="text-center " style="width:20%"> {{ " Şirket İsmi" }}</th>
+                        <th class="text-center " style="width:10%"> {{ "Ödeme Yöntemi" }}</th>
+                        <th class="text-center " style="width:10%"> {{ "Tutar" }}</th>
+                        <th class="text-center " style="width:10%"> {{ "Fatura" }}</th>
+                        <th class="text-center " style="width:10%"> {{ "Talep Tarihi" }}</th>
+                        <th class="text-center " style="width:8%;"> {{ "Durumu" }}</th>
+                        <th class="text-center " colspan="2" style="width:1%;">{{"Eylem"}} </th>
+                    </tr>
+                </thead>
+                <tbody class="data-list">
+                    <input type="hidden" name="filter_url" value="{{filter_url}}" class="form-control" />
+                    {% if dataodemeTalebi %}
+                    {% set row = 1 %}
+                    {% for isler in dataodemeTalebi %}
+
+                    <tr id="data-list{{ isler.odeme_talebi_id }}" class="{{isler.color}}">
+                        <td id="{{ isler.odeme_talebi_id }}" class="text-start item text-muted ">ID#{{ isler.odeme_talebi_id }}</td>
+                        <td id="{{ isler.odeme_talebi_id }}" class="text-start"><strong>{{isler.personel}}</strong></td>
+                        <td id="{{ isler.odeme_talebi_id }}" class="text-start">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="fw-bold">{{ isler.store.name|replace({'Uluslararası Öğrenci Derneği':''}) }}
+                        </div>
+                                <div class="text-muted">{{ isler.name }}</div>
+                            </div>
+                        </td>
+                        <td id="{{ isler.odeme_talebi_id }}" class="text-start item">{{ isler.banka_adi }}</td>
+                        <td id="{{ isler.odeme_talebi_id }}" class="text-start item">{{ isler.odeme_yontemi }}</td>
+                        <td id="{{ isler.odeme_talebi_id }}" class="text-start item">{{ isler.tutar }}</td>
+                        <td id="{{ isler.odeme_talebi_id }}" class="text-center item">
+                            {% if isler.fatura %}
+                            {{ isler.fatura }}
+                            {% else %}
+                            {{"..."}}
+                            {% endif %}
+                        </td>
+                        <td id="{{ isler.odeme_talebi_id }}" class="text-start item">{{ isler.date_added }}</td>
+                        <td class="text-start">
+                            <span data-toggle="tooltip" data-placement="top" title="{{ isler.last_history }}" class="badge {{isler.status_bg}}">
+                                {% if isler.last_history %}
+                                <i class="bi bi-question-circle"></i>
+                                {% endif %}
+                                {{ isler.status }}
+                            </span>
+
+                        </td>
+
+                        <td class="text-center">
+                            <button type="button" id="button-view" data-toggle="tooltip" title="Görüntüle" onclick="functionView('{{ isler.odeme_talebi_id }}','{{ isler.personel_id }}')" class="btn btn-info btn-sm"> <i class="bi bi-eye"></i></button>
+                        </td>
+
+                        <td class="text-center">
+                            <button type="button" onclick="remove('{{isler.odeme_talebi_id}}');" class="btn btn-danger btn-sm button-delete" {{button_delete}}><i class="bi bi-x-circle"></i></button>
+                        </td>
+                    </tr>
+
+                    {% set row = row + 1 %}
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td class="text-center" colspan="6">{{"Sonuç bulunamadı"}}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+
+            </table>
+        </form>
+    </div>
+
+ <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+
+<!-- Ödeme Modal -->
+<div class="modal fade" id="modal-odeme" tabindex="-1" aria-labelledby="modalOdemeLabel" aria-hidden="true">
+  <div class="modal-dialog custom-modal">
+    <div class="modal-content">
+
+      <form id="form-odeme-edit">
+        <div class="modal-body">
+          <!-- Tabs -->
+          <ul class="nav nav-tabs" id="odemeTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="modal-tab-1" data-bs-toggle="tab" data-bs-target="#tab-1" type="button" role="tab" aria-controls="tab-1" aria-selected="true">
+                {{ tab_general }}
+              </button>
+            </li>
+            {% if store_id == 0 %}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="modal-tab-2" data-bs-toggle="tab" data-bs-target="#tab-2" type="button" role="tab" aria-controls="tab-2" aria-selected="false">
+                {{ "İşlem Detayları" }}
+              </button>
+            </li>
+            {% endif %}
+          </ul>
+
+          <!-- Tab Content -->
+          <div class="tab-content mt-3">
+            <div class="tab-pane fade show active" id="tab-1" role="tabpanel" aria-labelledby="modal-tab-1">
+              <ul class="list-group"></ul>
+
+              <div class="mb-3" id="revizyon-status" style="display:{{status_revizyon}}">
+                <label class="form-label"><strong>{{"Durumu"}}</strong></label>
+                <select name="status" class="form-select status"
+                  onchange="document.getElementById('revizyon-text').style.display = (this.value == '2') ? 'block' : 'none';">
+                  <option value="0">{{"İşlem Bekliyor"}}</option>
+                  <option value="1">{{"İşleme Alındı"}}</option>
+                  <option value="2">{{"Güncelleme Talep Edildi"}}</option>
+                  <option value="3">{{"Ödeme Yapıldı"}}</option>
+                </select>
+              </div>
+
+              <div class="mb-3" id="revizyon-text" style="display:none;">
+                <label class="form-label"><strong>{{"Açıklama"}}</strong></label>
+                <textarea name="text" rows="5" placeholder="Yapılacak revizyonla ilgili kısa açıklama yazınız." class="form-control"></textarea>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-2" role="tabpanel" aria-labelledby="modal-tab-2">
+              <!-- İçerik buraya gelecek -->
+            </div>
+          </div>
+
+          <div class="mb-3" id="note" style="display:none;">
+            <div class="alert alert-warning">
+              {{"<strong>Not :</strong> Lütfen tasarım dosyasını <strong>sıkıştırarak</strong> yükleyiniz. Maksimum dosya boyutu<strong> 50 MB</strong>, İzin verilen dosya formatı <strong>(zip)</strong>"}}
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="modal-footer">
+        
+        <button type="button" id="button-revizyon-update" name="{{ isler.odeme_talebi_id }}" data-bs-toggle="tooltip" title="Güncelleme İşlemi" class="btn btn-primary" {{button_revizyon}}>
+          <i class="bi bi-save"></i> {{"Kaydet"}}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript"><!--
+$('#cover-spin').hide();
+function functionView(id,personel_id) {
+    $('.table tbody tr').removeClass('bg bg-light-info');
+    var user_personel_id = '{{user_personel_id}}';
+    $('#data-list' + id).addClass('bg bg-light-info');
+    $('#last-history').empty().hide();
+    $('#modal-tab-1').click();
+    $('#form-odeme-talebi-id').val(id);
+    
+    $.ajax({
+      url: 'index.php?route=personeller/odeme_talebi/dataView&user_token={{ user_token }}&odeme_talebi_id=' + id,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+       $('.alert-dismissible').remove();
+       $('.list-group-item').remove();
+       $('.description').find('p').remove();
+       $('.dropdown-menu').find('li').attr('class','');
+        
+       if (json['html']) {
+        $('#modal-odeme').modal('show');
+         $('#modal-odeme .list-group').append(json['html']);
+         $('#modal-odeme .description').append(json['description']);
+         $('#modal-odeme select[name^=\'status\']').val(json['status']);
+
+          if (json['html_history']) {
+            $('#tab-2').find('.alert-info').remove();
+            $('#tab-2').append(json['html_history']);
+          }
+
+        }
+
+         if (json['form_edit']) {
+          $('#revizyon-status').show();
+         }
+
+         if (json['form_edit']) {
+             $('#modal-talep').modal('show'); 
+             $('#modal-talep input[name=\'tutar\']').val(json['tutar']);
+             $('#modal-talep textarea[name=\'description\']').val(json['description']);
+             $('#modal-talep select[name=\'personel_birim_id\']').val(json['personel_birim_id']);
+             $('input[name="odeme_yontemi"][value="' + json['odeme_yontemi'] + '"]').prop('checked', true);
+             $('#modal-talep select[name=\'bank_account[banka]\']').val(json['banka_adi']);
+             $('#modal-talep input[name=\'bank_account[iban]\']').val(json['iban']);
+             $('#modal-talep input[name=\'bank_account[name]\']').val(json['name']);
+             $('#file-content').html(json['fatura']);
+             $('#modal-talep input[name=\'fatura\']').prop('checked', json['fatura_checked']);
+             
+         }
+
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+}
+
+
+$('#modal-button-update').on('click', function() {
+     var filter_url = $('input[name^="filter_url"]').val();
+     $.ajax({
+      url: 'index.php?route=personeller/odeme_talebi/save&user_token={{ user_token }}&form=edit' + '&odeme_talebi_id='  + $('#form-odeme-talebi-id').val(),
+      type: 'post',
+      dataType: 'json',
+      data : $('#form-tanitim-edit').serialize(),
+      
+      success: function(json) {
+        
+
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+
+  
+        if (json.success) {
+           $('#modal-odeme').modal('hide');
+           $('#odeme-data').load(filter_url);
+           alertsuccess(json.success);
+          
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+</script>
+<script>
+ function remove(odeme_talebi_id) {
+    if (confirm('Dikkat : Bu işlem geri alınamaz. Bu görevi silmek istediğinize emin misiniz?') == false) {    
+        exit();
+    }
+
+    var filter_url = $('input[name^="filter_url"]').val();
+   
+     $.ajax({
+      url: 'index.php?route=personeller/odeme_talebi/deleteData&user_token={{ user_token }}&odeme_talebi_id='  + odeme_talebi_id,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        $('.alert-dismissible').remove();
+
+        if (json.error.warning) {
+          alerterror(json.error.warning);
+        }
+                
+        if (json.success) {
+          $('#modal-odeme').modal('hide');
+          $('#odeme-data').load(filter_url); 
+          alertsuccess(json.success);
+                  
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  }
+
+$('#button-close').on('click', function() {
+    $('#modal-odeme').modal('hide');
+});
+
+//--></script>
+
+{# REVİZYON İŞLEMLERİ JQUERY #}
+<script type="text/javascript"><!--
+$('#button-revizyon-update').on('click', function() {
+    var filter_url = $('input[name^="filter_url"]').val();
+
+    $.ajax({
+      url: 'index.php?route=personeller/odeme_talebi/revizyon&user_token={{ user_token }}&odeme_talebi_id='  + $('#form-odeme-talebi-id').val(),
+      type: 'post',
+      dataType: 'json',
+      data: $('#form-odeme-edit').serialize(),
+      
+      success: function(json) {   
+
+        if (json.error.warning) {
+           alerterror(json.error.warning);
+        }
+
+        
+        if (json.success) {
+           $('#modal-odeme').modal('hide');
+           $('#odeme-data').load(filter_url);
+           alertsuccess(json.success);
+          
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+});
+//--></script>
+
+
+<script>
+$('.button-count-filter').on('click', function() {
+  var url = 'index.php?route=personeller/odeme_talebi/dataodemeTalebi&user_token={{ user_token }}&filter_status=' + $(this).attr('data-for');	
+  $('#odeme-data').load(url);
+});
+ </script> 
+
+
+<script>
+$(document).on('input', '.fatura-no', function() {
+  var faturaNo = $(this).val();
+  var row = $(this).closest('.row');       // aynı satırı bul
+  var inputCode = row.find('.input-code'); // o satırdaki code alanı
+
+  // Orijinal kodu saklamak için data attribute kullanalım
+  var originalCode = inputCode.attr('data-original') || inputCode.val();
+
+  // Eğer daha önce tireli eklenmişse, sadece orijinal kısmı al
+  originalCode = originalCode.replace(/^.*-/, '');
+
+  inputCode.attr('data-original', originalCode);
+
+  // Birleştir: faturaNo + "-" + originalCode
+  if (faturaNo.trim() !== "") {
+    inputCode.val(faturaNo + '-' + originalCode);
+  } else {
+    inputCode.val(originalCode); // boşsa sadece orijinal kodu göster
+  }
+});
+</script> 
+
+   

@@ -1,0 +1,462 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+
+				<!--breadcrumb-->
+				<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+					
+					<div class="ps-3">
+						<nav aria-label="breadcrumb">
+							 <ol class="breadcrumb mb-0 p-0">
+				            {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+					         {% endfor %}
+                  </ol>
+						</nav>
+					</div>
+					<div class="ms-auto">
+						<button type="submit" form="form-store" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> {{"Kaydet"}}</button>
+				   <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm btn-sm bg-white">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+				
+					</div>
+				</div>
+				<!--end breadcrumb-->
+
+        <div class="row">
+          <div class="col-12 mx-auto">
+           <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-store" class="form-horizontal">
+            <div class="card">
+							<div class="card-body">
+              
+               <input type="hidden" name="customer_group_id" value="6" class="form-control"/>
+								<ul class="nav nav-tabs nav-primary" role="tablist">
+									<li class="nav-item" role="presentation">
+										<a class="nav-link active" data-bs-toggle="tab" href="#tab-genel" role="tab" aria-selected="true">
+											<div class="d-flex align-items-center">
+												<div class="tab-icon"><i class="bx bx-user font-18 me-1"></i>
+												</div>
+												<div class="tab-title">{{ "Genel" }}</div>
+											</div>
+										</a>
+									</li>
+                  
+                                   {% if store_id == 0 %}
+									<li class="nav-item" role="presentation">
+										<a class="nav-link" data-bs-toggle="tab" href="#tab-veri" role="tab" aria-selected="false" tabindex="-1">
+											<div class="d-flex align-items-center">
+												<div class="tab-icon"><i class="bx bx-book-reader font-18 me-1"></i>
+												</div>
+												<div class="tab-title">{{ "Veri" }}</div>
+											</div>
+										</a>
+									</li>
+									{% endif %}
+                   
+								</ul>
+								<div class="tab-content py-3">
+                  <div class="tab-pane fade show active" id="tab-genel" role="tabpanel">
+                     
+										<fieldset id="yonetim" class="border rounded p-3 mb-4">
+                     
+                      <div class="row mb-3">
+                        
+                        <div class="profile-avatar text-start">
+                          <a href="javascript:void(0);" id="button-thumb-image" class="thumbnail">
+                           <img src="{{ thumb }}" id="thumb-img" class="border border-primary border-primary rounded-lg shadow"  width="120" height="120"  title="Resim eklemek için tıklayın" class="rounded-circle"></a>
+                           <input type="hidden" name="config_image" value="{{ config_image }}" id="input-image"/>
+                        </div>
+                      </div>
+
+                      <!-- Öğrenci Adı -->
+                      <div class="row mb-3">
+                        <label for="input-firstname" class="col-sm-2 col-form-label">{{ entry_name }}</label>
+                        <div class="col-sm-4">
+                          <input type="text" name="store_name" value="{{ store_name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control"/>
+                          {% if error_name %}
+                            <div class="text-danger">{{ error_name }}</div>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Soyadı -->
+                      <div class="row mb-3">
+                        <label for="input-lastname" class="col-sm-2 col-form-label">{{ entry_owner }}</label>
+                        <div class="col-sm-4">
+                         <input type="text" name="store_owner" value="{{ store_owner }}" placeholder="{{ entry_owner }}" id="input-owner" class="form-control"/>
+                  {% if error_owner %}
+                    <div class="text-danger">{{ error_owner }}</div>
+                  {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Kimlik No -->
+                      <div class="row mb-3">
+                        <label for="input-kimlik_no" class="col-sm-2 col-form-label">{{ entry_country }}</label>
+                        <div class="col-sm-4">
+                          <select name="sehir_id" id="input-sehir" class="form-select" >
+                   <option value="">{{ text_select }}</option>
+                    {% for sehir in sehirler %}
+                        <option value="{{ sehir.il_id }}" {% if sehir.il_id == sehir_id %}  selected="selected" {% endif %}>{{ sehir.name }}</option>
+                     {% endfor %}
+                  </select>
+                  {% if error_sehir %}
+                    <div class="text-danger">{{ error_sehir }}</div>
+                  {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Telefon -->
+                      <div class="row mb-3">
+                        <label for="input-telephone" class="col-sm-2 col-form-label">{{ entry_address }}</label>
+                        <div class="col-sm-4">
+                          <textarea type="text" name="store_address" placeholder="{{ entry_address }}" id="input-address" class="form-control"/>{{ store_address }}</textarea>
+                        </div>
+                      </div>
+
+                      <!-- E-Mail -->
+                      <div class="row mb-3">
+                        <label for="input-email" class="col-sm-2 col-form-label">{{ "E-Mail" }}</label>
+                        <div class="col-sm-4">
+                          <input type="text" name="store_email" value="{{ store_email }}" placeholder="{{ entry_email }}" id="input-email" class="form-control"/>
+                  {% if error_email %}
+                    <div class="text-danger">{{ error_email }}</div>
+                  {% endif %}
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label for="input-telphone1" class="col-sm-2 col-form-label">{{ entry_telephone1 }}</label>
+                        <div class="col-sm-4">
+                          <input type="text" name="store_telephone2" value="{{ store_telephone2 }}" placeholder="{{ entry_telephone2 }}" id="input-telephone2" class="form-control"/>
+                  {% if error_telephone2 %}
+                    <div class="text-danger">{{ error_telephone2 }}</div>
+                  {% endif %}
+                        </div>
+                      </div>
+
+                       <div class="row mb-3">
+                        <label for="input-telphone1" class="col-sm-2 col-form-label">{{ entry_telephone2 }}</label>
+                        <div class="col-sm-4">
+                          <input type="text" name="store_telephone" value="{{ store_telephone }}" placeholder="{{ entry_telephone1 }}" id="input-telephone" class="form-control"/>
+                  {% if error_telephone %}
+                    <div class="text-danger">{{ error_telephone }}</div>
+                  {% endif %}
+                        </div>
+                      </div>
+
+                       <div class="row mb-3">
+                        <label for="input-telphone1" class="col-sm-2 col-form-label">{{ "Sms Telefon" }}</label>
+                        <div class="col-sm-4">
+                         <input type="text" name="sms_telephone" value="{{ sms_telephone }}" placeholder="{{ "Sms gönderilecek numarayı yazınız." }}" id="input-telephone3" class="form-control"/>
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label for="input-telphone1" class="col-sm-2 col-form-label">{{ entry_web }}</label>
+                        <div class="col-sm-4">
+                        <input type="text" name="store_web" value="{{ store_web }}" placeholder="{{ entry_web }}" id="input-web" class="form-control"/>
+                        </div>
+                      </div>
+
+                      <!-- Durumu -->
+                      <div class="row mb-3">
+                         <label for="input-telphone1" class="col-sm-2 col-form-label">{{ "Durumu (Aktif / Pasif)" }}</label>
+                          <div class="col-sm-4">
+                        <div class="form-check form-switch">
+                          {% if status %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                          <input class="form-check-input" type="checkbox" {{ checked }} name="status" value="1" id="statusSwitch"
+                                style="width:3rem;height:1.5rem;">
+                          <label class="form-check-label ms-2" for="statusSwitch"></label>
+                        </div>
+                        </div>
+                      </div>
+                    </fieldset>
+
+
+                   <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                      <legend class="fw-bold">Sosyal Ağlar</legend>
+
+                      <div class="col-12">
+                        <div class="d-flex gap-3 flex-wrap">
+
+                          <!-- Facebook -->
+                          <div class="social-item d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-white text-primary toggle-input">
+                              <i class="bi bi-facebook"></i>
+                            </button>
+                            <div class="input-group d-none flex-grow-1">
+                              
+                              <input type="text" name="facebook" value="{{ facebook }}" class="form-control" placeholder="Facebook linki">
+                            </div>
+                          </div>
+
+                          <!-- Twitter -->
+                          <div class="social-item d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-white text-info toggle-input">
+                              <i class="bi bi-twitter"></i>
+                            </button>
+                            <div class="input-group d-none flex-grow-1">
+                              
+                              <input type="text" class="form-control" name="twitter" value="{{ twitter }}" placeholder="{{ entry_twitter }}">
+                            </div>
+                          </div>
+
+                          <!-- Instagram -->
+                          <div class="social-item d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-white text-primary toggle-input">
+                              <i class="bi bi-instagram"></i>
+                            </button>
+                            <div class="input-group d-none flex-grow-1">
+                              
+                              <input type="text" class="form-control" name="instagram" value="{{ instagram }}" placeholder="{{ entry_instagram }}">
+                            </div>
+                          </div>
+
+                          <!-- YouTube -->
+                          <div class="social-item d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-white text-danger toggle-input">
+                              <i class="bi bi-youtube"></i>
+                            </button>
+                            <div class="input-group d-none flex-grow-1">
+                              
+                              <input type="text" class="form-control" name="youtube" value="{{ youtube }}" placeholder="{{ entry_youtube }}"
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </fieldset>
+
+                    <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                      <legend class="fw-bold">{{ "Kullanıcı Bilgileri" }}</legend>
+
+                      <!-- Ülke -->
+                      <div class="row mb-3">
+                        <label for="input-telphone1" class="col-sm-2 col-form-label">{{ entry_username }}</label>
+                        <div class="col-sm-4">
+                        <div class="ms-auto position-relative">
+                              <div class="position-absolute top-50 translate-middle-y search-icon px-3"><i class="bi bi-person-circle"></i></div>
+                              <input type="email" class="form-control  ps-5" name="store_username" value="{{ store_username }}" placeholder="{{ entry_username }}" id="input-username">
+                           
+                            </div>
+                             {% if error_username %}
+                    <div class="text-danger">{{ error_username }}</div>
+                  {% endif %}
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label for="input-telphone1" class="col-sm-2 col-form-label">{{ entry_password }}</label>
+                        <div class="col-sm-4">
+                       <div class="input-group ms-auto">
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                        <input type="text" class="form-control" name="store_password" value="{{ store_password }}" placeholder="{{ entry_password }}" id="input-password">
+                        <button type="button" id="button-copy" data-toggle="tooltip" title="{{ button_copy }}" class="btn btn-outline-info">
+                          <i class="bi bi-clipboard"></i>
+                        </button>
+                        <button type="button" id="button-produce" data-loading-text="{{ text_loading }}" class="btn btn-success">
+                          <i class="fa fa-cog"></i> {{ button_produce }}
+                        </button>
+                      </div>
+                      </div>
+                    </fieldset>
+                  </div>
+
+                  
+									<div class="tab-pane fade" id="tab-veri" role="tabpanel">
+										<table class="table table-bordered">
+                        <thead>
+                            <tr>
+                              <td colspan="2" class="text-left">
+                                <Select name="category_id" id="select-category" class="form-control">
+                                  <option value="1">Ayni</option>
+                                  <option value="2">Nakdi</option>
+                              </select>
+                              
+                              </td>
+                              <td class="text-left">
+                              <input type="text" name="miktar" value="{{miktar}}" placeholder="miktar" id="input-miktar" class="form-control"/>
+                              </td>
+                              <td class="text-left">
+                                <input type="text" name="description" value="{{description}}" placeholder="Açıklama" id="input-description" class="form-control"/>
+                              </td>
+                              <td class="text-left">
+                              <input type="date" name="date_added" value="{{date_added}}" maxlength="10" placeholder="DD/MM/YYYY " id="input-date-added" class="form-control js-date">
+                              </td>
+                              <td class="text-left"><button type="button" id="button-store-data"  class="btn btn-primary">Ekle</button></td>
+                            </tr>
+                          </thead>
+                        </table>
+
+              <div id="store-data"></div>
+                	</div>
+
+									
+
+                  
+
+								</div>
+               
+							
+              </div>
+						</div>
+            
+           </form>
+          </div>
+        </div>
+				{{footer}}
+			</main>
+<script type="text/javascript"><!--
+$('#button-produce').on('click', function() {
+ var chars = "0123456789abcdefghijklmnopqrstuvwxyz@#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+ var passwordLength = 12;
+ var password = "";
+
+  for (var i = 0; i <= passwordLength; i++) {
+   var randomNumber = Math.floor(Math.random() * chars.length);
+   password += chars.substring(randomNumber, randomNumber +1);
+  }
+
+	$('input[name=\'store_password\']').val(password);
+});
+
+
+$('#button-copy').on('click', function() {
+  var copyText  = document.querySelector('#input-password');
+       copyText.select();
+       document.execCommand("copy");
+       $('#button-copy').attr('title',"Kopyalandı").toottip('show'); 
+});
+
+//--></script>
+
+<script type="text/javascript"><!--
+var dstore_id = '{{dstore_id}}';
+$('#store-data').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+
+	$('#store-data').load(this.href);
+});
+
+$('#store-data').load('index.php?route=setting/store/storedata&user_token={{ user_token }}&dstore_id={{ dstore_id }}');
+
+$('#button-store-data').on('click', function(e) {
+    $('.alert-dismissible').remove();
+    e.preventDefault();
+    var error = 'Lütfen boş alan bırakmayınız';
+     var category_id = $('#select-category').val();
+     var miktar = $('#input-miktar').val();
+     var description = $('#input-description').val();
+     var date_added = $('#input-date-added').val();
+
+     if(miktar == '' || description == '' || date_added == '') {
+       $('#alert').prepend(
+              '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + error + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            ); 
+     
+      exit();
+     }
+
+    $.ajax({
+      url: 'index.php?route=setting/store/addDatastore&user_token={{ user_token }}&dstore_id={{ dstore_id }}',
+      type: 'post',
+      dataType: 'json',
+      data: 'category_id=' + category_id + '&miktar=' + miktar + '&description=' + description + '&date_added=' + date_added,
+      beforeSend: function() {
+        $('#button-store-data').button('loading');
+      },
+      complete: function() {
+        $('#button-store-data').button('reset');
+      },
+      success: function(json) {
+        $('.alert-dismissible').remove();
+        if (json.error.warning) {
+	       $('#alert').prepend(
+              '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            ); 
+        }
+
+        if (json.success) {
+          $('#alert').append(
+              '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + json.success + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );  
+          $('#tab-data').find('input').val('');
+          $('#store-data').load('index.php?route=setting/store/storedata&user_token={{ user_token }}&dstore_id={{ dstore_id }}');
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+  });
+
+ $('#store-data').on('click', '.delete-data', function(e) {
+	e.preventDefault();
+	var element = this;
+
+     $.ajax({
+      url: 'index.php?route=setting/store/deleteData&user_token={{ user_token }}&store_veri_id='  + $(this).attr('id'),
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+        $('.alert-dismissible').remove();
+
+        if (json.error.warning) {
+	       $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error.warning +'</div>'); 
+         }
+
+        if (json.success) {
+         $('#store-data').load('index.php?route=setting/store/storedata&user_token={{ user_token }}&dstore_id={{ dstore_id }}');
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+  //--></script>
+
+<script>
+document.querySelectorAll('.toggle-input').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const inputGroup = this.nextElementSibling;
+    inputGroup.classList.toggle('d-none');
+  });
+});
+
+</script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

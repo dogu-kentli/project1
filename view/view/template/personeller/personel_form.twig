@@ -1,0 +1,1448 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+        <div class="ms-auto">
+            <button type="submit" form="form-setting" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-save"> Kaydet</i>
+            </button>
+            {% if level == 1 %}
+            <button type="button" id="button-form" data-toggle="tooltip" title="{{ "Online form" }}" class="btn btn-warning btn-sm">
+                <i class="bi bi-cog"></i> Online Form
+            </button>
+            {% endif %}
+            <a href="{{ cancel }}"  data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm bg-white btn-sm">
+                <i class="bi bi-arrow-counterclockwise"></i> 
+            </a>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 mx-auto">
+            <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-setting" class="form-horizontal">
+                <div class="card">
+                    <div class="card-body">
+
+                        <input type="hidden" name="customer_group_id" value="6" class="form-control" />
+                        <ul class="nav nav-tabs nav-primary" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#tab-genel" role="tab" aria-selected="true">
+                                    <div class="d-flex align-items-center">
+                                        <div class="tab-icon"><i class="bx bx-cog font-18 me-1"></i>
+                                        </div>
+                                        <div class="tab-title">{{ "Kişisel Bilgiler" }}</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" data-bs-toggle="tab" href="#tab-egitim" role="tab" aria-selected="false" tabindex="-1">
+                                    <div class="d-flex align-items-center">
+                                        <div class="tab-icon"><i class="bx bx-book-reader font-18 me-1"></i>
+                                        </div>
+                                        <div class="tab-title">{{ "Eğitim Bilgileri" }}</div>
+                                    </div>
+                                </a>
+                            </li>
+                            {% if parent_id == 1 %}
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" data-bs-toggle="tab" href="#tab-category" role="tab" aria-selected="false" tabindex="-1">
+                                    <div class="d-flex align-items-center">
+                                        <div class="tab-icon"><i class="bx bx-server font-18 me-1"></i>
+                                        </div>
+                                        <div class="tab-title">{{ "Kategori Ve Birimler" }}</div>
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+
+
+                        </ul>
+                        <div class="tab-content py-3">
+                            <div class="tab-pane fade show active" id="tab-genel" role="tabpanel">
+                                <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                                    <legend class="the-legend">Genel Bilgiler</legend>
+                                    <!-- Öğrenci Adı -->
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Adı <span class="text-danger">*</span></label>
+                                            <input type="text" name="firstname" value="{{ firstname }}" placeholder="Adı" id="input-firstname" class="form-control" />
+                                            {% if error_firstname %}
+                                            <div class="text-danger">{{ error_firstname }}</div>
+                                            {% endif %}
+                                            {{profile_complete_ratio}}
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Soyadı <span class="text-danger">*</span></label>
+                                            <input type="text" name="lastname" value="{{ lastname }}" placeholder="Soyadı" id="input-lastname" class="form-control" />
+                                            {% if error_lastname %}
+                                            <div class="text-danger">{{ error_lastname }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Kimlik No</label>
+                                            <input type="text" name="kimlikno" value="{{ kimlikno }}" placeholder="Kimlik No" id="input-kimlik_no" class="form-control" />
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Cep Telefonu (Operator Numarası) <span class="text-danger">*</span></label>
+                                            <div class="input-group mb-3">
+                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">--Operator--</button>
+                                                {% for custom_field in custom_fields %}
+                                                {% if custom_field.location_sort == 'account22' %}
+                                                <ul class="dropdown-menu" style="">
+                                                    {% for custom_field_value in custom_field.custom_field_value %}
+                                                    <li><a class="dropdown-item operator-code" href="javascript:void(0)" id="{{ custom_field_value.name }}">{{ custom_field_value.name }}</a></li>
+                                                    {% endfor %}
+                                                </ul>
+                                                {% endif %}
+                                                {% endfor %}
+                                                <input type="text" name="telephone" value="{{ telephone }}" placeholder="Telefon" id="input-telephone" class="form-control" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">İş Telefonu <span class="text-danger">*</span></label>
+                                            <input type="text" name="telephone3" value="{{ telephone3 }}" placeholder="İş Telefonu" id="input-telephone3" class="form-control" />
+                                            {% if error_lastname %}
+                                            <div class="text-danger">{{ error_lastname }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">E-Mail</label>
+                                            <input type="text" name="email" value="{{ email }}" placeholder="e-posta adresi" id="input-email" class="form-control" />
+                                            {% if error_email %}
+                                            <div class="text-danger">{{ error_email }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Doğum Yeri </label>
+                                            <input type="text" name="dogum_yeri" value="{{ dogum_yeri }}" placeholder="Doğum Yeri" id="input-dogum-yeri" class="form-control" />
+                                            {% if error_dogumyeri %}
+                                            <div class="text-danger">{{ error_dogumyeri }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Doğum Tarihi <span class="text-danger">*</span></label>
+                                            <input type="date" name="dogum_tarihi" value="{{ dogum_tarihi }}" placeholder="Doğum Tarihi" id="input-date-added" class="form-control" />
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Cinsiyet</label>
+                                            <select name="gender" id="input-gender" class="form-select">
+                                                <option value="">--Seçim Yapın--</option>
+                                                <option value="E" {% if gender == 'E' %} selected="selected" {% endif %}>Erkek</option>
+                                                <option value="K" {% if gender == 'K' %} selected="selected" {% endif %}>Kadın</option>
+                                            </select>
+                                            {% if error_gender %}
+                                            <div class="text-danger">{{ error_gender }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        {% for custom_field in custom_fields %}
+                                        {% if custom_field.location_sort == 'account1' %}
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Kan Grubu </label>
+                                            <select name="kan_grubu" id="input-gender" class="form-select">
+                                                <option value="">--Seçim Yapın--</option>
+                                                {% for custom_field_value in custom_field.custom_field_value %}
+                                                <option value="{{ custom_field_value.custom_field_value_id }}" {% if custom_field_value.custom_field_value_id == kan_grubu %} selected="selected" {% endif %}>{{ custom_field_value.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Medeni Hali <span class="text-danger">*</span></label>
+                                            <select name="medeni_hali" id="input-medeni_hali" class="form-select">
+                                                <option value="">--Seçim Yapın--</option>
+                                                <option value="E" {% if medeni_hali == 'E' %} selected="selected" {% endif %}>Evli</option>
+                                                <option value="B" {% if medeni_hali == 'B' %} selected="selected" {% endif %}>Bekar</option>
+                                            </select>
+                                             {% if error_medeni %}
+                                            <div class="text-danger">{{ error_medeni }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Çocuk Sayısı</label>
+                                            <input type="number" name="cocuk_sayisi" value="{{ cocuk_sayisi }}" placeholder="Çocuk Sayısı" id="input-meslegi" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                </fieldset>
+
+                                <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                                    <legend class="the-legend">Adres Bilgileri</legend>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-bold">Ev Adresi</label>
+                                            <input type="text" name="adres1" value="{{ adres1}}" placeholder="Ev Adresi" id="input-adres1" class="form-control" />
+                                            {% if error_adres1 %}
+                                            <div class="text-danger">{{ error_adres1 }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-bold">Iş Adresi</label>
+                                            <input type="text" name="adres2" value="{{ adres2}}" placeholder="İş Adresi" id="input-adres2" class="form-control" />
+                                            {% if error_adres2 %}
+                                            <div class="text-danger">{{ error_adres2 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                                    <legend>Diğer Bilgiler</legend>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-bold">Askerlik Durumu </label>
+                                            <select name="askerlik_durumu" id="input-askerlik-durumu" class="form-select">
+                                                <option value="">--Seçim Yapın--</option>
+                                                <option value="1" {% if askerlik_durumu == '1' %} selected="selected" {% endif %}>Yaptı</option>
+                                                <option value="2" {% if askerlik_durumu == '2' %} selected="selected" {% endif %}>Yapmadı</option>
+                                                <option value="3" {% if askerlik_durumu == '3' %} selected="selected" {% endif %}>Muaf</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-bold">Terhis/Tecil Tarihi <span class="text-danger">*</span></label>
+                                            <input type="date" name="askerlik_tecil" value="{{ askerlik_tecil}}" placeholder="Tarih" id="input-tecil" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Pasaport Türü</label>
+                                            <input type="text" name="pass_turu" value="{{ pass_turu}}" placeholder="Pasaport Türü" id="input-pass-turu" class="form-control" />
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Pasaport Numarası </label>
+                                            <input type="text" name="pass_number" value="{{ pass_number}}" placeholder="Numara" id="input-pass-number" class="form-control" />
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label fw-bold">Geçerlilik Tarihi</label>
+                                            <input type="date" name="pass_date" value="{{ pass_date}}" placeholder="Tarih" id="input-pass-date" class="form-control" />
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <div class="row">
+                                    <div class="col-md-2 mb-2">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" name="src_belgesi" type="checkbox" id="flexSwitchCheckChecked" {% if src_belgesi == 1 %} checked="checked" {% endif %} name="src_belgesi" value="1">
+                                            <label class="form-check-label" for="flexSwitchCheckChecked">Sürücü Belgesi</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2 mb-2">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" {% if src_belgesi2 == 1 %} checked="checked" {% endif %} name="src_belgesi2" value="1">
+                                            <label class="form-check-label" for="flexSwitchCheckChecked">Src Belgesi</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2 mb-2">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" {% if trafik_tecrubesi == 1 %} checked="checked" {% endif %} name="trafik_tecrubesi" value="1">
+                                            <label class="form-check-label" for="flexSwitchCheckChecked">Trafik Tecrübesi</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2 mb-2">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" id="toggle-engel" type="checkbox" id="flexSwitchCheckChecked" {% if engel_durumu == 1 %} checked="checked" {% endif %} name="engel_durumu" value="1">
+                                            <label class="form-check-label" for="flexSwitchCheckChecked">Engel Durumu</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2 mb-2">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" {% if seyahat == 1 %} checked="checked" {% endif %} name="seyahat" value="1">
+                                            <label class="form-check-label" for="flexSwitchCheckChecked">Seyahat İmkanı</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2 mb-2">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" id="toggle-adli-sicil" type="checkbox" id="flexSwitchCheckChecked" {% if adli_sicil == 1 %} checked="checked" {% endif %} name="adli_sicil" value="1">
+                                            <label class="form-check-label" for="flexSwitchCheckChecked">Adli Sicil Kaydı</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3" id="engel-description" style="display:none;">
+                                        <label class="form-label fw-bold">Engel Açıklama</label>
+                                        <input type="text" name="engel_description" value="{{ engel_description}}" placeholder="Açıklama" id="input-engel-description" class="form-control" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-3" id="sicil-description" style="display:none;">
+                                        <label class="form-label fw-bold">Adli sicil detayları</label>
+                                        <input type="text" name="adli_sicil_description" value="{{ adli_sicil_description}}" placeholder="Açıklama" id="input-adli-sicil-description" class="form-control" />
+                                    </div>
+                                </div>
+
+
+
+                                </fieldset>
+
+                                <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                                    <legend>İş Ve Meslek Bilgileri</legend>
+                                    <div class="row">
+                                        <div class="col-md-2 mb-2">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" {% if calisma_durumu == 1 %} checked="checked" {% endif %} name="calisma_durumu" value="1">
+                                                <label class="form-check-label" for="flexSwitchCheckChecked">Çalışma Durumu</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-2 mb-2">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" {% if is_arama == 1 %} checked="checked" {% endif %} name="is_arama" value="1">
+                                                <label class="form-check-label" for="flexSwitchCheckChecked">İş Arama Durumu</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-3 mb-3 form-meslek" style="display:none;">
+                                            <label class="form-label fw-bold">Çalıştığı Kurum</label>
+                                            <input type="text" name="kurum" value="{{ kurum }}" placeholder="Şuan Çalıştığınız Kurumu" id="input-kurum" class="form-control" />
+                                        </div>
+
+                                        {% for custom_field in custom_fields %}
+                                        {% if custom_field.location_sort == 'account23' %}
+                                        <div class="col-md-3 mb-3 form-meslek" style="display:none;">
+                                            <label class="form-label fw-bold">Meslek Grubu</label>
+                                            <select name="meslek_grubu" id="select-meslek-grubu" class="form-select">
+                                                <option value="">--Seçim Yapın--</option>
+                                                {% for custom_field_value in custom_field.custom_field_value %}
+                                                <option value="{{ custom_field_value.custom_field_value_id }}" {% if custom_field_value.custom_field_value_id == meslek_grubu %} selected="selected" {% endif %}>{{ custom_field_value.name }}</option>
+                                                {% endfor %}
+                                                <option value="diger" {% if meslek_grubu == "diger" %} selected="selected" {% endif %}>Diğer</option>
+                                            </select>
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                        <input type="hidden" name="diger_meslek" value="{{ diger_meslek }}" placeholder="Meslek Grubunu Yazınız." id="input-meslek-grubu2" class="form-control" />
+
+                                        <div class="col-md-3 mb-3 form-meslek" style="display:none;">
+                                            <label class="form-label fw-bold">Meslek Ünvanı</label>
+                                            <input type="text" name="meslek_unvan" value="{{ meslek_unvan }}" placeholder="Meslek Ünvanı" id="input-meslek-unvan" class="form-control" />
+                                        </div>
+
+                                        <div class="col-md-3 mb-3 form-meslek" style="display:none;">
+                                            <label class="form-label fw-bold">Çalıştığı Pozisyon</label>
+                                            <input type="text" name="pozisyon" value="{{ pozisyon }}" placeholder="Şuan çalıştığınız pozisyonu yazınız" id="input-pozisyon" class="form-control" />
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                                    <legend class="the-legend">Kullanıcı İşlemleri</legend>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-bold">Kullanıcı Adı</label>
+                                            <div class="input-group mb-3">
+                                            <input type="text" name="username" value="{{ username }}" placeholder="Kullanıcı Adı" id="input-username" class="form-control" />
+                                             <input type="hidden" name="user_id" value="{{ user_id }}" placeholder="Kullanıcı Adı" class="form-control" />
+                                              {% if parent_id == 1 %}
+                                              <a href="{{user_edit }}" class="btn btn-info"><i class="bi bi-pencil me-0"></i></a>
+                                              {% endif %}
+                                            </div>
+                                            {% if error_username %}
+                                            <div class="text-danger">{{ error_username }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-bold">Parola</label>
+                                            <div class="input-group mb-3">
+                                                <input type="text" name="password" value="" placeholder="Parola" id="input-password" class="form-control" />
+                                                <button type="button" class="btn btn-info" id="button-produce" data-loading-text="{{ text_loading }}"><i class="bi bi-gear me-0"></i> Üret</button>
+                                            
+                                            </div>
+                                             {% if error_password %}
+                                            <div class="text-danger">{{ error_password }}</div>
+                                            {% endif %}
+                                           
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+
+                                <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                                    <legend>Sosyal Ağlar</legend>
+
+                                    <div class="col-12">
+                                        <div class="d-flex gap-3 flex-wrap">
+
+                                            <!-- Facebook -->
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-primary toggle-input">
+                                                    <i class="bi bi-facebook"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+                                                    <input type="text" name="social_network[fb]" value="{{ social_network['fb'] }}" class="form-control" placeholder="Facebook linki">
+                                                </div>
+                                            </div>
+
+                                            <!-- Twitter -->
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-info toggle-input">
+                                                    <i class="bi bi-twitter"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+                                                    <input type="text" class="form-control" name="social_network[tw]" value="{{ social_network['tw'] }}" placeholder="{{ "Twitter Linki" }}">
+                                                </div>
+                                            </div>
+
+                                            <!-- Instagram -->
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-primary toggle-input">
+                                                    <i class="bi bi-instagram"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+
+                                                    <input type="text" class="form-control" name="social_network[tw]" value="{{ social_network['tw'] }}" placeholder="{{ "Instagram Linki" }}">
+                                                </div>
+                                            </div>
+
+                                            <!-- YouTube -->
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-danger toggle-input">
+                                                    <i class="bi bi-youtube"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+
+                                                    <input type="text" class="form-control" name="social_network[yt]" value="{{ social_network['yt'] }}" placeholder="{{ "Youtube" }}" </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Linkedin -->
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-primary toggle-input">
+                                                    <i class="bi bi-linkedin"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+
+                                                    <input type="text" class="form-control" name="social_network[ln]" value="{{ social_network['ln'] }}" placeholder="{{ "Linkedin" }}" </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="social-item d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-white text-success toggle-input">
+                                                    <i class="bi bi-whatsapp"></i>
+                                                </button>
+                                                <div class="input-group d-none flex-grow-1">
+
+                                                    <input type="text" class="form-control" name="social_network[wt]" value="{{ social_network['wt'] }}" placeholder="{{ "WHatsapp" }}" </div>
+                                                </div>
+
+                                            </div>
+
+                                            
+                                        </div>
+                                </fieldset>
+
+                                <fieldset id="yonetim" class="border rounded p-3 mb-4">
+                                    
+                                    <div class="row" >
+                                        <div class="col-md-4 mb-3"  style="display:{% if level == 1 %} block; {% else %} none; {% endif %}">
+                                        <label class="form-label fw-bold">Derneği</label>
+                                        <select name="store_id" class="form-select">
+                                            <option value="" {% if store_id == '' %} selected="selected" {% endif %}>{{text_select}}</option>
+                                            <option value="0" {% if store_id == '0' %} selected="selected" {% endif %}>Udef</option>
+                                            {% for store in stores %}
+                                            <option value="{{store.store_id}}" {% if store.store_id == store_id %} selected="selected" {% endif %}>{{store.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        {% if error_store %}
+                                            <div class="text-danger">{{ error_store }}</div>
+                                        {% endif %}
+                                    </div>
+                                       
+
+                                        <div class="col-md-4 mb-3" style="display:{% if parent_id == 1 %} block; {% else %} none; {% endif %}">
+                                            <label class="form-label fw-bold">Durumu</label>
+                                            <select name="status" class="form-select">
+                                            <option value="1" {% if status == 1 %} selected="selected" {% endif %}>Aktif</option>
+                                            <option value="0" {% if status == 0 %} selected="selected" {% endif %}>Pasif</option>
+                                            <option value="2" {% if status == 2 %} selected="selected" {% endif %}>Onay Bekliyor</option>
+                                            </select>
+                                        </div>
+
+                                        
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            <div class="tab-pane fade" id="tab-egitim" role="tabpanel">
+                                <fieldset id="yonetim" class="border rounded p-0 mb-0">
+
+
+                                    <!-- Okulu -->
+                                    <div class="row">
+                                        <div class="col col-lg-12 ">
+
+                                            <div class="card radius-10">
+                                                <div class="card-body">
+
+                                                    <div class="accordion" id="accordionExample">
+
+                                                        <div class="accordion-item">
+                                                            <h2 class="accordion-header" id="collapse-egitim">
+                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapseOne">
+                                                                    {{ "EĞİTİM BİLGİLERİ" }}
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="collapse-egitim" data-bs-parent="#accordionExample" style="">
+                                                                <div class="accordion-body">
+                                                                    <table id="table-egitim" class="table table-condensed">
+                                                                        <thead class="bg bg-light">
+                                                                            <th>{{"#"}}</th>
+                                                                            <th>{{"Okul Adı"}}</th>
+                                                                            <th>{{"Şehir"}}</th>
+                                                                            <th colspan="2">{{"Mezuniyet Yılı"}}</th>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    {{"İlkokul :"}}
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="ilkokul" value="{{ilkokul}}" placeholder="{{ "İlkokul Adı" }}" class="form-control" />
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="sehir_i" value="{{sehir_i}}" placeholder="{{ "Şehir" }}" class="form-control" />
+                                                                                </td>
+
+                                                                                <td colspan="2">
+                                                                                    <select name="mezuniyet_i" id="input-lisans" class="form-select">
+                                                                                        {% for year in years %}
+                                                                                        <option value="{{ year.text }}" {% if year.text == mezuniyet_i %} selected {% endif %}>{{ year.text }}</option>
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </td>
+                                                                            </tr>
+
+                                                                            <tr>
+                                                                                <td>
+                                                                                    {{"Ortaokul :"}}
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="ortaokul" value="{{ortaokul}}" placeholder="{{ "Ortaokul Adı" }}" class="form-control" />
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="sehir_o" value="{{sehir_o}}" placeholder="{{ "Şehir" }}" class="form-control" />
+                                                                                </td>
+
+                                                                                <td colspan="2">
+                                                                                    <select name="mezuniyet_o" id="input-lisans" class="form-select">
+                                                                                        {% for year in years %}
+                                                                                        <option value="{{ year.text }}" {% if  year.text == mezuniyet_o %} selected {% endif %}>{{ year.text }}</option>
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </td>
+                                                                            </tr>
+
+                                                                            <tr>
+                                                                                <td>
+                                                                                    {{"Lise :"}}
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="lise" value="{{lise}}" placeholder="{{ "Lise Adı" }}" class="form-control" />
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="sehir_l" value="{{sehir_l}}" placeholder="{{ "Şehir" }}" class="form-control" />
+                                                                                </td>
+
+                                                                                <td colspan="2">
+                                                                                    <select name="mezuniyet_l" id="input-lisans" class="form-select">
+                                                                                        {% for year in years %}
+                                                                                        <option value="{{ year.text }}" {% if  year.text == mezuniyet_l %} selected {% endif %}>{{ year.text }}</option>
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                        <thead class="bg bg-light">
+                                                                            <th>{{"#"}}</th>
+                                                                            <th>{{"Yüksek Okul Adı"}}</th>
+                                                                            <th>{{"Fakülte Adı"}}</th>
+                                                                            <th>{{"Bölüm Adı"}}</th>
+                                                                            <th>{{"Mezuniyet Yılı"}}</th>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    {{"Lisans :"}}
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="universite" value="{{universite}}" placeholder="{{ "Yüksek Okul Adı" }}" class="form-control" />
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="fakulte" value="{{fakulte}}" placeholder="{{ "Fakülte" }}" class="form-control" />
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    <input type="text" name="bolum" value="{{bolum}}" placeholder="{{ "Bölüm" }}" class="form-control" />
+                                                                                </td>
+                                                                                <td colspan="2">
+                                                                                    <select name="mezuniyet" id="input-lisans" class="form-select">
+                                                                                        {% for year in years %}
+                                                                                        <option value="{{ year.text }}" {% if year.text == mezuniyet %} selected {% endif %}>{{ year.text }}</option>
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    {{"Ön Lisans :"}}
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="universite1" value="{{universite1}}" placeholder="{{ "Yüksek Okul Adı" }}" class="form-control" />
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="fakulte1" value="{{fakulte1}}" placeholder="{{ "Fakülte" }}" class="form-control" />
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    <input type="text" name="bolum1" value="{{bolum1}}" placeholder="{{ "Bölüm" }}" class="form-control" />
+                                                                                </td>
+                                                                                <td colspan="2">
+                                                                                    <select name="mezuniyet1" id="input-lisans" class="form-select">
+                                                                                        {% for year in years %}
+                                                                                        <option value="{{ year.text }}" {% if year.text == mezuniyet1 %} selected {% endif %}>{{ year.text }}</option>
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </td>
+                                                                            </tr>
+
+                                                                            <tr>
+                                                                                <td>
+                                                                                    {{"Yüksek Lisans :"}}
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="universite2" value="{{universite2}}" placeholder="{{ "Yüksek Okul Adı" }}" class="form-control" />
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="fakulte2" value="{{fakulte2}}" placeholder="{{ "Fakülte" }}" class="form-control" />
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    <input type="text" name="bolum2" value="{{bolum2}}" placeholder="{{ "Bölüm" }}" class="form-control" />
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    <select name="mezuniyet2" id="input-lisans" class="form-select">
+                                                                                        {% for year in years %}
+                                                                                        <option value="{{ year.text }}" {% if year.text == mezuniyet2 %} selected {% endif %}>{{ year.text }}</option>
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </td>
+                                                                            </tr>
+
+                                                                            <tr>
+                                                                                <td>
+                                                                                    {{"Doktora :"}}
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="universite3" value="{{universite3}}" placeholder="{{ "Yüksek Okul Adı" }}" class="form-control" />
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input type="text" name="fakulte3" value="{{fakulte3}}" placeholder="{{ "Fakülte" }}" class="form-control" />
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    <input type="text" name="bolum3" value="{{bolum3}}" placeholder="{{ "Bölüm" }}" class="form-control" />
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    <select name="mezuniyet3" id="input-lisans" class="form-select">
+                                                                                        {% for year in years %}
+                                                                                        <option value="{{ year.text }}" {% if year.text == mezuniyet3 %} selected {% endif %}>{{ year.text }}</option>
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="accordion-item">
+                                                            <h2 class="accordion-header" id="collapse-gorev">
+                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                                                    {{ "ALDIĞI GÖREVLER" }}
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="collapse-gorev" data-bs-parent="#accordionExample">
+                                                                <div class="accordion-body">
+                                                                    <table id="gorev" class="table table-condensed">
+                                                                        <thead class="bg bg-light">
+                                                                            <th> {{"Kurumu"}}</th>
+                                                                            <th> {{"Birim / Pozisyon"}}</th>
+                                                                            <th> {{"Başlangıç"}}</th>
+                                                                            <th> {{"Bitiş"}}</th>
+                                                                            <th> {{"Açıklama"}}</th>
+                                                                            <th> {{"Eylem"}}</th>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {% set gorev_row = 0 %}
+                                                                            {% for gorev in personel_gorev %}
+                                                                            <tr class="text-start" id="gorev-row{{ gorev_row }}">
+                                                                                {% for custom_field in custom_fields %}
+                                                                                {% if custom_field.location_sort == 'account6' %}
+                                                                                <td id="gorev-{{gorev.gorev_id}}" class="text-start">
+                                                                                    <select name="personel_gorev[{{ gorev_row }}][gorev_value_id]" class="form-select gorev-row{{ gorev_row }}" id="{{ gorev_row }}">
+                                                                                        <option value="">{{ text_select }}</option>
+                                                                                        {% for custom_field_value in custom_field.custom_field_value %}
+
+                                                                                        <option value="{{ custom_field_value.custom_field_value_id }}" {% if custom_field_value.custom_field_value_id == gorev.gorev_value_id %} selected="selected" {% endif %}>{{ custom_field_value.name }}</option>
+
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </td>
+                                                                                {% endif %}
+                                                                                {% endfor %}
+
+                                                                                <td class="text-start" style="width:25%"><input type="text" name="personel_gorev[{{ gorev_row }}][pozisyon]" value="{{ gorev.pozisyon }}" placeholder="{{ "Birim / Pozisyon" }}" class="form-control gorev-row{{ gorev_row }}" />
+                                                                                </td>
+                                                                                <td class="text-start">
+                                                                                    <div class="input-group date gorev-row{{ gorev_row }}">
+                                                                                        <input type="text" name="personel_gorev[{{ gorev_row }}][date_start]" value="{{ gorev.date_start }}" placeholder="{{ "Başlangıç Tarihi" }}" data-date-format="DD/MM/YYYY" class="form-control " />
+                                                                                        <div class="input-group-btn">
+                                                                                            <button class="btn btn-default" type="button"><i class="fa fa-calendar"></i></button>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                </td>
+                                                                                <td class="text-start">
+                                                                                    <div class="input-group date gorev-row{{gorev_row}}">
+                                                                                        <input type="date" name="personel_gorev[{{ gorev_row }}][date_end]" value="{{ gorev.date_end }}" placeholder="{{ "Bitiş Tarihi" }}" data-date-format="DD/MM/YYYY" class="form-control" />
+
+                                                                                    </div>
+
+                                                                                </td>
+                                                                                <td class="text-start"><input type="text" name="personel_gorev[{{ gorev_row }}][description]" value="{{ gorev.description }}" placeholder="{{ "Açıklama" }}" class="form-control gorev-row{{gorev_row}}" />
+                                                                                    <span class="gorev-row-{{gorev_row}}">
+                                                                                        <h5>{{ personel_gorev.description }}</h5>
+                                                                                    </span>
+                                                                                </td>
+
+                                                                                <td class="text-start">
+                                                                                    <button type="button" onclick="$('#gorev-row{{ gorev_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i></button>
+                                                                                </td>
+                                                                            </tr>
+                                                                            {% set gorev_row = gorev_row + 1 %}
+                                                                            {% endfor %}
+                                                                        </tbody>
+                                                                        <tfoot>
+                                                                            <tr>
+                                                                                <td colspan="5" class="text-start">
+                                                                                <button type="submit" form="form-customer" class="btn btn-primary btn-sm" type="button"><i class="bi bi-save"></i></button></td>
+                                                                                <td class="text-start">
+                                                                                <button type="button" onclick="addGorev();" data-toggle="tooltip" title="{{ button_gorev_add }}" class="btn btn-info btn-sm"><i class="bi bi-plus-circle"></i> </button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tfoot>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="accordion-item">
+                                                            <h2 class="accordion-header" id="collapse-dil">
+                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapseThree">
+                                                                    {{ "İYİ DERECEDE BİLDİĞİ DİLLER" }}
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="collapse-dil" data-bs-parent="#accordionExample">
+                                                                <div class="accordion-body">
+                                                                    {% for custom_field in custom_fields %}
+                                                                    {% if custom_field.location_sort == 'account7' %}
+                                                                    {% if custom_field.type == 'checkbox' %}
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-condensed">
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    {% set row = 0 %}
+                                                                                    {% for custom_field_value in custom_field.custom_field_value  %}
+                                                                                    {% if row %10 * 2 == 0 %} {{ "</tr><tr>" }}{% endif %}
+                                                                                    <td>
+                                                                                        <input type="checkbox" name="custom_field[{{ custom_field.custom_field_id }}][]" value="{{ custom_field_value.custom_field_value_id }}" {% if custom_field_value.custom_field_value_id in dil_custom_field[custom_field.custom_field_id] %} checked="checked" style="background:#95d8e6;font-weight:bold;" {% endif %} />
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        {% if custom_field_value.custom_field_value_id in dil_custom_field[custom_field.custom_field_id] %} <strong> {{ custom_field_value.name }} </strong> {% else %} {{ custom_field_value.name }} {% endif %}
+                                                                                    </td>
+                                                                                    {% set row = row + 1 %}
+
+                                                                                    {% endfor %}
+                                                                                <tr>
+                                                                                    <td colspan="16" class="text-start"><button type="submit" form="form-customer" class="btn btn-default" type="button"><i class="fa fa-save"></i></button></td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                        {% endif %}
+                                                                        {% endif %}
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+
+
+                                                        </div>
+
+                                                        <div class="accordion-item">
+                                                            <h2 class="accordion-header" id="collapse-sertifika">
+                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                                                                    {{"ALDIĞI SERTİFİKALAR"}}
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="collapse-sertifika" data-bs-parent="#accordionExample" style="">
+                                                                <div class="accordion-body">
+                                                                    <table id="sertifika" class="table table-condensed">
+                                                                        <thead class="bg bg-light">
+
+                                                                            <th class="text-start"> {{"Sertifika Adı"}}</th>
+                                                                            <th class="text-start"> {{"Kurumu"}}</th>
+                                                                            <th class="text-start"> {{"Tarih"}}</th>
+                                                                            <th class="text-start"> {{"Eylem"}}</th>
+
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {% set sertifika_row = 0 %}
+                                                                            {% for sertifika in personel_sertifika %}
+                                                                            <tr id="sertifika-row{{ sertifika_row }}">
+                                                                                <td class="text-start" bgcolor="#edf2f5" class="text-start"><input type="text" name="personel_sertifika[{{ sertifika_row }}][baslik]" value="{{ sertifika.baslik }}" placeholder="{{ "Sertifika Adı" }}" class="form-control sertifika-row{{ sertifika_row }}" />
+                                                                                </td>
+                                                                                <td class="text-start" bgcolor="#edf2f5" class="text-start"><input type="text" name="personel_sertifika[{{ sertifika_row }}][kurum]" value="{{ sertifika.kurum }}" placeholder="{{ "Aldığı Kurum" }}" class="form-control sertifika-row{{ sertifika_row }}" />
+                                                                                </td>
+                                                                                <td class="text-start">
+                                                                                    <input type="date" name="personel_sertifika[{{ sertifika_row }}][date_added]" value="{{ sertifika.date_added }}" placeholder="{{ entry_date_dokuman }}" class="form-control" />
+                                                                                </td>
+                                                                                <td class="text-start">
+                                                                                    <button type="button" onclick="$('#sertifika-row{{ sertifika_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i></button>
+                                                                                </td>
+                                                                            </tr>
+                                                                            {% set sertifika_row = sertifika_row + 1 %}
+                                                                            {% endfor %}
+                                                                        </tbody>
+                                                                        <tfoot>
+                                                                            <tr>
+                                                                                <td colspan="3"><button type="submit" form="form-personel" class="btn btn-default" type="button"><i class="fa fa-save"></i></button></td>
+                                                                                <td class="text-start">
+                                                                                <button type="button" onclick="addSertifika();" data-toggle="tooltip" title="{{ button_sertifika_add }}" class="btn btn-info btn-sm"><i class="bi bi-plus-circle"></i></button></td>
+                                                                            </tr>
+                                                                        </tfoot>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="accordion-item">
+                                                            <h2 class="accordion-header" id="collapse-tez">
+                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                                                                    {{ "AKADEMİK TEZ BİLGİLERİ"}}
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="collapse-tez" data-bs-parent="#accordionExample" style="">
+                                                                <div class="accordion-body">
+                                                                    <table id="tez-body" class="table table-condensed table-hover">
+                                                                        <thead class="bg bg-light">
+                                                                            <th class="text-start"> {{"Tez Konusu"}}</th>
+                                                                            <th class="text-start"> {{"Türü"}}</th>
+                                                                            <th class="text-start"> {{"Başlama Tarihi"}}</th>
+                                                                            <th class="text-start"> {{"Bitiş Tarihi"}}</th>
+                                                                            <th class="text-start"> {{"Eylem"}}</th>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {% set tez_row = 0 %}
+                                                                            {% for personel_tez in personel_tezs %}
+                                                                            <tr id="tez-row{{ tez_row }}">
+                                                                                <td class="text-start"><input type="text" name="personel_tez[{{ tez_row }}][baslik]" value="{{ personel_tez.baslik }}" placeholder="{{ "Tez Konusu" }}" class="form-control tez-row{{ tez_row }}" />
+                                                                                </td>
+                                                                                <td class="text-start">
+                                                                                    <select name="personel_tez[{{ tez_row }}][lisans_id]" id="input-lisans" class="form-select tez-row{{ tez_row }}">
+                                                                                        <option value="1" {% if personel_tez.lisans_id == 1 %} selected {% endif %}>{{ "Lisans" }}</option>
+                                                                                        <option value="2" {% if personel_tez.lisans_id == 2 %} selected {% endif %}>{{ "Yüksek Lisans" }}</option>
+                                                                                        <option value="3" {% if personel_tez.lisans_id == 3 %} selected {% endif %}>{{ "Doktora" }}</option>
+                                                                                    </select>
+                                                                                </td>
+                                                                                <td class="text-start">
+                                                                                      <input type="date" name="personel_tez[{{ tez_row }}][date_start]" value="{{ personel_tez.date_start }}" placeholder="{{ entry_date_start }}" class="form-control" />
+                                                                                </td>
+                                                                                <td class="text-start">
+                                                                                      <input type="date" name="personel_tez[{{ tez_row }}][date_end]" value="{{ personel_tez.date_end }}" placeholder="{{ entry_date_end }}" class="form-control" />
+                                                                                </td>
+                                                                                <td class="text-start">
+                                                                                    <button type="button" onclick="$('#tez-row{{ tez_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i></button>
+                                                                                </td>
+                                                                            </tr>
+                                                                            {% set tez_row = tez_row + 1 %}
+                                                                            {% endfor %}
+                                                                        </tbody>
+                                                                        <tfoot>
+                                                                            <tr>
+                                                                                <td colspan="4"><button type="submit" form="form-personel" class="btn btn-default" type="button"><i class="fa fa-save"></i></button></td>
+                                                                                <td class="text-start"><button type="button" onclick="addTez();" data-toggle="tooltip" title="{{ "Yeni Satır Ekle" }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i></button></td>
+                                                                            </tr>
+                                                                        </tfoot>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+
+
+                                            </div>
+                                        </div>
+
+                                </fieldset>
+                            </div>
+
+                            <div class="tab-pane fade" id="tab-category" role="tabpanel">
+                                <div class="row mb-3 col-sm-6">
+                                    <label class="form-label fw-bold">Üyelik Kategorisi </label>
+                                    <div class="bg-light border p-2" style="height: 150px; overflow: auto;">
+                                        {% for key,value in personel_group %}
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="personel_group_id[]" value="{{ key }}" {% if key in personel_groups %} checked="checked" {% endif %}>
+                                            <label class="form-check-label">{{ value }}</label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3 col-sm-6">
+                                    <label class="form-label fw-bold">{{ "Bağlı Birimi" }}</label>
+                                    <div class="bg-light border p-2" style="height: 150px; overflow: auto;">
+                                        {% for birim in birimler %}
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="personel_birim_id[]" value="{{ birim.personel_birim_id }}" {% if birim.personel_birim_id in personel_birims %} checked="checked" {% endif %}>
+                                            <label class="form-check-label">{{ birim.name }}</label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3 col-sm-6">
+                                    <label class="form-label fw-bold">{{ "Diğer Ayarlar" }}</label>
+                                    <div class="bg-light border p-2" style="height: 150px; overflow: auto;">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="custom_field[imizaci_id]" value="{{ personel_id }}" {% if personel_id in imzacilar %} checked="checked" {% endif %}>
+                                            <label class="form-check-label">{{ "imzacı" }}</label>
+                                        </div>
+                                        <small class="text-muted d-block mt-2">
+                                            Bu kişiyi imzacı olarak seçerseniz, görevlendirme tablosundaki görev sürecinde yetkili olur.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    {{footer}}
+</main>
+
+<!-- FORM OLUŞTURMA MODAL -->
+<div class="modal fade" id="modal-generate" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width:35%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="exampleModalLabel">Harici Form Oluşturma</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        
+        <label for="input-form-baslik" class="col-form-label">Form Başlığı:</label>
+        <div class="form-group">
+          <input type="text" name="baslik" value="Gönüllü Kayıt Formu" 
+                 placeholder="Form başlığı yazınız." 
+                 id="input-form-baslik" class="form-control"/>
+        </div>
+
+        <label for="input-form-status" class="col-form-label mt-3">Form Durumu:</label>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox"  name="status" id="input-form-status" {% if online_form_status %} checked {% endif %}>
+          <label class="form-check-label" for="input-form-status">Aktif/Pasif</label>
+        </div>
+
+        <div class="form-group mt-3" id="form-url">
+          <label for="form-url-textarea" class="col-form-label">Form url adresi:</label>
+          <textarea name="url" rows="3" placeholder="Url adresi" id="form-url-textarea" class="form-control">{{form_url}}</textarea>
+          <div class="text-end input-url mt-2">
+            <a href="javascript:void(0)" id="button-copy" data-bs-toggle="tooltip" title="Kopyala">
+              <i class="fa fa-copy"></i> Kopyala
+            </a>
+          </div>
+        </div>
+
+        <div class="alert alert-warning mt-3">
+          <strong>Uyarı :</strong> Sisteme giriş yapmadan personel kayıt etmek için bir <strong>form oluşturun</strong>. 
+          Form url'sini sadece kayıt yapacak kişi veya kurumla paylaşın.
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="modal-button-generate" class="btn btn-info">
+          <i class="bi bi-save"></i> Formu Kaydet
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="view/javascript/jquery/jquery.inputmask.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('input[name="engel_durumu"]').on('change', function() {
+            if ($(this).prop('checked')) {
+                $('#engel-description').show();
+            } else {
+                $('#engel-description').hide();
+            }
+        });
+
+        $('input[name="engel_durumu"]:checked').trigger('change');
+    });
+
+
+    $(document).ready(function() {
+        // Engel Durumu radio butonları değiştiğinde açıklama kutusunu göster/gizle
+        $('input[name="adli_sicil"]').on('change', function() {
+            if ($(this).prop('checked')) {
+                $('#sicil-description').show();
+            } else {
+                $('#sicil-description').hide();
+            }
+        });
+
+        // Sayfa yüklendiğinde mevcut değere göre trigger et
+        $('input[name="adli_sicil"]:checked').trigger('change');
+    });
+
+
+    $(document).ready(function() {
+        // Çalışma Durumu radio butonları değiştiğinde ilgili alanları göster/gizle
+        $('input[name="calisma_durumu"]').on('change', function() {
+            if ($(this).prop('checked')) {
+                $('.form-meslek').show();
+                $('#is-arama').hide();
+            } else {
+                $('.form-meslek').hide();
+                $('#is-arama').show();
+            }
+        });
+
+        // Sayfa yüklendiğinde mevcut değere göre trigger et
+        $('input[name="calisma_durumu"]:checked').trigger('change');
+    });
+
+    //MESLEK GRUPLARI
+    $(document).ready(function() {
+        // Çalışma Durumu radio butonları değiştiğinde ilgili alanları göster/gizle
+        $('select[name="meslek_grubu"]').on('change', function() {
+            if ($(this).val() == 'diger') {
+                $('#input-meslek-grubu2').attr('type', 'text');
+            } else {
+                $('#input-meslek-grubu2').attr('type', 'hidden');
+                $('#input-meslek-grubu2').val('');
+            }
+        });
+
+        // Sayfa yüklendiğinde mevcut değere göre trigger et
+        $('select[name="meslek_grubu"]').trigger('change');
+    });
+
+    $(document).ready(function() {
+        $('.operator-code').on('click', function() {
+            if ($(this).attr('id') === '') {
+                $('#input-telephone').val('');
+            } else {
+                var code = $(this).attr('id').trim() + ' 999 99 99';
+                $('#input-telephone').val('');
+                $('#input-telephone').inputmask(code);
+
+            }
+
+        });
+    });
+
+    $('#input-telephone').inputmask('0999 999 99 99');
+</script>
+
+
+<script type="text/javascript">
+    $('#button-produce').on('click', function() {
+        var chars = "0123456789abcdefghijklmnopqrstuvwxyz@#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var passwordLength = 10;
+        var password = "";
+
+        for (var i = 0; i <= passwordLength; i++) {
+            var randomNumber = Math.floor(Math.random() * chars.length);
+            password += chars.substring(randomNumber, randomNumber + 1);
+        }
+
+        $('input[name=\'password\']').val(password);
+    });
+</script>
+
+<script type="text/javascript">
+    var bugun = '{{ bugun }}';
+    var gorev_row = {{ gorev_row }};
+
+    function addGorev() {
+        var html = '<tr id="gorev-row' + gorev_row + '">';
+
+        {% for custom_field in custom_fields %}
+            {% if custom_field.location_sort == 'account6' %}
+                html += '<td class="text-start">';
+                html += '<select name="customer_gorev[' + gorev_row + '][gorev_value_id]" class="form-select">';
+                {% for custom_field_value in custom_field.custom_field_value %}
+                    html += '<option value="{{ custom_field_value.custom_field_value_id }}">{{ custom_field_value.name }}</option>';
+                {% endfor %}
+                html += '</select>';
+                html += '</td>';
+            {% endif %}
+        {% endfor %}
+
+        html += '<td class="text-start"><input type="text" name="personel_gorev[' + gorev_row + '][pozisyon]" value="" placeholder="Birim / Pozisyon" class="form-control"/></td>';
+        html += '<td class="text-start" style="width:20%;"><input type="date" name="personel_gorev[' + gorev_row + '][date_start]" value="" class="form-control"/></td>';
+        html += '<td class="text-start" style="width:20%;"><input type="date" name="personel_gorev[' + gorev_row + '][date_end]" value="" class="form-control"/></td>';
+        html += '<td class="text-start"><input type="text" name="personel_gorev[' + gorev_row + '][description]" value="" placeholder="Açıklama" class="form-control"/></td>';
+        html += '<td style="width:1%;" class="text-start">';
+        html += '<button type="button" onclick="$(\'#gorev-row' + gorev_row + '\').remove();" data-bs-toggle="tooltip" title="Sil" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i></button>';
+        html += '</td>';
+
+        html += '</tr>';
+
+        $('#gorev tbody').append(html);
+
+        gorev_row++;
+    }
+</script>
+
+<script type="text/javascript">
+    var sertifika_row = {{sertifika_row}};
+
+    function addSertifika() {
+        html = '<tr id="sertifika-row' + sertifika_row + '">';
+        html += '  <td class="text-start"><input type="text" name="personel_sertifika[' + sertifika_row + '][baslik]" value="" placeholder="{{ "Sertifika Adı" }}" class="form-control" /></td>';
+        html += '  <td class="text-start"><input type="text" name="personel_sertifika[' + sertifika_row + '][kurum]" value="" placeholder="{{ "Kurumu" }}" class="form-control" /></td>';
+        html += '  <td class="text-start" ><input type="date" name="personel_sertifika[' + sertifika_row + '][date_added]" value="" placeholder="{{ "Belge Tarihi" }}" class="form-control" /></td>';
+        html += '  <td style="width:1%;" class="text-start"><button type="button" onclick="$(\'#sertifika-row' + sertifika_row + '\').remove();" data-toggle="tooltip" title="{{ "Sil" }}" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i></button></td>';
+        html += '</tr>';
+
+        $('#sertifika tbody').append(html);
+
+        sertifika_row++;
+    }
+</script>
+
+<script type="text/javascript">
+    var tez_row = {{tez_row}};
+
+    function addTez() {
+        html = '<tr id="tez-row' + tez_row + '">';
+        html += '<td class="text-start"><input type="text" name="personel_tez[' + tez_row + '][baslik]" value="" placeholder="{{ "Tez Konusu" }}" class="form-control" /></td>';
+        html += '<td class="text-start" >';
+        html += '<select name="personel_tez[' + tez_row + '][lisans_id]" id="input-lisans" class="form-select">';
+        html += '<option value="">{{ "--Seçim Yapın--" }}</option>';
+        html += '<option value="1">{{ "Lisans" }}</option>';
+        html += '<option value="2">{{ "Yüksek Lisans" }}</option>';
+        html += '<option value="3">{{ "Doktora" }}</option>';
+        html += '</select>';
+        html += ' </td>';
+        html += '  <td  class="text-start" ><input type="date" name="personel_tez[' + tez_row + '][date_start]" value="" placeholder="{{ "Başlangıç Tarihi" }}" class="form-control" /></td>';
+        html += '  <td class="text-start" ><input type="date" name="personel_tez[' + tez_row + '][date_end]" value="" placeholder="{{ "Bitiş Tarihi" }}" class="form-control" /></td>';
+        html += '  <td style="width:1%;" class="text-start"><button type="button" onclick="$(\'#tez-row' + tez_row + '\').remove();" data-toggle="tooltip" title="{{ "Sil" }}" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i></button></td>';
+        html += '</tr>';
+
+        $('#tez-body tbody').append(html);
+
+        tez_row++;
+    }
+</script>
+
+<script type="text/javascript">
+    var document_row = {{document_row}};
+
+    function addDocument() {
+        html = '<tr id="document-row' + document_row + '">';
+        html += '<td class="text-start"><input type="text" name="personel_document[' + document_row + '][name]" value="" placeholder="{{ "Belge Adı" }}" class="form-control" /></td>';
+        html += ' <td class="text-start"><div class="input-group"><input type="text" name="personel_document[' + document_row + '][filename]" value="" id="input-filename' + document_row + '" placeholder="{{ "Belge Adı" }}" class="form-control" readonly/><input type="hidden" name="personel_document[' + document_row + '][file]" value="" id="input-file' + document_row + '" placeholder="{{ "Code" }}" class="form-control" readonly/><input type="hidden" name="personel_document[' + document_row + '][code]" value="" id="input-filecode' + document_row + '" placeholder="{{ "Code" }}" class="form-control" readonly/>';
+        html += '<span class="input-group-btn"><a href="" data-toggle="tooltip" title="{{ "Belgeyi İndir"}}" id="download' + document_row + '" class="btn btn-outline-warning" disabled><i class="fa fa-download"></i></a></span></div></td>';
+        html += '<td style="width:1%;" class="text-start" ><button type="button" onclick="documentUpload(' + document_row + ')" name="' + document_row + '" data-toggle="tooltip" title="{{ "Belge Yükle" }}" class="btn btn-outline-warning button' + document_row + '"><i class="fa fa-upload"></i> Dosya Yükle</button></td>';
+        html += '<td style="width:1%;" class="text-start"><button type="button" onclick="$(\'#document-row' + document_row + '\').remove();" data-toggle="tooltip" title="{{ "Sil" }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>';
+        html += '</tr>';
+
+        $('#document tbody').append(html);
+
+        document_row++;
+    }
+</script>
+
+<script type="text/javascript">
+    function documentUpload(row) {
+        var id = row;
+
+        $('#form-upload').remove();
+        $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+        $('#form-upload input[name=\'file\']').trigger('click');
+
+        if (typeof timer != 'undefined') {
+            clearInterval(timer);
+        }
+
+        timer = setInterval(function() {
+            if ($('#form-upload input[name=\'file\']').val() != '') {
+                clearInterval(timer);
+
+                $.ajax({
+                    url: 'index.php?route=personeller/personel/upload&user_token={{ user_token }}&id=' + id,
+                    type: 'post',
+                    dataType: 'json',
+                    data: new FormData($('#form-upload')[0]),
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function() {
+                        $('.button' + id).prop('disabled', true);
+                    },
+
+                    success: function(json) {
+                        $('.alert-dismissible').remove();
+                        if (json.error) {
+                            $('.button' + id).prop('disabled', false);
+                            $('.container-fluid').prepend('<div class="alert alert-fixed alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error + '</div>');
+                        }
+
+                        if (json.success) {
+                            $('.container-fluid').prepend('<div class="alert success-fixed alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.success + '</div>');
+                            $('#input-file' + id).val(json['filename']);
+                            $('#input-filename' + id).val(json['mask']);
+                            $('#input-filecode' + id).val(json['code']);
+                        }
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                    }
+                });
+            }
+        }, 500);
+    }
+</script>
+
+<script type="text/javascript">
+    $('#tab-egitim .panel-heading').on('click', function() {
+        $('#tab-egitim').find('.panel-heading').css('background-color', '#eee');
+        $('#tab-egitim').find('.panel-body').css('border', '1px solid #ccc');
+        $('#tab-egitim').find('.panel-heading').css('opacity', '0.3');
+        $(this).css('background-color', '#96d0f0');
+        $(this).css('opacity', '');
+
+    });
+</script>
+
+<script type="text/javascript">
+    $('#button-form').on('click', function() {
+        //$('.input-url').hide();
+        //$('textarea[name=\'url\']').val('');
+        $('#modal-button-generate').prop('disabled', false);
+        $('#modal-generate').modal('show');
+    });
+
+    $('#button-copy').on('click', function() {
+        var copyText = $('textarea[name=\'url\']');
+        copyText.select();
+        document.execCommand("copy");
+    });
+
+</script>
+
+<script type="text/javascript"><!--
+    $('#modal-button-generate').on('click', function() {
+        if ($('#input-form-baslik').val() == '') {
+            $('#alert').prepend(
+              '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+              '<div class="d-flex align-items-center">' +
+              '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+              '<div class="ms-3"><div class="text-dynamic">Lütfen form başlığını yazınız.</div></div>' +
+              '</div>' +
+              '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+          ); 
+            return;
+        }
+
+        var status = $('#input-form-status:checked').length ? 1 : 0;
+
+        $.ajax({
+            url: 'index.php?route=personeller/personel/formGenerate&user_token={{ user_token }}&baslik=' + $('#input-form-baslik').val() + '&status=' + status,
+            type: 'post',
+            dataType: 'json',
+            success: function(json) {
+
+                if (json.error.warning) {
+                     $('#alert').prepend(
+                        '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                        '<div class="d-flex align-items-center">' +
+                        '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                        '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                        '</div>' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                        '</div>'
+                    ); 
+                }
+
+                if (json.success) {
+                    //$('textarea[name=\'url\']').val(json['token']);
+                    $('#modal-generate').modal('hide');
+                    $('#alert').append(
+                        '<div class="alert border-0 border-success border-start border-2 bg-light-success alert-dismissible fade show py-1">' +
+                        '<div class="d-flex align-items-center">' +
+                        '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+                        '<div class="ms-3"><div class="text-dynamic">' + json.success + '</div></div>' +
+                        '</div>' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                        '</div>'
+                    );
+
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+
+    });
+</script>
+
+<script type="text/javascript">
+
+    $('#input-lastname').on('change', function() {
+
+        var firstname = $('#input-firstname').val();
+        var lastname = $('#input-lastname').val();
+
+        var name = firstname + ' ' + lastname;
+        name = name.replaceAll(' ', '.');
+
+        var username = convertChracter(name);
+        username.trim();
+
+        $('input[name=\'username\']').val(username.toLowerCase());
+
+    });
+
+    function convertChracter(text) {
+        const turkishChars = {
+            'ğ': 'g',
+            'Ğ': 'G',
+            'ü': 'u',
+            'Ü': 'U',
+            'ş': 's',
+            'Ş': 'S',
+            'ı': 'i',
+            'İ': 'I',
+            'ö': 'o',
+            'Ö': 'O',
+            'ç': 'c',
+            'Ç': 'C'
+        };
+
+        return text.replace(/[ğüşıöçĞÜŞİÖÇ]/g, function(match) {
+            return turkishChars[match];
+        });
+    }
+
+</script>
+
+<script type="text/javascript">
+    $('input[id^=\'input-permission-all\']').on('click', function() {
+        var for_input = $(this).attr('for');
+        if ($(this).prop('checked') == true) {
+            $('.' + for_input).prop('checked', true)
+        } else {
+            $('.' + for_input).prop('checked', false)
+        }
+
+    });
+</script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>
+
+<script>
+    document.querySelectorAll('.toggle-input').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const inputGroup = this.nextElementSibling;
+            inputGroup.classList.toggle('d-none');
+        });
+    });
+</script>

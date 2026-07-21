@@ -1,0 +1,35 @@
+
+  <table class="table table-bordered">    
+    <thead>
+     <tr>
+        <td class="text-center">{{ "S.N" }}</td>
+		<td class="text-left">{{ "Kategori" }}</td>
+		<td class="text-left">{{ "Miktar" }}</td>
+        <td class="text-left">{{ "Açıklama" }}</td>
+        <td class="text-left">{{ "Tarih" }}</td>
+        <td class="text-center">{{ "İşlem" }}</td>
+     </tr>
+    </thead>
+                  
+    <tbody>
+	{% if data_store %}
+	{% set row = 1 %}
+	{% for veri in data_store %}
+    <tr id="data-list{{veri.store_veri_id}}">
+	    <td class="text-center" style="width:1%;">{{ row }}</td>
+        <td class="text-left">{{ veri.category_id }}</td>
+		<td class="text-left">{{ veri.miktar }}</td>
+		<td class="text-left">{{ veri.description }}</td>
+        <td class="text-left">{{ veri.date_added }}</td>
+        <td class="text-center"><button type="button" id="{{veri.store_veri_id}}" class="btn btn-danger delete-data">Sil</button></td>     
+    </tr>
+	{% set row = row + 1 %}
+    {% endfor %}
+    {% endif %}	
+    </tbody>		 
+    </table>
+
+<div class="row">
+  <div class="col-sm-6 text-left">{{ pagination }}</div>
+  <div class="col-sm-6 text-right">{{ results }}</div>
+</div>

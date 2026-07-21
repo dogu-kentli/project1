@@ -1,0 +1,544 @@
+{{ header }}{{ column_left }}
+
+<main id="page-content" class="page-content">
+  <div class="container-fluid">
+    <div class="card shadow-sm border-0 rounded-3">
+
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Toplantı Düzenleme Formu</h5>
+        <div>
+          <button type="submit" form="form-toplanti" class="btn btn-primary btn-sm">
+            <i class="bi bi-save"></i> Kaydet
+          </button>
+          <a href="{{ cancel }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-counterclockwise"></i> İptal
+          </a>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-toplanti">
+
+          <div class="text-center mb-3">
+            {% if store_logo %}
+              <img src="{{ store_logo }}" class="img-fluid mb-2" style="max-height:60px;">
+            {% else %}
+              <img src="view/image/logo.png" width="170">
+            {% endif %}
+
+            <div class="d-flex justify-content-between py-2">
+              <div>No: <strong>{{ no }}</strong></div>
+              <div class="fw-semibold">{{ toplanti_name }}</div>
+        
+              <div>Tarih/Saat : 
+              <input type="date" name="toplanti_tarihi" value="{{ toplanti_tarihi }}" class="form-control-sm bg-light-info" {% if status %} readonly {% endif %}>
+              <input type="time" name="toplanti_saati" value="{{ toplanti_saati }}" class="form-control-sm bg-light-info" {% if status %} readonly {% endif %}>
+              </div>
+            </div>
+          </div>
+
+          <div class="card shadow-sm mb-4 overflow-visible">
+            <div class="card-header bg-light fw-semibold">👥 Personel Listesi</div>
+            <div class="table-responsive overflow-visible">
+              <table class="table table-striped  align-middle mb-0">
+                <tbody id="personel-list">
+                  {% for personel in personeller %}
+                  <tr id="personel-row{{personel.row}}">
+                    <td class="text-muted">{{personel.row}}</td>
+                    <td style="width: 150px;">
+                      <select name="personel_array[{{personel.row}}][status]" class="form-select">
+                        <option value="0" {{ personel.status == 0 ? 'selected' }}>❌ Yok</option>
+                        <option value="1" {{ personel.status == 1 ? 'selected' }}>✅ Var</option>
+                        <option value="2" {{ personel.status == 2 ? 'selected' }}>🟡 İzinli</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input type="text" name="personel_array[{{personel.row}}][personel]" value="{{personel.personel}}" id="personel-personel-name{{personel.row}}" class="form-control auto-complete" data-id="{{personel.row}}" data-for="personel" placeholder="Ad Soyad">
+                      <input type="hidden" name="personel_array[{{personel.row}}][personel_id]" id="personel-personel-id{{personel.row}}" value="{{personel.personel_id}}">
+                    </td>
+                    <td>
+                      <input type="text" name="personel_array[{{personel.row}}][birim]" id="personel-personel-birim{{personel.row}}" value="{{personel.birim}}" class="form-control" placeholder="Birim">
+                    </td>
+                    <td class="text-end">
+                      <button type="button" onclick="$('#personel-row{{personel.row}}').remove();" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="5" class="text-end p-2">
+                      <button type="button" onclick="addPersonel()" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-plus-lg"></i> Personel Ekle
+                      </button>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light fw-semibold">📋 Toplantı Gündemi</div>
+            <table class="table table-striped mb-0">
+              <tbody id="gundem-list">
+                {% for gundem in gundemler %}
+                <tr id="gundem-row{{gundem.row}}">
+                  <td style="width:1%">{{gundem.row}}</td>
+                  <td>
+                    <input type="text" name="gundem_array[]" value="{{gundem.name}}" class="form-control" placeholder="Gündem Maddesi">
+                  </td>
+                  <td class="text-end" style="width:1%">
+                    <button type="button" onclick="$('#gundem-row{{gundem.row}}').remove();" class="btn btn-outline-danger btn-sm">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="text-end p-2">
+                    <button type="button" onclick="addGundem()" class="btn btn-outline-primary btn-sm">
+                      <i class="bi bi-plus-lg"></i> Gündem Ekle
+                    </button>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="card shadow-sm mb-4 overflow-visible">
+            <div class="card-header bg-light fw-semibold">📌 Toplantı Kararları</div>
+            <div class="table-responsive-sm">
+              <table class="table  align-middle mb-0">
+                <thead class="table-light text-nowrap">
+                  <tr>
+                    <th style="width:1%">#</th>
+                    <th>Karar</th>
+                    <th style="width:15%;">Sorumlu</th>
+                    <th style="width:9%;">Statü</th>
+                    <th style="width:2%;">Tarih</th>
+                    <th style="width:1%"></th>
+                  </tr>
+                </thead>
+                <tbody id="karar-list">
+                  {% for karar in kararlar %}
+                  <tr id="karar-row{{karar.row}}">
+                    <td>{{karar.row}}</td>
+                    <td>
+                      <textarea name="karar_array[{{karar.row}}][baslik]" class="form-control input-border-none border-0 textarea-box" onfocus="textAreaAdjust(this)" onkeyup="textAreaAdjust(this)">{{karar.name}}</textarea>
+                      <span data-toggle="tooltip" data-for="{{karar.row}}" title="{{ "Açıklama Ekle" }}" class="karar-plus-icon">+</span>
+                      <input type="text" name="karar_array[{{karar.row}}][baslik_detay]" class="form-control input-detay" placeholder="Bu kararla ilgili sonuç yazınız." value="{{karar.detay}}" style="display:none;">
+                    </td>
+                    <td>
+                      <input type="text" name="karar_array[{{karar.row}}][personel]" value="{{karar.personel}}" id="karar-personel-name{{karar.row}}" data-id="{{karar.row}}" data-for="karar" class="form-control auto-complete" placeholder="Sorumlu Seçiniz">
+                      <input type="hidden" name="karar_array[{{karar.row}}][personel_id]" id="karar-personel-id{{karar.row}}" value="{{karar.personel_id}}">
+                    </td>
+                    <td>
+                      <select name="karar_array[{{karar.row}}][statu]" class="form-select form-select-sm">
+                        <option value="DEK" {{ karar.statu == 'DEK' ? 'selected' }}>DEK</option>
+                        <option value="DK" {{ karar.statu == 'DK' ? 'selected' }}>DK</option>
+                        <option value="TK" {{ karar.statu == 'TK' ? 'selected' }}>TK</option>
+                        <option value="İK" {{ karar.statu == 'İK' ? 'selected' }}>İK</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input type="date" name="karar_array[{{karar.row}}][karar_tarihi]" value="{{karar.karar_tarihi}}" class="form-control">
+                    </td>
+                    <td class="text-end">
+                      <button type="button" onclick="$('#karar-row{{karar.row}}').remove();" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="6" class="text-end p-2">
+                      <button type="button" onclick="addKarar()" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-plus-lg"></i> Karar Ekle
+                      </button>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light fw-semibold d-flex justify-content-between align-items-center">
+              <span>🌟 Dilek ve Temenniler</span>
+              <button type="button" onclick="addTemenni()" class="btn btn-primary btn-sm rounded-circle">
+                <i class="bi bi-plus-lg"></i>
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="row g-3" id="temenni-list">
+                {% for key, item in description %}
+                <div class="col-md-6 col-lg-4" id="temenni-row{{key}}">
+                  <div class="card h-100 border-light shadow-sm">
+                    <div class="card-body p-3">
+                      <div class="d-flex justify-content-between mb-2">
+                        <span class="badge bg-secondary">#{{key}}</span>
+                        <button type="button" onclick="$('#temenni-row{{key}}').remove();" class="btn btn-link btn-sm text-danger p-0">
+                          <i class="bi bi-x-circle-fill"></i>
+                        </button>
+                      </div>
+                      <div class="mb-2">
+                        <label class="small text-muted fw-bold">Açıklama</label>
+                        <textarea name="temenni_array[{{key}}][description]" class="form-control" rows="2" placeholder="Dilek veya temenni...">{{item.description}}</textarea>
+                      </div>
+                      <div>
+                        <label class="small text-muted fw-bold">Ad Soyad</label>
+                        <input type="text" name="temenni_array[{{key}}][name]" value="{{item.name}}" class="form-control" placeholder="İsim">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+        </form>
+
+        <div class="pull-right">
+               <button type="submit" form="form-toplanti" class="btn btn-info"><i class="fa fa-save"></i>{{" Toplantıyı Kaydet "}}</button> 
+           </div>
+      </div>
+
+      
+    </div>
+
+    
+  </div>
+  {{ footer }}
+</main>
+
+
+
+<style>
+/* Autocomplete Kesilme Sorunu İçin Çözüm */
+.ui-autocomplete {
+  z-index: 9999 !important;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  border: 1px solid #ddd;
+  background: white;
+}
+
+/* Card ve Responsive Alanların Taşmasını Engelleme */
+.overflow-visible {
+  overflow: visible !important;
+}
+.table-responsive.overflow-visible {
+  overflow: visible !important;
+}
+
+/* Genel Stil İyileştirmeleri */
+textarea {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  min-width: 200px;
+  padding: 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background-color: #fff;
+  width: 100%;
+  transition: all 0.2s;
+  min-height: 38px;
+}
+
+
+
+textarea:focus {
+  border-color: #86b7fe;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.card { transition: transform 0.2s; }
+.card:hover { transform: translateY(-2px); }
+.table td { padding: 0.75rem; }
+
+</style>
+
+<script type="text/javascript"><!--
+// Delegation: tüm .auto-complete inputları için çalışır
+$(document).on('click', '.auto-complete', function () {
+  var $this = $(this);
+
+  // Eğer bu inputa daha önce autocomplete bağlanmadıysa
+  if (!$this.data('autocomplete-initialized')) {
+    $this.data('autocomplete-initialized', true);
+
+    $this.autocomplete({
+      source: function(request, response) {
+        $.ajax({
+          url: 'index.php?route=setting/autocomplete/personelautocomplete&user_token={{ user_token }}&category_id={{toplanti_category_id}}&filter_personel=' + encodeURIComponent(request),
+          dataType: 'json',
+          success: function(json) {
+           
+            response($.map(json, function(item) {
+              return {
+                label: item['name'],
+                value: item['personel_id'],
+                birim: item['birim']
+              }
+            }));
+          }
+        });
+      },
+      select: function(item) {
+        var row = $this.data('id');
+        var bolum = $this.data('for');
+
+        if(item['value'] == 'new') {
+          var adsoyad = item['label'].trim().replace(" ismi eklensin mi?","");
+          $('#' + bolum + '-personel-name' + row).val(adsoyad);
+          $('#' + bolum + '-personel-id' + row).val(0);
+          $('#' + bolum + '-personel-birim' + row).val('Genel');
+          
+        } else {
+          $('#' + bolum + '-personel-name' + row).val(item['label']);
+          $('#' + bolum + '-personel-id' + row).val(item['value']);
+          $('#' + bolum + '-personel-birim' + row).val(item['birim']);
+        }
+      }
+    });
+  }
+});
+
+
+// YENİ SATIR EKLEME FONKSİYONLARI
+function addPersonel() {
+  var row = $('#personel-list tr').length + 1;
+  var html = `
+    <tr id="personel-row${row}">
+      <td class="text-muted">${row}</td>
+      <td>
+        <select name="personel_array[${row}][status]" class="form-select form-select-sm">
+          <option value="0">❌ Yok</option>
+          <option value="1" selected>✅ Var</option>
+          <option value="2">🟡 İzinli</option>
+        </select>
+      </td>
+      <td>
+        <input type="text" name="personel_array[${row}][personel]" id="personel-personel-name${row}" data-id="${row}" data-for="personel" placeholder="Personel ara..." class="form-control auto-complete">
+        <input type="hidden" name="personel_array[${row}][personel_id]" id="personel-personel-id${row}">
+      </td>
+      <td>
+        <input type="text" name="personel_array[${row}][birim]" id="personel-personel-birim${row}" class="form-control" placeholder="Birim">
+      </td>
+      <td class="text-end">
+        <button type="button" onclick="$('#personel-row${row}').remove();" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Sil</button>
+      </td>
+    </tr>`;
+  $('#personel-list').append(html);
+}
+
+function addGundem() {
+  var row = $('#gundem-list tr').length + 1;
+  var html = `
+    <tr id="gundem-row${row}">
+      <td style="width:1%">${row}</td>
+      <td><input type="text" name="gundem_array[]" class="form-control" placeholder="Yeni gündem maddesi"></td>
+      <td class="text-end"><button type="button" onclick="$('#gundem-row${row}').remove();" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Sil</button></td>
+    </tr>`;
+  $('#gundem-list').append(html);
+}
+
+function addKarar() {
+  var row = $('#karar-list tr').length + 1;
+  var html = `
+    <tr id="karar-row${row}">
+      <td>${row}</td>
+      <td><textarea name="karar_array[${row}][baslik]" class="form-control" onkeyup="textAreaAdjust(this)" placeholder="Karar açıklaması..."></textarea></td>
+      <td>
+        <input type="text" name="karar_array[${row}][personel]" class="form-control auto-complete" id="karar-personel-name${row}" data-id="${row}" data-for="karar" placeholder="Sorumlu ara...">
+        <input type="hidden" name="karar_array[${row}][personel_id]" id="karar-personel-id${row}">
+      </td>
+      <td>
+        <select name="karar_array[${row}][statu]" class="form-select form-select-sm">
+          <option value="DEK">DEK</option><option value="DK">DK</option><option value="TK">TK</option><option value="İK">İK</option>
+        </select>
+      </td>
+      <td><input type="date" name="karar_array[${row}][karar_tarihi]" class="form-control"></td>
+      <td class="text-end"><button type="button" onclick="$('#karar-row${row}').remove();" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Sil</button></td>
+    </tr>`;
+  $('#karar-list').append(html);
+}
+
+function addTemenni() {
+  var row = $('#temenni-list .col-md-6').length + 1;
+  var html = `
+    <div class="col-md-6 col-lg-4" id="temenni-row${row}">
+      <div class="card h-100 border-light shadow-sm">
+        <div class="card-body p-3">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="badge bg-primary">Yeni #${row}</span>
+            <button type="button" onclick="$('#temenni-row${row}').remove();" class="btn btn-link btn-sm text-danger p-0">
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+          </div>
+          <div class="mb-2">
+            <label class="small text-muted fw-bold">Açıklama</label>
+            <textarea name="temenni_array[${row}][description]" class="form-control" rows="2" placeholder="Dilek veya temenni..."></textarea>
+          </div>
+          <div>
+            <label class="small text-muted fw-bold">Ad Soyad</label>
+            <input type="text" name="temenni_array[${row}][name]" class="form-control" placeholder="İsim">
+          </div>
+        </div>
+      </div>
+    </div>`;
+  $('#temenni-list').append(html);
+}
+
+function textAreaAdjust(element) {
+    $('#karar-list').find('textarea').each(function() {
+        this.style.height = "auto";
+    });
+
+    element.style.height = "1px";
+    element.style.height = (element.scrollHeight) + "px";
+}
+//--></script>
+
+<script>
+$('.karar-plus-icon').on('click', function() {
+    var row = $(this).attr('data-for');
+    $('input[name=\'karar_array[' + row + '][baslik_detay]\']').show();
+});
+
+</script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>
+<style>
+/* Autocomplete Kesilme Sorunu İçin Çözüm */
+.ui-autocomplete {
+  z-index: 9999 !important;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  border: 1px solid #ddd;
+  background: white;
+}
+
+/* Card ve Responsive Alanların Taşmasını Engelleme */
+.overflow-visible {
+  overflow: visible !important;
+}
+.table-responsive.overflow-visible {
+  overflow: visible !important;
+}
+
+/* Genel Stil İyileştirmeleri */
+textarea {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background-color: #fff;
+  width: 100%;
+  transition: all 0.2s;
+  min-height: 38px;
+}
+
+textarea:focus {
+  border-color: #86b7fe;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.card { transition: transform 0.2s; }
+.card:hover { transform: translateY(-2px); }
+.table td { padding: 0.75rem; }
+.form-control-sm, .form-select-sm { border-radius: 4px; }
+
+.input-border-none {
+    width:100%;
+    border: none;
+     overflow: hidden;
+    outline: none; /* Opsiyonel: focus durumundaki çerçeveyi kaldırmak için */
+    scrollbar-width: thin; /* Firefox için */
+    scrollbar-color: #888 #f1f1f1; /* Firefox için, kaydırma çubuğu ve arka plan renkleri */
+    
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+      width: 12px; /* Kaydırma çubuğunun genişliği */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f1f1; /* Kaydırma çubuğunun arka plan rengi */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #888; /* Kaydırma çubuğunun rengi */
+      border-radius: 6px; /* Köşeleri yuvarlatma */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #555; /* Kaydırma çubuğunun üstüne gelindiğinde rengi değişir */
+  }
+  .input-border-none::placeholder {
+    color: #dbdbdb;
+  }
+  
+  .add-line {
+      display: inline;
+      color: blue;
+      cursor: pointer;
+  }
+    
+  .add-line:hover {
+      text-decoration: underline;
+  }
+
+.karar-plus-icon {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #8abaf8ff;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  line-height: 18px;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+td:hover .karar-plus-icon {
+  opacity: 1;
+}
+</style>

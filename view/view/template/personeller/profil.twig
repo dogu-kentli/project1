@@ -1,0 +1,188 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+	     {% if level and id == 1 %}
+        <button type="button" data-toggle="tooltip" title="{{ "Sil" }}" class="btn btn-danger" onclick="confirm('{{ "İşlemi onaylıyor musunuz?" }}') ? $('#form-stock-status').submit() : false;" {{disabled}}><i class="fa-regular fa-trash-can"></i></button>
+	     {% endif %}
+		 </div>
+      <h1><i class="fas fa-hand-holding-heart"></i></h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-list"></i> {{ heading_title}}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-stock-status">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>
+                  <td class="text-left"><a href="javascript:void(0)" >{{ "Ad Soyad" }}</a></td>
+                  <td class="text-left"><a href="javascript:void(0)" >{{ "Telefon" }}</a></td>
+                  <td class="text-left"><a href="javascript:void(0)" >{{ "Kurum" }}</a></td>
+                  <td class="text-left"><a href="javascript:void(0)" >{{ "Birim" }}</a></td>
+                  <td class="text-left"><a href="javascript:void(0)" >{{ "Kategori" }}</a></td>
+                  <td class="text-center"><a href="javascript:void(0)" >{{ "Kayıt Tarihi" }}</a></td>
+                  <td class="text-left"><a href="javascript:void(0)" >{{ "Durumu" }}</a></td>
+                 
+                  <td style="width:1%;"  class="text-center">{{ "Eylem" }}</td>				  
+                </tr>
+              </thead>
+              <tbody>
+                {% if personels %}
+                {% for personel in personels %}
+                <tr id="data-list{{personel.personel_id}}">
+                  <td class="text-center">{% if personel.personel_id in selected %}
+                    <input type="checkbox" name="selected[]" value="{{ personel.personel_id }}" checked="checked" />
+                    {% else %}
+                    <input type="checkbox" name="selected[]" value="{{ personel.personel_id }}" />
+                    {% endif %}
+                  </td>
+                  <td class="text-left">{{ personel.name }}</td>
+                  <td class="text-left">{{ personel.telephone }}</td>
+                  <td class="text-left">{{ personel.store['name'] }}</td>
+                  <td class="text-left">{{ personel.birim }}</td>
+                  <td class="text-left">{{ personel.category }} </td>
+                  <td class="text-left">{{ personel.date_added }}</td>
+                   <td class="text-center">
+                   {% if personel.status == 1 %}<span class="label label-success">{{ "Aktif" }}</span> {% endif %}
+                   {% if personel.status == 0 %}<span class="label label-danger">{{"Pasif"}} </span>{% endif %}
+                   {% if personel.status == 2 %}<span class="label label-info">{{"Onay Bekliyor"}} </span>{% endif %}
+                  </td>
+                 
+				      
+                  <td class="text-center" >
+				          <a href="{{ personel.edit }}" data-toggle="tooltip" title="{{ "Düzenle" }}" class="btn btn-primary" ><i class="fa fa-pencil"></i></a>
+                  </td>
+
+				</tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                  <td class="text-center" colspan="7">{{ text_no_results }}</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </form>
+        <div class="row">
+          <div class="col-sm-6 text-left">{{ pagination }}</div>
+          <div class="col-sm-6 text-right">{{ results }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{# GÖRÜNTÜLEME MODAL #}
+<div id="modal-personel-view" class="modal">
+  <div class="modal-dialog" style="width:40%;">
+    <div class="modal-content">
+      
+      <form id="form-tanitim-edit">
+      <input type="hidden" name="personel_id" value="">
+      <div class="modal-body">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-1" id="modal-tab-1" data-toggle="tab"></a></li>
+            {% if store_id == 0 %}
+            <li><a href="#tab-2" id="modal-tab-2" data-toggle="tab" style="display:none;">{{ "Eğitim Bilgileri" }}</a></li>
+             {% endif %} 
+          </ul>
+        <div class="tab-content">
+          
+          <div class="tab-pane active" id="tab-1"> 
+            <div class="well well-sm" style="height: 400px; overflow: auto;">
+            <table class="table table-striped"> 
+              <thead>
+                <th>İşlem Tipi</th>
+                <th>Açıklama</th>
+                <th>Status</th>
+                <th>Tarih</th>
+              </thead>
+              <tbody id="table-history"></tbody>
+            </table>
+            </div>
+            </div>
+            
+            <div class="tab-pane" id="tab-2"> 
+            
+            </div>
+            </div>
+
+      </div>
+      </form>
+
+      <div class="modal-footer">
+           <div class="pull-right">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            
+
+           </div>
+      </div>
+        
+      </div>
+    </div>
+  </div>
+
+<script>
+
+function functionView(personel_id) {
+    $('.table tr').removeClass('bg bg-info');
+   
+    $('#data-list' + personel_id).addClass('bg bg-info');
+    
+    $('#modal-personel-view').modal('show');
+   
+    $.ajax({
+      url: 'index.php?route=personeller/personel/dataView&user_token={{ user_token }}&personel_id=' + personel_id,
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+       $('.alert-dismissible').remove();
+       $('#table-history').find('tr').remove();
+       $('.description').find('p').remove();
+       $('.dropdown-menu').find('li').attr('class','');
+
+       $('#modal-tab-1').html(json['name']); 
+       if (json['html']) {
+         $('#table-history').append(json['html']);
+         
+        }
+
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+}
+</script> 
+<script>
+ $('.btn-login').on('click', function() {
+     $(this).button('loading');
+     $('#cover-spin').show(0);
+ });
+</script> 
+{{ footer }}

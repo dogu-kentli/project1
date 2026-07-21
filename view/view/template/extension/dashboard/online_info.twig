@@ -1,0 +1,34 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title"><img src="view/image/etkinlik.png" width="32" hegiht="32"> {{ heading_title }}</h3>
+  </div>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+	   <tr>
+	    <th>{{"Etkinlik Adı"}}</th>
+      <th>{{"Tarih"}}</th>
+      <th>{{"Katılımcı Sayısı"}}</th>
+      <th>{{"Derneği"}}</th>
+		
+	   </tr>
+	  </thead>
+      <tbody>
+        {% if informations %}
+          {% for information in informations %}
+            <tr>
+              <td class="text-left">{{ information.etkinlik_adi }}</td>
+              <td>{{ information.tarih }}</td>
+			        <td>{{"Katılımcı Sayısı: "}}<b>{{ information.sayi }}</b></td>
+              <td>{{ information.store['name'] }}</b></td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td class="text-center" colspan="6">{{ text_no_results }}</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>

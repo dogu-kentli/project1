@@ -1,0 +1,103 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">Ülkele Formu</h5>
+            <div class="ms-auto">
+              <button type="submit" form="form-country" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-save"></i>
+              </button>
+               <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm bg-white btn-sm">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-country" class="row g-3">
+            
+            <div class="col-12">
+              <label class="form-label" for="input-name">{{ entry_name }}</label>
+             <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control"/>
+              {% if error_name %}
+                <div class="text-danger">{{ error_name }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label" for="input-iso-code">{{ entry_iso_code_2 }}</label>
+              <input type="text" name="iso_code_2" value="{{ iso_code_2 }}" placeholder="{{ entry_iso_code_2 }}" id="input-iso-code-2" class="form-control"/>
+            </div>
+
+             <div class="col-12">
+              <select name="bolge_id" id="input-bolge" class="form-select">
+                {% for bolge in bolgeler %}
+                  {% if bolge.bolge_id == bolge_id %}
+                    <option value="{{ bolge.bolge_id }}" selected="selected">{{ bolge.name }}</option>
+                  {% else %}
+                    <option value="{{ bolge.bolge_id }}">{{ bolge.name }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group" style="display:none;">
+            <label class="col-sm-2 control-label">{{ entry_postcode_required }}</label>
+            <div class="col-sm-10">
+              <label class="radio-inline">
+                {% if postcode_required %}
+                  <input type="radio" name="postcode_required" value="1" checked="checked"/>
+                  {{ text_yes }}
+                {% else %}
+                  <input type="radio" name="postcode_required" value="1"/>
+                  {{ text_yes }}
+                {% endif %}
+              </label> <label class="radio-inline">
+                {% if not postcode_required %}
+                  <input type="radio" name="postcode_required" value="0" checked="checked"/>
+                  {{ text_no }}
+                {% else %}
+                  <input type="radio" name="postcode_required" value="0"/>
+                  {{ text_no }}
+                {% endif %}
+              </label>
+            </div>
+          </div>
+
+           <!-- Status (Switch) -->
+            <div class="col-12">
+              <label class="form-label d-block">{{ entry_status }} (Aktif / Pasif)</label>
+              <div class="form-check form-switch">
+                {% if status %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                <input class="form-check-input" type="checkbox" {{ checked }} name="status" value="1" id="statusSwitch"
+                       style="width:3rem;height:1.5rem;">
+                
+              </div>
+            </div>
+
+            
+            
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ footer }}
+</main>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

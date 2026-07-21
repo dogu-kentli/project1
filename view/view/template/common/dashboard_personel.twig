@@ -1,0 +1,797 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+
+    <div class="row col-12 g-2 m-0"> 
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p class="mb-1 text-secondary">Görevlendirmeler</p>
+                            <h4 class="mb-0 text-pink">Açıkta: {{pgtotal1}}</h4>
+                        </div>
+                        <div class="ms-auto">
+                            <div class="w_chart" id="chart21" data-percent="{{percent_pg}}">
+                                <span class="w_percent">{{percent_pg}}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 border-top pt-2" style="font-size: 0.85rem;">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i>
+                        Tamamlanan: <strong>{{pgtotal4}}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p class="mb-1 text-secondary">Ödemeler</p>
+                            <h4 class="mb-0 text-primary">Açıkta: {{pototal0}}</h4>
+                        </div>
+                        <div class="ms-auto">
+                            <div class="w_chart" id="chart22" data-percent="{{percent_po}}">
+                                <span class="w_percent">{{percent_po}}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 border-top pt-2" style="font-size: 0.85rem;">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i>
+                        Ödeme Yapılan: <strong>{{pototal3}}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
+    <div class="card radius-10">
+        <div class="card-body">
+            <div class="d-flex align-items-center">
+                <div style="padding:13px;">
+                    <p class="mb-1 text-secondary">Etkinlikler</p>
+                    <h4 class="mb-0 text-warning">Bugün: {{petkinlik_total_today}}</h4>
+                </div>
+                <div class="widget-icon-large bg-gradient-warning text-white ms-auto"><i class="bi bi-calendar-event-fill"></i></div>
+            </div>
+            
+            <div class="mt-3 border-top pt-2" style="font-size: 0.85rem;">
+                        <i class="bi bi-plus text-success me-1"></i>
+                        Toplam: <strong>{{petkinlik_total}}</strong>
+                    </div>
+        </div>
+    </div>
+</div>
+
+       <div class="col-12 col-md-6 col-xl-3">
+    <div class="card radius-10">
+        <div class="card-body">
+            <div class="d-flex align-items-center">
+                <div style="padding:13px;">
+                    <p class="mb-1 text-secondary">Form ve Anketler</p>
+                    <h4 class="mb-0 text-success">Bugün: {{pform_total_today}}</h4>
+                </div>
+                <div class="widget-icon-large bg-gradient-success text-white ms-auto"><i class="bi bi-card-checklist"></i>
+              </div>
+            </div>
+            
+            <div class="mt-3 border-top pt-2" style="font-size: 0.85rem;">
+                        <i class="bi bi-plus text-success me-1"></i>
+                      Toplam: <strong>{{pform_total}}</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </div>
+
+    
+    <div class="row my-2 g-3"> 
+    <div class="col-12 col-md-8" id="toplantilar">
+         <div class="card shadow-sm rounded-3 " >
+             <div class="card-header border-0 py-3 d-flex align-items-center justify-content-between">
+                 <div class="d-flex align-items-center">
+                     <div class="bg-pink bg-opacity-10 p-2 rounded-3 me-3">
+                         <i class="bi bi-journal-check fs-5"></i>
+                     </div>
+                     <div>
+                         <h5 class="card-title mb-0 fw-bold">Planlanmış Toplantılar ({{total_toplanti}})</h5>
+                         
+                         <small class="text-muted">Planlanmış toplantıları buradan takip edebilirsiniz.</small>
+                     </div>
+                 </div>
+             </div>
+             <div class="table-responsive-sm" id="toplanti-responsive" style="height:310px; overflow:hidden;">
+                 <table class="table table-striped align-middle mb-0">
+                     <thead class="table-light fs-7">
+                         <tr>
+                             <th scope="col" class="ps-4" style="min-width: 180px;">Toplantı No / Tarih</th>
+                             <th scope="col" style="min-width: 250px;">Toplantı Konusu & Detay</th>
+                             <th scope="col" style="min-width: 200px;"><i class="bi bi-alarm fs-7"></i> Kalan Tahmini Süre</th>
+                         </tr>
+                     </thead>
+                     
+                     <tbody>
+                         {% if toplantilar %}
+                         {% for toplanti in toplantilar %}
+                         <tr>
+                             <td class="ps-4">
+                                 <span class="fw-bold d-block">#{{toplanti.toplanti_no}}</span>
+                                 <small class="text-muted">{{toplanti.tarih}} / {{toplanti.saat}}</small>
+                             </td>
+                             <td>
+                                 <span class="fw-semibold d-block">{{toplanti.baslik}}</span>
+                                 <small class="text-wrap d-block text-muted" style="max-width: 400px;">
+                                     Yer : {{toplanti.toplanti_yeri}}
+                                 </small>
+                             </td>
+                             <td>
+                                 <div class="countdown-wrapper d-flex align-items-center gap-1" data-datetime="{{ toplanti.tarih_iso }}T{{ toplanti.saat_iso }}">
+                                     <div class="countdown-item">
+                                         <span class="days fw-bold text-dark">00</span>
+                                         <small class="text-muted d-block">Gün</small>
+                                     </div>
+                                     <div class="countdown-separator">:</div>
+                                     <div class="countdown-item">
+                                         <span class="hours fw-bold text-dark">00</span>
+                                         <small class="text-muted d-block">Saat</small>
+                                     </div>
+                                     <div class="countdown-separator">:</div>
+                                     <div class="countdown-item">
+                                         <span class="minutes fw-bold text-dark">00</span>
+                                         <small class="text-muted d-block">Dk</small>
+                                     </div>
+                                     <div class="countdown-separator">:</div>
+                                     <div class="countdown-item">
+                                         <span class="seconds fw-bold text-danger">00</span>
+                                         <small class="text-muted d-block">Sn</small>
+                                     </div>
+                                 </div>
+                                 <span class="badge bg-danger d-none countdown-finished">Toplantı Başladı</span>
+                             </td>
+                         </tr>
+                         {% endfor %}
+                         {% else %}
+                          <tr><td class="text-center" colspan="3"> Planlanmış toplantı bulunamadı..</td></tr>
+                         {% endif %}
+
+                     </tbody>
+                 </table>
+             </div>
+
+             
+         </div>
+
+         
+     </div>
+
+     <div class="col-12 col-md-4" id="son-kararlar">
+         <div class="card shadow-sm rounded-3 d-flex flex-column justify-content-between" >
+             
+             <div>
+                 <div class="card-header border-0 py-3 d-flex align-items-center">
+                     <div class="bg-pink bg-opacity-10 p-2 rounded-3 me-3">
+                         <i class="bi bi-check2-square fs-5 "></i>
+                     </div>
+                     <div>
+                         <h5 class="card-title mb-0 fw-bold">Son Kararlar</h5>
+                         <small >En son toplantıda alınan kararlar</small>
+                     </div>
+                 </div>
+
+                 <div class="table-responsive-sm" style="height:255px; overflow:hidden;">
+                     <table class="table table-striped align-middle mb-0 w-100">
+                         <tbody>
+                             {% for karar in kararlar %}
+                             <tr>
+                                 <td class="text-wrap text-break py-3 px-4">
+                                     <span class="d-block mb-2">{{karar.name}}</span>
+                                     {% if karar.statu %}
+                                     <small class="fw-bold  d-inline-block bg-light-pink bg-opacity-10 px-2 py-1 rounded fs-8">
+                                         <i class="bi bi-info-circle me-1"></i> {{karar.statu}}
+                                     </small>
+                                     {% endif %}
+                                 </td>
+                             </tr>
+                             {% else %} <tr>
+                                 <td class="text-muted text-center py-4 fs-7">Bu toplantıya ait karar bulunamadı.</td>
+                             </tr>
+                             {% endfor %}
+                         </tbody>
+                     </table>
+                 </div>
+             </div>
+
+             <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center pt-0 pb-3 px-4">
+                 <span class="text-muted fs-7">Toplam {{ kararlar|length }} karar</span>
+                 <a href="{{all_link}}" class="btn btn-sm btn-info px-3  rounded-2 shadow-sm">
+                     Tümü <i class="bi bi-arrow-right-short ms-1"></i>
+                 </a>
+             </div>
+
+         </div>
+     </div>
+
+</div>
+
+       
+    <div class="row my-2">
+        <div class="col-12 col-lg-12 col-xxl-6 d-flex mb-2 mb-xxl-0">
+            <div class="card radius-10 w-100">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Bölgeye Göre Öğrenci Dağılımı</h5>
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    <div class="row w-100 align-items-center justify-content-center">
+                        <div class="col-12 col-md-7 d-flex justify-content-center align-items-center">
+                            <div id="chart3"></div>
+                        </div>
+                        <div class="col-12 col-md-5 d-flex justify-content-center align-items-center">
+                            <ul class="list-group list-group-flush w-100">
+                                {% for bolge in bolgeler %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 px-0 py-1">
+                                    <div class="d-flex align-items-center" style="font-size: 0.9rem;">
+                                        <i class="bi bi-circle-fill text-{{ bolge.color }} me-2"></i>
+                                        <span class="fw-bold text-secondary small text-truncate">{{ bolge.name }} :</span>
+                                    </div>
+                                    <span>{{ bolge.total }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-12 col-xxl-6 d-flex">
+            <div class="card radius-10 w-100">
+                <div class="card-header bg-transparent">
+                    <div class="row g-3 align-items-center">
+                        <div class="col">
+                            <h5 class="mb-0">Federasyona Bağlı Dernekler</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="vmap" style="width: 100%; top:0; height:400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-4">
+        <div class="col-12 col-xl-4 d-flex" id="dernekler-data"></div>
+        <div class="col-12 col-xl-4 d-flex" id="basvuru-data"></div>
+        <div class="col-12 col-xl-4 d-flex" id="etkinlik-data"></div>
+    </div>
+
+    <div class="row my-2">
+        <div class="col-12">
+            <div class="card radius-10">
+                <div class="card-header bg-transparent">
+                    <div class="row g-3 align-items-center">
+                        <div class="col">
+                            <h5 class="mb-0">Son 10 Etkinlik</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Etkinlik Adı</th>
+                                    <th>Tarih</th>
+                                    <th>Katılımcı Sayısı</th>
+                                    <th>Derneği</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for information in informations %}
+                                <tr>
+                                    <td>{{ information.etkinlik_adi }}</td>
+                                    <td>{{ information.tarih }}</td>
+                                    <td>{{ information.sayi }}</td>
+                                    <td>{{ information.store['name'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="feedback-container" onclick="$('#modal-feedback').modal('show')">
+        <div class="inner-circle">
+            <i class="bi bi-chat-dots-fill"></i>
+        </div>
+        <span class="text-label">Geri Bildirim</span>
+    </button>
+    {{ footer }}
+
+</main>
+
+<script>
+    $('#data-transfer').delegate('.sort', 'click', function(e) {
+        $('#cover-spin').show(0);
+        e.preventDefault();
+
+        $('#data-transfer').load(this.href);
+    });
+
+    $('#data-transfer').load('index.php?route=common/dashboard/ogrenciTransfer&user_token={{ user_token }}');
+</script>
+
+<script>
+    $(document).on('click', '.sort', function(e) {
+        e.preventDefault();
+        $('#cover-spin').show(0);
+
+        var target = $(this).data('id');
+        var href = $(this).attr('href');
+
+        // Özel tarih seçeneği ise inputlardan değerleri al
+        if ($(this).data('custom')) {
+            $('#cover-spin').hide();
+            return;
+        }
+
+        $(target).load(href, function() {
+            $('#cover-spin').hide();
+        });
+    });
+
+    // Tarih inputları değiştiğinde otomatik çalışacak
+    $(document).on('blur', '.date-sort', function() {
+        $('#cover-spin').show(0);
+
+        var target = $(this).data('id');
+        var href = $(this).data('link'); // parametresiz base URL
+
+        var date_start = $(target + " input[name='date_start']").val();
+        var date_end = $(target + " input[name='date_end']").val();
+
+        if (!date_start || !date_end) {
+            $('#cover-spin').hide();
+            return;
+        }
+
+        href += '&date_start=' + encodeURIComponent(date_start) + '&date_end=' + encodeURIComponent(date_end);
+
+        $(target).load(href, function() {
+            $('#cover-spin').hide();
+        });
+
+        console.log(href);
+    });
+
+
+    // Sayfa ilk açıldığında default yüklemeler
+    $('#dernekler-data').load('index.php?route=extension/dashboard/dernekler/datadernek&user_token={{ user_token }}');
+    $('#basvuru-data').load('index.php?route=extension/dashboard/basvuru/databasvuru&user_token={{ user_token }}');
+    $('#etkinlik-data').load('index.php?route=extension/dashboard/etkinlik/dataetkinlik&user_token={{ user_token }}');
+</script>
+<script>
+$('#toggle-scroll').on('click', function() {
+    let container = $('#toplanti-responsive');
+    if (container.css('overflow') === 'hidden') {
+        container.css('overflow', 'auto'); // scroll bar aktif
+        $(this).text('Kapat');
+    } else {
+        container.css('overflow', 'hidden'); // scroll bar gizli
+        $(this).text('Tümü');
+    }
+});
+
+</script>
+
+
+<link type="text/css" href="view/javascript/jquery/jqvmap/jqvmap.css" rel="stylesheet" media="screen" />
+<script type="text/javascript" src="view/javascript/jquery/jqvmap/jquery.vmap.js"></script>
+<script type="text/javascript" src="view/javascript/jquery/jqvmap/maps/jquery.vmap.turkey.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.ajax({
+            url: 'index.php?route=extension/dashboard/map/map&user_token={{ user_token }}',
+            dataType: 'json',
+            success: function(json) {
+                var data = {}; // data object olarak tanımlandı
+
+                // json içindeki verileri harita için uygun formata dönüştürme
+                $.each(json, function(code, value) {
+                    data[code] = value.total;
+                });
+
+                // 2. jVectorMap Haritasını Başlatma
+                $('#vmap').vectorMap({
+                    map: 'turkey_tr',
+                    backgroundColor: '',
+                    borderColor: '#fff',
+                    color: '#919190',
+                    hoverColor: '#000000',
+                    borderColor: '#818181',
+                    selectedColor: '#ccc',
+                    scaleColors: ['#23a1d1'],
+                    enableZoom: true,
+                    showTooltip: true,
+                    values: data,
+                    normalizeFunction: 'polynomial',
+
+                    // Harita üzerine gelindiğinde (Tooltip)
+                    onLabelShow: function(event, label, code) {
+                        if (json[code]) {
+                            // Düzeltme: Gizli Span ID'si için bölge kodu olan 'code' kullanıldı.
+                            // Bu span, tıklama anında bölge ID'sini almak için kullanılıyor.
+                            label.html('<strong>' + label.text() + '</strong><br/>' + json[code]['name'] + '<br /><span id="il-' + code + '" style="display:none;">' + json[code]['total'] + '</span>');
+                        }
+                    },
+
+                    // Harita bölgesine tıklandığında
+                    onRegionClick: function(event, code, regionName) {
+                        // Gizli spandan haritaya ait benzersiz ID'yi (il_id) alıyoruz.
+                        var il_id = $('#il-' + code).text();
+
+                        if (il_id === '') {
+                            console.log('Bölge (' + regionName + ') için detay verisi bulunamadı.');
+                            return;
+                        }
+
+                        // 3. Detay Bilgilerini Çekme (AJAX)
+                        $.ajax({
+                            url: 'index.php?route=extension/dashboard/map/info&user_token={{ user_token }}&code=' + il_id,
+                            dataType: 'json',
+                            success: function(json) {
+                                // Önceki sonuçları temizle
+                                $('#modal-body').empty(); // Modal içeriğini tamamen temizle
+                                var html = '<div class="row">'; // Bootstrap row ile başladık
+
+                                if (json.store && json.store.length > 0) {
+                                    $.each(json.store, function(i, store) {
+                                        var divclass = (json.store.length > 1) ? 'col-sm-12 col-md-6' : 'col-sm-12';
+
+                                        html += '<div class="' + divclass + ' mt-3">'; // Tekil mağaza/dernek kartı
+                                        // **Bootstrap 5 list-group yapısı**
+                                        html += ' <div class="list-group">';
+
+                                        // Logo
+                                        html += ' <div class="list-group-item text-center">';
+                                        html += '  <img src="' + store.logo + '" class="img-thumbnail" alt="' + store.name + '">';
+                                        html += ' </div>';
+
+                                        // Başlık + Sosyal Medya
+                                        html += ' <div class="list-group-item bg-primary text-white d-flex justify-content-between align-items-center">';
+                                        html += '  <strong>' + store.name + '</strong>';
+                                        html += '  <span class="d-flex gap-2">';
+                                        html += '  <a href="' + store.in_url + '" target="_blank" class="text-white"><i class="fab fa-instagram"></i></a>';
+                                        html += '  <a href="' + store.fb_url + '" target="_blank" class="text-white"><i class="fab fa-facebook"></i></a>';
+                                        html += '  <a href="' + store.tw_url + '" target="_blank" class="text-white"><i class="fab fa-twitter"></i></a>';
+                                        html += '  <a href="' + store.yt_url + '" target="_blank" class="text-white"><i class="fab fa-youtube"></i></a>';
+                                        html += '  </span>';
+                                        html += ' </div>';
+                                        html += ' <div class="list-group-item d-flex justify-content-between"><span><strong>Dernek Başkanı:</strong></span> <span>' + store.baskan + '</span></div>';
+                                        html += ' <div class="list-group-item d-flex justify-content-between"><span><strong>Başkan Telefon:</strong></span> <span>' + store.telephone2 + '</span></div>';
+                                        html += ' <div class="list-group-item d-flex justify-content-between"><span><strong>Dernek Telefon:</strong></span> <span>' + store.telephone + '</span></div>';
+                                        html += ' <a href="' + store.web + '" target="_blank" class="list-group-item list-group-item-action"><i class="fa fa-globe text-primary me-2"></i> ' + store.web + '</a>';
+                                        html += ' <div class="list-group-item"><i class="fa fa-envelope text-primary me-2"></i> ' + store.email + '</div>';
+                                        html += ' <div class="list-group-item"><i class="fa fa-map-marker text-primary me-2"></i> ' + store.address + '</div>';
+                                        html += ' <div class="list-group-item"><i class="fa fa-user text-primary me-2"></i> Toplam Üye Sayısı: <strong>' + store.total + '</strong></div>';
+                                        html += ' </div>'; // list-group DIV'i kapandı
+                                        html += '</div>'; // col DIV'i kapandı
+                                    });
+                                }
+                                html += '</div>'; // row DIV'i kapandı
+
+                                $('#modal-body').append(html);
+
+                                // Modal boyutunu ayarlama
+                                if (json.store && json.store.length > 1) {
+                                    $('#modal-store').find('.modal-dialog').removeClass('modal-sm').addClass('modal-md'); // Birden çok sonuç varsa daha geniş (xl)
+                                } else {
+                                    $('#modal-store').find('.modal-dialog').addClass('modal-md').removeClass('modal-sm'); // Tek sonuç varsa küçük (sm)
+                                }
+
+                                var modalEl = document.getElementById('modal-store');
+                                var modal = new bootstrap.Modal(modalEl);
+                                modal.show();
+                            }
+                        });
+                    }
+                });
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert("AJAX Hatası:\r\n" + thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    });
+</script>
+
+<script>
+  $(function () {
+        "use strict";
+
+        // veriyi burada tanımlıyoruz
+        const dataFromTwig = {{bolgeler|default([])|json_encode|raw}};
+
+        if (!Array.isArray(dataFromTwig) || dataFromTwig.length === 0) return;
+
+        const chartSeries = [];
+        const chartLabels = [];
+        const chartColors = [];
+
+        const colorMap = {
+            primary: "#3361ff",
+            danger: "#e72e2e",
+            success: "#12bf24",
+            warning: "#ff6632",
+            info: "#89b3f7",
+            purple: "#d54be4"
+        };
+
+        dataFromTwig.forEach(item => {
+            chartSeries.push(Number(item.total)); // 0 olsa bile push et
+            chartLabels.push(item.name);
+            chartColors.push(colorMap[item.color] || "#999999");
+        });
+
+        const options = {
+            series: chartSeries,
+            labels: chartLabels,
+            colors: chartColors,
+            chart: {
+                type: 'donut',
+                height: 310,
+                width: '100%',
+                
+                toolbar: {
+                    show: false
+                }
+            },
+            // TOOLTIP DÜZELTMESİ
+            tooltip: {
+                enabled: true,
+                shared: false,
+                intersect: true,
+                theme: '',
+                y: {
+                    formatter: function(val) {
+                        return val;
+                    },
+                    title: {
+                        formatter: function(seriesName) {
+                            return seriesName + ":";
+                        }
+                    }
+                }
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '65%',
+                    },
+                    // Dilimin grafikte her halükarda yer kaplamasını sağlar
+                    dataLabels: {
+                        minAngleToShowLabel: 0.1 // 0.1 derece bile olsa etiketi (yüzdeyi) göster
+                    }
+                }
+            },
+
+            dataLabels: {
+                enabled: true,
+                minAngleToShowLabel: 0.1, // Buraya da ekliyoruz
+                formatter: function(val) {
+                    return val.toFixed(1) + "%";
+                },
+                dropShadow: {
+                    enabled: true
+                }
+            },
+
+            legend: {
+                show: false
+            },
+            stroke: {
+                colors: ['#ffffff'],
+                width: 2
+            }
+        };
+
+        // Eski grafiği temizleyip yenisini bas (Çakışma olmasın)
+        const chartElement = document.querySelector("#chart3");
+        chartElement.innerHTML = '';
+        const chart = new ApexCharts(chartElement, options);
+        chart.render();
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        function startCountdowns() {
+            $('.countdown-wrapper').each(function() {
+                var $wrapper = $(this);
+                var targetDateString = $wrapper.data('datetime'); // ISO formatındaki tarih (YYYY-MM-DDTHH:mm)
+
+                // Hedef tarihi milisaniyeye çevir
+                var countDownDate = new Date(targetDateString).getTime();
+
+                // Eğer gelen tarih geçersizse konsola yaz ve geç
+                if (isNaN(countDownDate)) {
+                    console.error("Geçersiz tarih formatı:", targetDateString);
+                    return;
+                }
+
+                // Her eleman için ayrı bir zamanlayıcı (interval) başlat
+                var x = setInterval(function() {
+                    var now = new Date().getTime();
+                    var distance = countDownDate - now;
+
+                    // Süre bittiyse
+                    if (distance < 0) {
+                        clearInterval(x);
+                        $wrapper.addClass('d-none'); // Geri sayımı gizle
+                        $wrapper.siblings('.countdown-finished').removeClass('d-none'); // "Başladı" badge'ini göster
+                        return;
+                    }
+
+                    // Gün, Saat, Dakika ve Saniye hesaplamaları
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    // Başına sıfır ekleme fonksiyonu (Örn: 5 yerine 05 göstermek için)
+                    days = days < 10 ? "0" + days : days;
+                    hours = hours < 10 ? "0" + hours : hours;
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                    // HTML içeriklerini güncelle
+                    $wrapper.find('.days').text(days);
+                    $wrapper.find('.hours').text(hours);
+                    $wrapper.find('.minutes').text(minutes);
+                    $wrapper.find('.seconds').text(seconds);
+
+                }, 1000);
+            });
+        }
+
+        // Fonksiyonu tetikle
+        startCountdowns();
+    });
+</script>
+<script>
+function switchDecision(key) {
+  // Tüm elemanları gizle
+  $('[class*="decision-target-"]').addClass('d-none').removeClass('d-block');
+  // Seçilen gruba ait üst metin, yüzde ve barı göster
+  $('.decision-target-' + key).removeClass('d-none').addClass('d-block');
+}
+</script>
+<style>
+#chart3 svg:not(.apexcharts-svg) {
+    display: none !important;
+}
+
+#chart3 svg[height="50"] {
+    display: none !important;
+}
+
+
+.countdown-wrapper {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-card{
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+    transition: all .3s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,.08);
+   
+}
+
+.dashboard-card:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,.15);
+}
+
+.dashboard-card .card-body{
+    padding: 1.4rem;
+}
+
+.dashboard-card .icon-box{
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(10px);
+}
+
+.dashboard-card .title{
+    font-size: 14px;
+    opacity: .85;
+    margin-bottom: 8px;
+}
+
+.dashboard-card .value{
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.dashboard-card .footer-text{
+    font-size: 13px;
+    opacity: .9;
+}
+
+.progress-modern{
+    height: 6px;
+    border-radius: 50px;
+    background: rgba(255,255,255,.18);
+}
+
+.progress-modern .progress-bar{
+    border-radius: 50px;
+}
+
+/* Kart Renkleri */
+.card-red{
+    background: linear-gradient(135deg,#ff4d6d,#c9184a);
+    color: #fff;
+}
+
+.card-blue{
+    background: linear-gradient(135deg,#4f8cff,#2457ff);
+    color: #fff;
+}
+
+.card-orange{
+    background: linear-gradient(135deg,#ffb347,#ff7b00);
+    color: #fff;
+}
+
+.card-purple{
+    background: linear-gradient(135deg,#8b5cf6,#6d28d9);
+    color: #fff;
+}
+
+
+.countdown-item {
+    text-align: center;
+    background: #f8f9fa;
+    /* Hafif gri arka plan */
+    padding: 4px 8px;
+    border-radius: 6px;
+    min-width: 45px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.countdown-item span {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.countdown-item small {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.countdown-separator {
+    font-weight: bold;
+    color: #ccc;
+    padding-bottom: 12px;
+    /* Yazıların ortalanması için */
+}
+</style>

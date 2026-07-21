@@ -1,0 +1,161 @@
+{% if customers_transfer %}
+<div class="col py-2">
+    <div class="card border-primary shadow radius-15">
+        <div class="card-body">
+
+            <h4 class="card-title text-primary">{{ customer.name }} </h4>
+            <p class="card-text">Transfer talepleri var lütfen detaylardan talepleri inceleyip gerekli işlemleri uygulayınız..
+           
+            <span data-bs-target="#t2_details" data-bs-toggle="collapse" 
+      class="badge bg-gradient-purple custom-badge">Göster ▼</span>
+
+            </p>
+            
+            <div class="collapse border" id="t2_details">
+                <div class="p-2 text-monospace">
+                    <div class="table-responsive-sm">
+                        <table class="table table-sm align-middle mb-0 bg-light ">
+                            <thead>
+                                <th>{{"Öğrenci Adı"}}</th>
+                                <th>{{"Talep Açan Dernek"}}</th>
+                                <th>{{"Talep Edilen Dernek"}}</th>
+                                <th>{{"Tarih"}}</th>
+                                <th>{{"Yönü"}}</th>
+                                <th>{{"Açıklama"}}</th>
+                                <th colspan="2" class="text-center" style="width:1%;">{{"İşlem"}}</td>
+                                    </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in customers_transfer %}
+                                <tr id="row{{customer.customer_id}}">
+                                    <td class="text-left"><i class="fa fa-exchange" aria-hidden="true"></i> {{ customer.name }}
+                                        {% if customer.description %} <a href="javascript:void(0)" id="{{customer.customer_id}}" data-toggle="tooltip" title="Açıklamayı okuyunuz" class="description-item"><i class="fa-solid fa-circle-info"></i></a>{% endif %}
+                                    </td>
+                                    <td>{{ customer.store_new['name'] }}</td>
+                                    <td>{{ customer.store_old['name'] }}</td>
+                                    <td>{{ customer.date_added }}</td>
+                                    <td>{% if customer.tip == 2 %} <i class="bi bi-arrow-right fa-2x text-warning"></i> {% else %} <i class="bi bi-arrow-left text-success fa-2x"></i> {% endif %}</td>
+                                    <td>{{ customer.text }}</b></td>
+                                    <td class="text-right" style="width:1%;">
+                                        <button type="button" id="button_onay" name="{{customer.customer_id}}" for="{{customer.change_store_id}}" data-toggle="tooltip" title="{{ button_onay }}" class="btn btn-rainbow-custom btn-glow-green btn-sm">
+                                            <i class="fa fa-check"></i> Onayla
+                                        </button>
+                                    </td>
+                                    <td class="text-right" style="width:1%;">
+                                        <button type="button" id="button-cancel" name="{{customer.customer_id}}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-sm btn-danger">
+                                            <i class="fa fa-times"></i> {{"Reddet"}}
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% if customer.description %}
+                                <tr id="detay{{customer.customer_id}}">
+                                    <td colspan="9"><strong>Referans :</strong> {{customer.description}} </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script type="text/javascript">
+        <!--
+        $('button[id=\'button_onay\']').on('click', function() {
+            var $btn = $(this);
+            var customer_id = $(this).attr('name');
+            var store_id = $(this).attr('for');
+
+            if (confirm('{{ text_confirm }}') == false) {
+                exit();
+            }
+
+            $.ajax({
+                url: 'index.php?route=extension/dashboard/transfer/addTransfer&user_token={{ user_token }}&customer_id=' + customer_id + '&store_id=' + store_id,
+                dataType: 'json',
+
+                beforeSend: function() {
+                    $btn.buttonanimate('loading');
+                },
+
+                success: function(json) {
+                   
+                    if (json.error.warning) {
+                        alerterror(json.error.warning);
+
+                        $btn.buttonanimate('reset')
+                    }
+
+                    if (json.success) {
+                        alertsuccess(json.success);
+                        $('button[id=\'button_onay\'][name=' + customer_id + ']').buttonanimate('reset');
+                        location = json['url'];
+                    }
+
+                },
+
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                }
+
+            });
+        });
+        //
+        -->
+    </script>
+
+    <script type="text/javascript">
+        <!--
+        $('button[id=\'button-cancel\']').on('click', function() {
+            var $btn = $(this);
+            var customer_id = $(this).attr('name');
+
+            if (confirm('{{ text_confirm2 }}') == false) {
+                exit();
+            }
+
+            $.ajax({
+                url: 'index.php?route=extension/dashboard/transfer/delTransfer&user_token={{ user_token }}&customer_id=' + customer_id,
+                dataType: 'json',
+                beforeSend: function() {
+                    $btn.buttonanimate('loading');
+                },
+
+                success: function(json) {
+                   
+                    if (json.error.warning) {
+                        alerterror(json.error.warning);
+                    }
+
+                    if (json.success) {
+                        alertsuccess(json.success);
+                        $btn.buttonanimate('reset');
+
+                        location = json['url'];
+                    }
+
+                },
+
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                }
+
+            });
+        });
+
+        $('.description-item').on('click', function() {
+            $('#detay' + $(this).attr('id')).toggle();
+        });
+        //
+        -->
+    </script>
+    <style>
+    .custom-badge {
+  cursor: pointer;       /* el işareti */
+  font-size: 1rem;       /* yazıyı büyütür */
+  padding: 0.2em 0.5em;  /* etrafındaki boşluğu artırır */
+}
+</style>

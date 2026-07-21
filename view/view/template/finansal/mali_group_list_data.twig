@@ -1,0 +1,94 @@
+    <div class="table-responsive-sm">
+        <form id="form-developer">
+            <input type="hidden" name="filter_url" value="{{filter_url}}">
+            <table id="table-bagisci" class="table table-bordered table-sm align-middle mb-0 ">
+
+                <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                    <tr>
+                        <td class="text-start" style="width:20%">{{ "Başlık / Tanım" }}</td>
+                        <td class="text-start" style="width:10%">{{ "Kategori" }}</td>
+                        <td class="text-start" style="width:8%">{{ "Ekleme Tarihi" }}</td>
+                        <td class="text-start" style="width:5%">{{ "Durumu" }}</td>
+                        <td class="text-center" colspan="2" style="width:1%">{{ "Eylem" }}</td>
+
+                    </tr>
+                </thead>
+                <tbody class="data-list">
+                    {% for group in groups %}
+                    <tr id="data-row{{ row }}">
+                        <td><span>{{group.name}}</span></td>
+                        <td><span class="category-badge" style="color:{{group.color}}; border-color:{{group.color}};">{{group.tab}}</span></td>
+                        <td><span>{{group.date_added}}</span></td>
+                        <td class="text-center">
+                            <a href="javascript:void(0);" data-toggle="tooltip" title="{{ "Degiştirmek için tıklayın" }}" onclick="changeStatus('{{group.mali_group_id}}','{{group.category}}','{{group.tab}}')"> <span class="badge  {% if group.status == 'Aktif' %} bg-success {% else %} bg-danger {% endif %}">{{group.status}}</span></a>
+                        </td>
+                        <td class="text-end">
+                            <button type="button" data-toggle="tooltip" title="{{ button_edit }}" onclick="editCategory('{{group.mali_group_id}}')" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></button>
+                        </td>
+                        <td class="text-end">
+                            <button type="button" data-toggle="tooltip" title="{{ button_delete }}" onclick="removeCategory('{{group.mali_group_id}}','{{group.category}}')" class="btn btn-danger btn-sm"><i class="bi bi-dash-circle"></i></button>
+                        </td>
+                    </tr>
+                    {% set row = row + 1 %}
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </form>
+    </div>
+
+    <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+
+
+    <script type="text/javascript">
+        function functionView(id) {
+            $('.table tr').removeClass('bg bg-info');
+            $('#data-list' + id).addClass('bg bg-info');
+            $('#modal-bagisci').modal('show');
+
+            $('#modal-bagisci input[name^=\'bagisci_id\']').val(id);
+            $('#modal-bagisci input[name^=\'form\']').val("edit");
+
+            $.ajax({
+                url: 'index.php?route=finansal/bagisci/dataView&user_token={{ user_token }}&bagisci_id=' + id,
+                type: 'post',
+                dataType: 'json',
+                success: function(json) {
+                    $('.alert-dismissible').remove();
+
+                    if (json['bagisci']) {
+                        $('#modal-bagisci input[name^=\'ad\']').val(json['bagisci']['ad']);
+                        $('#modal-bagisci input[name^=\'soyad\']').val(json['bagisci']['soyad']);
+                        $('#modal-bagisci input[name^=\'telefon\']').val(json['bagisci']['telefon']);
+                        $('#modal-bagisci input[name^=\'email\']').val(json['bagisci']['email']);
+                        $('#modal-bagisci select[name^=\'country_id\']').val(json['bagisci']['country_id']);
+                        $('#modal-bagisci select[name^=\'sehir_id\']').val(json['bagisci']['il_id']);
+                        $('#modal-bagisci input[name^=\'city_id\']').val(json['bagisci']['ilce_id']);
+                        $('#modal-bagisci select[name^=\'sehir_id\']').trigger('change');
+                        $('#modal-bagisci select[name^=\'gender\']').val(json['bagisci']['gender']);
+                        $('#modal-bagisci input[name^=\'dogum_tarihi\']').val(json['bagisci']['dogum_tarihi']);
+                        $('#modal-bagisci textarea[name^=\'adres\']').val(json['bagisci']['adres']);
+                    }
+
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                }
+            });
+
+        } 
+           $('#button-close').on('click', function() {
+            $('#modal-bagisci').modal('hide');
+        });
+
+        </script>  
+        
+
+    

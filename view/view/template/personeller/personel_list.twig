@@ -1,0 +1,343 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+            <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm" onclick="confirm('{{ text_confirm }}') ? $('#form-personel').submit() : false;"><i class="bi bi-trash"></i> Sil</button>
+            <button type="button" data-toggle="tooltip" title="{{ "Filtreyi temizle" }}" onclick="location='index.php?route=personeller/personel&user_token={{ user_token }}';" class="btn btn-light border border-dark shadow-sm btn-sm bg-white">
+                <i id="filter-icon" class="bi bi-funnel-fill"></i>
+            </button>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                {% if id == 1 %}
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-lg-2 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{filter_name}}" id="input-filter-name" placeholder="Konusunu yazınız" class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-6 me-auto">
+                            <select name="filter_store" class="form-select auto-filter">
+                                <option value="">{{text_all}}</option>
+                                {% for store in stores %}
+                                <option value="{{ store.store_id }}" {% if filter_store == store.store_id %} selected="selected" {% endif %}>{{store.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2 col-6 me-auto">
+                            <select name="filter_birim" class="form-select auto-filter">
+                                <option value="" selected="selected">{{text_select}}</option>
+                                {% for birim in birimler %}
+                                <option value="{{birim.personel_birim_id}}" {% if birim.personel_birim_id == filter_birim %} selected="selected" {% endif %}>{{birim.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2 col-6 me-auto">
+                            <select name="filter_category" class="form-select auto-filter">
+                                <option value="">{{text_select}}</option>
+                                {% for key,value in personel_groups %}
+                                <option value="{{key}}" {% if filter_category == key %} selected {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2 col-6 me-auto">
+                            <select name="filter_status" class="form-select auto-filter">
+                                <option value="">{{text_select}}</option>
+                                <option value="2" {% if filter_status == 2 %} selected='selected' {% endif %}>{{"Onay Bekliyor"}}</option>
+                                <option value="1" {% if filter_status == 1 %} selected='selected' {% endif %}>{{"Aktif"}}</option>
+                                <option value="0" {% if filter_status !='' and filter_status == 0 %} selected='selected' {% endif %}>{{"Pasif"}}</option>
+                            </select>
+                        </div>
+
+
+                        <div class="col-lg-2 co1-6 me-auto">
+                            <select name="limit" class="form-select auto-filter">
+                                {% for key,value in limits %}
+                                <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-personel">
+                    <div class="card-body">
+
+                        <div class="table-responsive-sm">
+                            <table class="table table-striped table-bordered table-hover align-middle mb-0">
+                                <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                    <tr>
+                                        <th style="width: 1px;" class="text-center">
+                                            <input type="checkbox" class="form-check-input" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" />
+                                        </th>
+                                        <th class="text-start">{{ "Ad Soyad" }}</th>
+                                        <th class="text-start">{{ "Telefon" }}</th>
+                                        <th class="text-start">{{ "Kurum" }}</th>
+                                        <th class="text-start">{{ "Birim" }}</th>
+                                        <th class="text-start">{{ "Kategori" }}</th>
+                                        <th class="text-center">{{ "Kayıt Tarihi" }}</th>
+                                        <th class="text-start">{{ "Durumu" }}</a></th>
+                                        <th style="width:1%;" colspan="3" class="text-center">{{ "Eylem" }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if personels %}
+                                    {% for personel in personels %}
+                                    <tr id="data-list{{personel.personel_id}}">
+                                        <td class="text-center">
+
+                                            <input type="checkbox" class="form-check-input" name="selected[]" value="{{ personel.personel_id }}" />
+
+                                        </td>
+                                        <td class="text-start">{{ personel.name }}</td>
+                                        <td class="text-start">{{ personel.telephone }}</td>
+                                        <td class="text-start">
+                                            <div class="border rounded p-2 bg-light">
+
+                                                {{ personel.store.name|replace({'Uluslararası Öğrenci Derneği':''}) }}
+                                            </div>
+                                        </td>
+                                        <td class="text-start">
+                                            <div class="cell-scroll">
+                                                {{ personel.birim }}
+                                            </div>
+                                        </td>
+                                        <td class="text-start">
+                                            <div class="cell-scroll">
+                                                {{ personel.category }}
+                                            </div>
+                                        </td>
+                                        <td class="text-start">{{ personel.date_added }}</td>
+                                        <td class="text-center">
+                                            {% if personel.status == 1 %}<span class="badge bg-success">{{ "Aktif" }}</span> {% endif %}
+                                            {% if personel.status == 0 %}<span class="badge bg-danger">{{"Pasif"}} </span>{% endif %}
+                                            {% if personel.status == 2 %}<span class="badge bg-info">{{"Onay Bekliyor"}} </span>{% endif %}
+                                        </td>
+
+                                        <td>
+                                            <div class="d-flex justify-content-end gap-2 fs-5">
+                                                <!-- Edit button stays outside -->
+                                                <a href="{{ personel.edit }}" class="btn btn-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Düzenle" aria-label="Edit">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </a>
+
+                                                {% if level %}
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-outline-dark btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <li>
+                                                            <a class="dropdown-item text-warning" href="javascript:void(0);" data-bs-toggle="tooltip" id="button-view" title="Personel İşlem Kaydı" aria-label="Views">
+                                                                <i class="bi bi-eye-fill"></i> İşlem Kaydı
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item text-dark" href="{{ personel.login }}" data-bs-toggle="tooltip" title="Öğrenci hesabıyla oturum aç" aria-label="Login">
+                                                                <i class="bi bi-lock-fill"></i> Personel Girişi
+                                                            </a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+
+
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td class="text-center" colspan="7">{{ text_no_results }}</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+                                {{ pagination }}
+                            </div>
+                            <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+                                {{ results }}
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    {# GÖRÜNTÜLEME MODAL #}
+    <div id="modal-personel-view" class="modal">
+        <div class="modal-dialog" style="width:40%;">
+            <div class="modal-content">
+
+                <form id="form-tanitim-edit">
+                    <input type="hidden" name="personel_id" value="">
+                    <div class="modal-body">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#tab-1" id="modal-tab-1" data-toggle="tab"></a></li>
+                            {% if store_id == 0 %}
+                            <li><a href="#tab-2" id="modal-tab-2" data-toggle="tab" style="display:none;">{{ "Eğitim Bilgileri" }}</a></li>
+                            {% endif %}
+                        </ul>
+                        <div class="tab-content">
+
+                            <div class="tab-pane active" id="tab-1">
+                                <div class="well well-sm" style="height: 400px; overflow: auto;">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <th>İşlem Tipi</th>
+                                            <th>Açıklama</th>
+                                            <th>Status</th>
+                                            <th>Tarih</th>
+                                        </thead>
+                                        <tbody id="table-history"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="tab-2">
+
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {{footer}}
+</main>
+<script type="text/javascript">
+    <!--
+    $('.auto-filter').on('change', function() {
+        $('#cover-spin').show(0);
+
+        url = 'index.php?route=personeller/personel&user_token={{ user_token }}';
+
+        if ($('input[name=\'filter_name\']').val()) {
+            url += '&filter_name=' + encodeURIComponent($('input[name=\'filter_name\']').val());
+        }
+
+        if ($('select[name=\'filter_store\']').val()) {
+            url += '&filter_store=' + encodeURIComponent($('select[name=\'filter_store\']').val());
+        }
+
+        if ($('select[name=\'filter_category\']').val()) {
+            url += '&filter_category=' + encodeURIComponent($('select[name=\'filter_category\']').val());
+        }
+
+        if ($('select[name=\'filter_birim\']').val()) {
+            url += '&filter_birim=' + encodeURIComponent($('select[name=\'filter_birim\']').val());
+        }
+
+        if ($('select[name=\'filter_status\']').val() !== '') {
+            url += '&filter_status=' + encodeURIComponent($('select[name=\'filter_status\']').val());
+        }
+
+        if ($('select[name=\'limit\']').val() !== '') {
+            url += '&limit=' + encodeURIComponent($('select[name=\'limit\']').val());
+        }
+
+        location = url;
+    });
+
+    $('#button-clear').on('click', function() {
+        url = 'index.php?route=personeller/personel&user_token={{ user_token }}';
+        location = url;
+    });
+    //
+    -->
+</script>
+
+<script>
+    function functionView(personel_id) {
+        $('.table tr').removeClass('bg bg-info');
+
+        $('#data-list' + personel_id).addClass('bg bg-info');
+
+        $('#modal-personel-view').modal('show');
+
+        $.ajax({
+            url: 'index.php?route=personeller/personel/dataView&user_token={{ user_token }}&personel_id=' + personel_id,
+            type: 'post',
+            dataType: 'json',
+            success: function(json) {
+                $('.alert-dismissible').remove();
+                $('#table-history').find('tr').remove();
+                $('.description').find('p').remove();
+                $('.dropdown-menu').find('li').attr('class', '');
+
+                $('#modal-tab-1').html(json['name']);
+                if (json['html']) {
+                    $('#table-history').append(json['html']);
+
+                }
+
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+
+    }
+</script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>
+<style>
+    .cell-scroll {
+        max-height: 60px;
+        /* hücre yüksekliği sabit */
+        overflow-y: auto;
+        /* dikey scroll çıksın */
+    }
+</style>

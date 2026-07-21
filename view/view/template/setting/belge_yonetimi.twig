@@ -1,0 +1,388 @@
+{{ header }}{{ column_left }}
+<main id="page-content" class="page-content">
+ <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-belge-yonetimi" class="row g-4">
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">Belge Yönetimi Formu</h5>
+            <div class="ms-auto">
+              <button type="submit" form="form-belge-yonetimi" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-save"></i>
+              </button>
+              <a href="{{ cancel }}" type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light border border-dark shadow-sm bg-white btn-sm">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+         
+            
+            <div class="col-lg-6 p-2">
+             <label class="form-label fw-bold" for="input-baslik">Başlık</label>
+                <input type="text" name="baslik" value="{{ baslik }}" placeholder="Bir başlık yazınız." id="input-baslik" class="form-control"/>
+                {% if error_baslik %}<div class="invalid-feedback">{{ error_baslik }}</div>{% endif %}
+            </div>
+
+            <div class="col-lg-9 p-2">
+             <label class="form-label fw-bold">Açıklama</label>
+                <textarea name="description" id="textarea-richtexteditor" class="form-control">{{description}}</textarea>
+            </div>
+
+            <div class="col-lg-4 p-3">
+             <label class="form-label fw-bold" for="input-secim">Seçim Kriteri</label>
+                <select name="secim" id="input-secim" class="form-select border-primary-subtle">
+                  <option value="1" {% if secim == 1 %} selected {% endif %}>Tüm Dernek ve Temsilcilikler</option>
+                  <option value="2" {% if secim == 2 %} selected {% endif %}>Seçili Dernek ve Temsilcilikler</option>
+                  <option value="3" {% if secim == 3 %} selected {% endif %}>İHH Projeli Öğrenciler</option>
+                  <option value="4" {% if secim == 4 %} selected {% endif %}>Link Verilen Öğrenciler</option>
+                </select>
+            </div>
+
+            <div id="dernekler" class="col-12 p-2" style="display:none;">
+                <div class="p-2 bg-light border rounded">
+                  <label class="form-label fw-bold mb-3">Dernek Listesi</label>
+                  <div class="checkbox-wrapper bg-white shadow-sm p-3" style="max-height: 200px; overflow-y: auto;">
+                    
+                      {% for store in stores %}
+                     
+                        <div class="form-check">
+                          <input type="checkbox" class="form-check-input" id="store_{{ store.store_id }}" name="stores_array[]" value="{{ store.store_id }}" {% if store.store_id in stores_array %} checked {% endif %}>
+                          <label class="form-check-label small" for="store_{{ store.store_id }}">{{ store.name }}</label>
+                        </div>
+                      
+                      {% endfor %}
+                   
+                  </div>
+                </div>
+              </div>
+
+            <div class="col-12 p-2">
+              <label class="form-label d-block">{{ entry_status }} (Aktif / Pasif)</label>
+              <div class="form-check form-switch">
+                {% if status %} {% set checked = 'checked' %} {% else %}{% set checked = '' %} {% endif %}
+                <input class="form-check-input" type="checkbox" {{ checked }} name="status" value="1" id="statusSwitch" style="width:3rem;height:1.5rem;">
+              </div>
+            </div>
+         
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12 mx-auto">
+      <div class="card">
+        <div class="card-header py-3 bg-transparent">
+          <div class="d-sm-flex align-items-center">
+            <h5 class="mb-2 mb-sm-0">İstenen Belgeler</h5>
+            <div class="ms-auto">
+              <button type="button" class="btn btn-light" id="button-copy">🔗 Linki Kopyala</button>
+                 <div id="copy-tooltip">Kopyalandı!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body form-card-container">
+          <fieldset>
+      <table class="table table-bordered table-striped align-middle">
+        <thead class="table-light text-center">
+          <tr>
+            <th style="width:5%;">#</th>
+            <th style="width:25%;">Belge Adı</th>
+            <th style="width:45%;">Açıklama</th>
+            <th style="width:15%;">Zorunlu</th>
+            <th style="width:1%;">Eylem</th>
+          </tr>
+        </thead>
+        <tbody id="belgeAlanlariKapsayici">
+          {# TWIG DÖNGÜSÜ İLE MEVCUT/POST EDİLEN VERİLERİ OLUŞTURMA #}
+          {% set row = 1 %}
+          {% if belgeler is defined and belgeler is not empty %}
+            {% for belge in belgeler %}
+              {% set idPrefix = 'belge-' ~ row %}
+              <tr id="{{ idPrefix }}">
+                <td class="text-center">{{ row }}</td>
+                <td>
+                  <input type="text" 
+                        class="form-control" 
+                        id="{{ idPrefix }}-name" 
+                        name="belgeler[{{ row }}][name]" 
+                        value="{{ belge.name|default('') }}" 
+                        placeholder="Belge Adı" required>
+                  {% if error_belgeler[row]['name'] %}
+                    <div class="text-danger">{{ error_belgeler[row]['name'] }}</div>
+                  {% endif %}
+                </td>
+                <td>
+                  <input type="text" 
+                        class="form-control" 
+                        id="{{ idPrefix }}-description" 
+                        name="belgeler[{{ row }}][description]" 
+                        value="{{ belge.description|default('') }}" 
+                        placeholder="Açıklama">
+                  {% if error_belgeler[row]['description'] %}
+                    <div class="text-danger">{{ error_belgeler[row]['description'] }}</div>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <input type="hidden" name="belgeler[{{ row }}][required]" value="0">
+                  <input class="form-check-input" type="checkbox" value="1" id="{{ idPrefix }}-required"  name="belgeler[{{ row }}][required]" 
+                        {% if belge.required is defined and (belge.required == '1' or belge.required == 'on') %}checked{% endif %}>
+                </td>
+                <td class="text-center">
+                  <button class="btn btn-outline-danger btn-sm" type="button" onclick="silSatir('{{ idPrefix }}')" title="Sil">
+                    <i class="bi bi-dash-circle"></i>
+                  </button>
+                </td>
+              </tr>
+              {% set row = row + 1 %}
+            {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+
+  <div class="text-center mt-3 pt-2 border-top">
+    <button type="button" class="btn btn-info" id="yeniSatirEkleBtn">
+      <i class="fa fa-plus"></i> Belge Ekle
+    </button>
+  </div>
+</fieldset>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ footer }}
+  </form>
+</main>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const kapsayici = document.getElementById('belgeAlanlariKapsayici');
+    const maxBelge = 15;
+
+    // Sayaç, Twig'de son kullanılan row değerinden (bir sonraki eklenecek satırın indeksi) başlatılır.
+    let belgeSayaci = parseInt('{{ row }}' || 1); 
+
+    if (kapsayici.querySelectorAll('.belge-item').length === 0) {
+        belgeSayaci = 0;
+    }
+
+    function belgeSatiriOlustur(index, belge) {
+    const idPrefix = `belge-${index}`;
+    const name = belge?.name ?? '';
+    const description = belge?.description ?? '';
+    const required = (belge?.required && belge.required !== '0') ? 'checked' : '';
+
+    // <tr> oluştur
+    const yeniSatir = document.createElement('tr');
+    yeniSatir.className = 'belge-item align-middle';
+    yeniSatir.id = idPrefix;
+
+    // İçeriği tablo hücreleriyle doldur
+    yeniSatir.innerHTML = `
+        <td class="text-center">${index}</td>
+        <td>
+            <input type="text" class="form-control" 
+                   id="${idPrefix}-name" 
+                   name="belgeler[${index}][name]" 
+                   value="${name}" 
+                   placeholder="Belge Adı" required>
+        </td>
+        <td>
+            <input type="text" class="form-control" 
+                   id="${idPrefix}-description" 
+                   name="belgeler[${index}][description]" 
+                   value="${description}" 
+                   placeholder="Açıklama">
+        </td>
+        <td class="text-center">
+            <input type="hidden" name="belgeler[${index}][required]" value="0">
+            <input class="form-check-input" type="checkbox" value="1" 
+                   id="${idPrefix}-required" 
+                   name="belgeler[${index}][required]" checked ${required}>
+        </td>
+        <td class="text-center">
+            <button class="btn btn-outline-danger btn-sm" type="button" 
+                    onclick="silSatir('${idPrefix}')" title="Sil">
+                  <i class="bi bi-dash-circle"></i>
+            </button>
+        </td>
+    `;
+
+    // Tablo gövdesine ekle (tbody)
+    const kapsayici = document.getElementById('belgeAlanlariKapsayici');
+    kapsayici.appendChild(yeniSatir);
+   }
+
+    const ekleBtn = document.getElementById('yeniSatirEkleBtn');
+
+    function yeniBelgeAlaniOlustur() {
+        if (kapsayici.querySelectorAll('.belge-item').length >= maxBelge) {
+            $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> En fazla 15 adet belge talep edilebilir.</div>');
+            return;
+        }
+
+        belgeSayaci++;
+        belgeSatiriOlustur(belgeSayaci, {});
+    }
+
+    window.silSatir = function (satirId) {
+        const silinecekSatir = document.getElementById(satirId);
+        if (silinecekSatir) {
+            silinecekSatir.remove();
+            yenidenNumaralandir();
+        }
+    };
+
+    function yenidenNumaralandir() {
+        const satirlar = kapsayici.querySelectorAll('.belge-item');
+        let numara = 1;
+
+        satirlar.forEach(satir => {
+            const newIdPrefix = `belge-${numara}`;
+            
+            // 1. Görünen sıra numarasını güncelle
+            const numaraDiv = satir.querySelector('.sira-numarasi');
+            if (numaraDiv) numaraDiv.textContent = numara;
+            
+            // 2. Satır ID'sini güncelle
+            satir.id = newIdPrefix;
+            
+            // 3. Input name ve ID'lerini güncelle (en kritik adım)
+            const inputs = satir.querySelectorAll('input');
+            inputs.forEach(input => {
+                
+                // Name güncelleme
+                if (input.name && input.name.startsWith('belgeler[')) {
+                    const alanAdiMatch = input.name.match(/\[([^\]]+)\]$/);
+                    if (alanAdiMatch && alanAdiMatch[1]) {
+                        const alanAdi = alanAdiMatch[1]; 
+                        input.name = `belgeler[${numara}][${alanAdi}]`;
+                    }
+                }
+                
+                // ID güncelleme
+                if (input.id && input.id.includes('-')) {
+                    const alanAdi = input.id.substring(input.id.lastIndexOf('-') + 1);
+                    input.id = `${newIdPrefix}-${alanAdi}`;
+                }
+            });
+            // 4. Silme butonunun onclick parametresini güncelle
+            const silButonu = satir.querySelector('.btn-danger');
+            if (silButonu) {
+                silButonu.setAttribute('onclick', `silSatir('${newIdPrefix}')`);
+            }
+            
+            numara++;
+        });
+        
+        // Sayaç değerini, bir sonraki eklenecek satırın doğru indeksi için ayarla
+        belgeSayaci = satirlar.length;
+    }
+
+    ekleBtn.addEventListener('click', yeniBelgeAlaniOlustur);
+});
+</script>
+
+<script>
+    // Uyarı mesajları
+    var error_warning = '{{ error_warning|default('') }}';
+    var success = '{{ success|default('') }}';
+    $(document).ready(function() {
+        if(error_warning) {
+            $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + error_warning +'</div>');
+        }
+
+        if(success) {
+            $('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + success +'</div>');
+        } 
+        
+        
+       
+    });
+</script>
+
+<script type="text/javascript"><!--
+var code = '{{code}}';
+$('select[name=\'secim\']').on('change',function() {
+  $('#input-code').val('');
+  $('#copy').hide();
+  $('#dernekler').hide();
+   $('#button-copy').hide();
+  
+  if($(this).val() == 1) {
+    $('#dernekler').find(':checkbox').prop('checked',false);
+  }
+
+  if($(this).val() == 2) {
+    $('#dernekler').show();
+  }
+
+  if($(this).val() == 3) {
+    $('#dernekler').hide();
+  }
+
+  if($(this).val() == 4) {
+    $('#copy').show();
+    $('#dernekler').find(':checkbox').prop('checked',false);
+    $('#input-code').val(code);
+     $('#button-copy').show();
+  }
+});
+
+$('select[name=\'secim\']').trigger('change');
+//--></script>
+
+<script>
+  $('#button-copy').on('click', function () {
+    $('input[name="form_url"]').attr('type','text');
+    var copyText = $('input[name="form_url"]');
+    copyText.select();
+    document.execCommand("copy");
+
+     $('input[name="form_url"]').attr('type','hidden');
+
+    // Tooltip konumlandırma
+    var button = $(this);
+    var tooltip = $('#copy-tooltip');
+    var offset = button.position();
+
+    tooltip.css({
+      top: offset.top - tooltip.outerHeight() - 8,
+      left: offset.left + (button.outerWidth() / 2) - (tooltip.outerWidth() / 2)
+    });
+
+    // Göster ve sonra gizle
+    tooltip.fadeIn(200);
+    setTimeout(function () {
+      tooltip.fadeOut(300);
+    }, 2000);
+  });
+</script>
+
+<link rel="stylesheet" href="view/javascript/editor/richtexteditor/rte_theme_default.css" />
+<script src="view/javascript/editor/richtexteditor/rte.js"></script>
+<script type='text/javascript' src="view/javascript/editor/richtexteditor/lang/rte-lang-tr.js"></script>
+<script src="view/javascript/editor/richtexteditor/plugins/all_plugins.js"></script>
+
+<script>
+  var editor1cfg = { skin: "gray", toolbar: "basic", removeButtons: ["images", "video"] };
+  var editor1 = new RichTextEditor("#textarea-richtexteditor", editor1cfg);
+</script>
+<style>
+    #copy-tooltip {
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+    z-index: 1000;
+    display: none;
+    transform: translateY(-100%);
+}
+</style>

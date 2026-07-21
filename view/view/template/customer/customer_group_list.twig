@@ -1,0 +1,96 @@
+{{ header }}{{ column_left }}
+<main class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+        <div class="ms-auto">
+            {% if store_id == 0  %}
+            <a href="{{add}}" data-toggle="tooltip" class="btn btn-sm btn-primary" title="{{ button_add }}"><i class="bi bi-plus-lg"></i> Ekle</a>
+
+            <button type="button" onclick="confirm('{{ text_confirm }}') ? $('#form-customer-group').submit() : false;" class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Sil</button>
+            {% endif %}
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <hr>
+    <div class="card">
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-customer-group">
+                                <table id="example" class="table table-invoice" role="grid" aria-describedby="example_info">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').trigger('click');" /></th>
+                                            <th class="text-start">{{ column_name }}</th>
+                                            <th class="text-end">{{ column_sort_order }}</th>
+                                            <th style="width: 1px;" class="text-end">{{ column_action }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if customer_groups %}
+                                        {% for customer_group in customer_groups %}
+                                        <tr>
+                                            <td class="text-center">
+                                                <input type="checkbox" class="form-check-input" name="selected[]" value="{{ customer_group.customer_group_id }}" />
+                                            </td>
+                                            <td class="text-start">{{ customer_group.name }}</td>
+                                            <td class="text-end">{{ customer_group.sort_order }}</td>
+                                            <td class="text-end"><a href="{{ customer_group.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-info btn-sm"><i class="bi bi-pencil"></i></a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td class="text-center" colspan="4">{{ text_no_results }}</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+                            {{ pagination }}
+                        </div>
+                        <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+                            {{ results }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{footer}}
+</main>
+<script>
+    var error_warning = '{{error_warning}}';
+    var success = '{{success}}';
+    $(document).ready(function() {
+        if (error_warning) {
+            alerterror(error_warning);
+        }
+
+        if (success) {
+            alertsuccess(success);
+        }
+    });
+</script>

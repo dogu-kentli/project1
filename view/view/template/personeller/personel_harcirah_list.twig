@@ -1,0 +1,216 @@
+{{ header }}{{ column_left }}
+<main id="harcirahlar" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end">
+            <button type="button" id="button-add" title="{{ button_add }}"  class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Ekle</button>
+            
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                 <div class="card-body" id="data-harcirah"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+    {{footer}}
+</main>
+
+<div class="modal fade" id="modal-harcirah" tabindex="-1" aria-labelledby="modalHarcirahLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content shadow-lg border-0 rounded-3">
+      
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="modalHarcirahLabel">Harcırah Bilgisi</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="form-harcirah" class="needs-validation" >
+          <input type="hidden" name="personel_harcirah_id" value="0">
+          <div class="mb-1">
+            <label class="form-label fw-bold">Personel Adı</label>
+            <input type="text" name="filter_personel" value="" placeholder="Personel Adı" id="input-personel" class="form-control"/>
+            <input type="hidden" name="personel_id" value="" placeholder="Personel ID" id="input-personel-id" class="form-control"/>
+          </div>
+          <div class="mb-1">
+            <label for="input-date" class="form-label fw-bold">Tarih</label>
+            <input type="date" name="date_added" value="{{bugun}}" id="input-date" class="form-control" >
+          </div>
+          
+          <div class="mb-1">
+            <label class="form-label fw-bold">Harcırah Miktarı</label>
+            <input type="text" name="alinan_miktar" data-mask="#.##0,00" placeholder="0,00" class="form-control finansal">
+          </div>
+          
+          <div class="mb-1">
+            <label class="form-label fw-bold">Harcanan Miktar</label>
+            <input type="text" name="harcanan_miktar" data-mask="#.##0,00" placeholder="0,00" class="form-control finansal">
+          </div>
+          
+          <div class="mb-1">
+            <label class="form-label fw-bold">Geri Ödenecek Miktar</label>
+            <input type="text" name="kalan_miktar" data-mask="#.##0,00" placeholder="0,00" class="form-control" readonly>
+          </div>
+
+          <div class="mb-1">
+            <label class="form-label fw-bold">Açıklama</label>
+            <textarea name="description" class="form-control"></textarea>
+          </div>
+          
+          <div class="mb-1">
+            <label class="form-label fw-bold">Durumu</label>
+            <select name="status" class="form-select">
+              <option value="1">Açık</option>
+              <option value="0">Hesabı Kapat</option>
+            </select>
+          </div>
+          
+        </form>
+      </div>
+      
+      <div class="modal-footer d-flex text-end">
+        
+        <button type="button" id="button-save" name="edit" class="btn btn-primary">
+          <i class="fa-solid fa-floppy-disk"></i> Kaydet
+        </button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+ $('input[name^=\'filter_personel\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=setting/autocomplete/personelautocomplete&user_token={{ user_token }}&category_id=1&filter_personel=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['personel_id'],
+            }
+          }));
+        }
+      });
+    },
+
+    'select': function(item) {
+      $('input[name^=\'filter_personel\']').val(item['label']);
+      $('input[name^=\'personel_id\']').val(item['value']);
+    }
+  });
+//--></script>
+
+<script type="text/javascript"><!--
+$('button[id^=\'button-add\']').on('click', function() {
+  $('input[name^=\'personel_harcirah_id\']').val(0);
+  $('#modal-harcirah input,textarea').val('');
+  $('#modal-harcirah').modal('show');
+});
+</script>
+
+<script type="text/javascript"><!--
+   $('#data-harcirah').delegate('.pagination a', 'click', function(e) {
+    e.preventDefault();
+
+    $('#data-harcirah').load(this.href);
+  });
+
+  $('#data-harcirah').load('index.php?route=personeller/personel_harcirah/dataHarcama&user_token={{ user_token }}');
+
+//--></script>
+
+<script type="text/javascript">
+$('#modal-harcirah .finansal').on('input', function() {
+    var total1 = 0, total2 = 0;
+
+    // Alınan miktar
+    var amiktar = $('#modal-harcirah input[name^="alinan_miktar"]').val();
+    if(amiktar !== '') {
+        amiktar = amiktar.replace(/\./g,''); // tüm noktaları sil
+        amiktar = amiktar.replace(',', '.'); // virgülü noktaya çevir
+        total1 = Number(amiktar);
+    }
+
+    // Harcanan miktar
+    var hmiktar = $('#modal-harcirah input[name^="harcanan_miktar"]').val();
+    if(hmiktar !== '') {
+        hmiktar = hmiktar.replace(/\./g,'');
+        hmiktar = hmiktar.replace(',', '.');
+        total2 = Number(hmiktar);
+    }
+
+    // Kalan miktar
+    var totalSum = total1 - total2;
+    $('#modal-harcirah input[name^="kalan_miktar"]').val(
+        new Intl.NumberFormat('tr-TR').format(totalSum)
+    );
+});
+</script>
+
+
+<script type="text/javascript"><!--
+  $('#data-harcirah').on('click', '.delete-data', function(e) {
+	e.preventDefault();
+	var element = this;
+
+    if (confirm('Dikkat : Bu işlem geri alınamaz. Bu kaydı silmek istediğinize emin misiniz?') == false) {    
+        exit();
+    }
+
+     $.ajax({
+      url: 'index.php?route=personeller/personel_harcirah/delete&user_token={{ user_token }}&personel_harcirah_id='  + $(this).attr('id'),
+      type: 'post',
+      dataType: 'json',
+      success: function(json) {
+      
+        if (json.error.warning) {
+            alerterror(json.error.warning);
+        }
+
+        if (json.success) {
+         $('#data-harcirah').load('index.php?route=personeller/personel_harcirah/dataHarcama&user_token={{ user_token }}');
+         alertsuccess(json.success);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+
+  });
+
+//--></script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>

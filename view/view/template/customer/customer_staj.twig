@@ -1,0 +1,402 @@
+{{ header }}{{ column_left }}
+<main id="page-staj" class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-sm-flex align-items-center mb-3">
+
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{home}}"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{breadcrumb.text}}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="ms-auto text-end me-3">
+         <a href="{{ export }}" data-toggle="tooltip" title="Exel Dökümü" class="btn btn-success btn-sm"><i class="bi bi-download"></i></a>
+          <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm" onclick="confirm('{{ text_confirm }}') ? $('#form-basvuru').submit() : false;"><i class="bi bi-trash"></i> Sil</button>
+          <button type="button" id="button-clear" data-toggle="tooltip" title="{{ "Filtreyi Temizle" }}" class="btn btn-light btn-sm border shadow-sm bg-white" ><i class="bi bi-filter"></i></button>
+        </div>
+    </div>
+    <!--end breadcrumb-->
+
+    <div class="row">
+        <div class="col-12 col-lg-12 d-flex">
+            <div class="card w-100">
+                <div class="card-header py-3">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-6 me-auto">
+                            <div class="ms-auto position-relative">
+                                <div class="position-absolute top-50 translate-middle-y search-icon px-2"><i class="bi bi-search"></i></div>
+                                <input type="text" name="filter_name" value="{{filter_name}}" id="input-filter-name" placeholder="Bavuru ismi..." class="form-control ps-4 auto-filter">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6 ">
+                            
+                        </div>
+
+                    
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select name="filter_store" class="form-select auto-filter">
+                                <option value="">{{text_select}}</option>
+                                {% for store in stores %}
+                                <option value="{{ store.store_id }}" {% if filter_store == store.store_id %} selected="selected" {% endif %}>{{store.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select name="filter_status" class="form-select auto-filter">
+                              <option value="">{{text_select}}</option>
+                              {% for key,value in statuses %}
+                              <option value="{{key}}" {% if filter_status == key %} selected="selected" {% endif %}>{{value}}</option>
+                              {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-lg-1 co1-6 col-md-3">
+                           <select name="limit" class="form-select auto-filter">
+                            {% for key,value in limits %}
+                            <option value="{{value}}" {% if filter_limit == value %} selected="selected" {% endif %}>{{value}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                    </div>
+                </div>
+                <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-basvuru">
+                    <div class="card-body">
+
+                        <div class="table-responsive-sm">
+                            <table class="table table-bordered table-striped align-middle mb-0 ">
+                           <thead class="align-middle" style="background-color:#018bd3;color:#fff;font-weight:bold;">
+                                  <tr>
+                                    <th style="width: 1px;" class="text-center">{{"#"}}</th>
+                                    <th class="text-start">
+                                       {{ "Öğrenci Adı" }}
+                                    </th>
+                                    <th class="text-start">
+                                        {{ "Derneği" }}
+                                    </th>
+                                    <th class="text-start">
+                                        {{ "Başlangıç Tarihi" }}
+                                    </th>
+                                    <th class="text-start">
+                                        {{ "Bitiş Tarihi" }}
+                                    </th>
+                                    <th class="text-center">
+                                       {{ "Durumu" }}
+                                    </th>
+                                    <th class="text-center" colspan="2">
+                                        {{ "Eylem" }}
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% if customers_staj %}
+                                  {% for customer in customers_staj %}
+                                  <tr id="data-list{{personel.personel_id}}">
+                                    <td class="text-center">
+                                      <input type="checkbox" class="form-check-input" name="selected[]" value="{{ customer.staj_id }}" />
+                                    </td>
+                                    <td class="text-start"><a href="{{customer.edit}}" class="text-dark">{{ customer.name }}</a></td>
+                                    <td class="text-start">
+                                     <div class="border rounded p-2 bg-light">
+                                    {{ customer.store.name }}
+                                    </div>
+                                    </td>
+                                    <td class="text-start">{{ customer.staj_date_start }}</td>
+                                    <td class="text-start">{{ customer.staj_date_end }}</td>
+                                    <td class="text-start">
+                                     <span class="badge {{customer.bg}}">{{  customer.status }}</span>
+                                    </td>
+                                  
+                                    <td class="text-center" >
+                                    <button type="button" id="button-view" data-toggle="tooltip" title="Görüntüle" onclick="edit('{{ customer.customer_id }}','{{ customer.staj_id }}')" class="btn btn-info btn-sm"> <i class="bi bi-eye"></i></button>
+                                    </td>
+                                    
+                                    <td class="text-center" >
+                                    <a href="{{customer.pdf}}" data-toggle="tooltip"  target="_blank" title="{{ "Pdf olarak görüntüle" }}" class="btn btn-warning btn-sm text-dark" ><i class="bi bi-file-earmark-pdf"></i></a>
+                                    </td>
+
+                                  </tr>
+                                  {% endfor %}
+                                  {% else %}
+                                  <tr>
+                                    <td class="text-center" colspan="7">{{ text_no_results }}</td>
+                                  </tr>
+                                  {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+  <div class="col-12 col-sm-6 d-flex justify-content-center justify-content-sm-start">
+    {{ pagination }}
+  </div>
+  <div class="col-12 col-sm-6 small text-muted text-center text-sm-end">
+    {{ results }}
+  </div>
+</div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+{# REVİZYON MODAL #}
+<div id="modal-revizyon" class="modal fade" tabindex="-1" aria-labelledby="modalRevizyonLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" > <div class="modal-content shadow-sm">
+      
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title" id="modalRevizyonLabel font-weight-bold">Revizyon İşlemleri</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form id="form-revizyon">
+        <input type="hidden" name="customer_id" id="input-customer-id" value="">
+        <input type="hidden" name="staj_id" id="input-staj-id" value="">
+        
+        <div class="modal-body py-0"> 
+           <ul class="nav nav-tabs nav-fill" role="tablist">
+            <li class="nav-item">
+              <button type="button" href="#tab-1" id="modal-tab-1" class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-1" role="tab">
+                <i class="bi bi-info-circle me-1"></i> {{ "Genel Bilgiler" }}
+              </button>
+            </li>
+            {% if store_id == 0 %}
+            <li class="nav-item">
+              <button type="button" href="#tab-2" id="modal-tab-2" class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-2" role="tab">
+                <i class="bi bi-clock-history me-1"></i> {{ "İşlem Detayları" }}
+              </button>
+            </li>
+            {% endif %}
+          </ul>
+          
+          <div class="tab-content p-3 border border-top-0 rounded-bottom">
+            <div class="tab-pane fade show active" id="tab-1" role="tabpanel">
+              <ul class="list-group list-group-flush mb-3 mt-2"></ul>
+              <div class="description mb-3 text-muted small"></div>
+              
+              <div class="mb-4">
+                <label class="form-label fw-semibold text-secondary small mb-1">{{ "Durumu" }}</label>
+                <select name="status" class="form-select form-select-lg status" onchange="statusChange();" style="font-size: 0.95rem;">
+                  {% for key,value in statuses %}
+                  <option value="{{key}}">{{value}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              
+              <div class="mb-3" id="text" style="display:none;">
+                <label class="form-label fw-semibold text-secondary small mb-1">{{ "Açıklama" }}</label>
+                <textarea name="text" rows="4" placeholder="Kısaca açıklama yazabilirsiniz..." class="form-control shadow-sm"></textarea>
+              </div>
+            </div>
+            
+            <div class="tab-pane fade history-data p-2" id="tab-2" role="tabpanel" >
+              
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top-0 mt-2">
+          <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Kapat</button>
+          <button type="button" id="button-modal-save" class="btn btn-primary px-4">
+            <i class="bi bi-check2-circle me-1"></i> {{ button_save }}
+          </button>
+        </div>
+      </form>
+      
+    </div>
+  </div>
+</div>
+{{footer}}
+</main>
+
+<script>
+function edit(customer_id,staj_id) {
+  	$('#modal-revizyon').modal('show');
+    $('#input-customer-id').val(customer_id);
+    $('#input-staj-id').val(staj_id);
+    $('#modal-tab-1').tab('show');
+   
+
+
+    $.ajax({
+    url: 'index.php?route=customer/customer_staj/dataview&user_token={{ user_token }}&customer_id='  + customer_id + '&staj_id=' + staj_id,
+		dataType: 'json',
+    type: 'post',
+
+		success: function(json) {
+      $('.alert-dismissible').remove();
+      $('.list-group-item').remove();
+      $('#tab-2 .alert-info').remove();
+
+      if (json.error.warning) {
+       $('#alert').prepend('<span class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json.error.warning + '</div>');
+      }
+
+
+      if (json['html']) {
+        $('.list-group').html(json['html']);
+        $('#modal-revizyon select[name^=\'status\']').val(json['status']);
+       
+        $('#modal-revizyon textarea[name^=\'text\']').prop('placeholder',json['placeholder']);
+        $('#tab-2').append(json['history']);
+      }		
+      
+		},
+		
+    error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+    }
+	});
+
+}
+
+</script>
+<script>
+$('#button-modal-save').on('click', function() {
+  $.ajax({
+    url: 'index.php?route=customer/customer_staj/revizyon&user_token={{ user_token }}',
+		 type: 'post',
+     dataType: 'json',
+     data : $('#form-revizyon').serialize(),
+
+    beforeSend: function() {
+			$('#button-modal-save').button('loading');
+		},
+
+    complete: function() {
+      $('#button-modal-save').button('reset');
+    },
+
+		success: function(json) {
+     $('.alert-dismissible').remove();
+     
+      if (json.error.warning) {
+       $('#alert').prepend(
+              '<div class="alert border-0 border-danger border-start border-2 bg-light-danger alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-danger"><i class="bi bi-x-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + json.error.warning + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );
+      
+     }		
+
+     if (json.success) {
+       $('#alert').append(
+              '<div class="alert border-0 border-success border-start border-4 bg-light-success alert-dismissible fade show py-2">' +
+                '<div class="d-flex align-items-center">' +
+                  '<div class="fs-3 text-success"><i class="bi bi-check-circle-fill"></i></div>' +
+                  '<div class="ms-3"><div class="text-dynamic">' + json.success + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+              '</div>'
+            );  
+        $('#modal-revizyon').modal('hide');
+        location.reload();
+     }		
+      
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+	});
+});
+</script>
+<script>
+function statusChange() {
+  const status = $('#modal-revizyon select[name^="status"]').val();
+  $('#text').show();
+  const placeholders = {
+      '0': 'Kısa açıklama yazabilirsiniz',
+      '1': 'Açıklama: Şirket bilgileri (Ad, adres, iletişim vs.)',
+      '2': 'Kısa açıklama yazabilirsiniz',
+      '3': 'Kısa açıklama yazabilirsiniz',
+      '4': 'Açıklama: Eksik belgeler ve nedenlerini listeleyin',
+      '5': 'Açıklama: Red nedeni detaylı yazınız',
+      '6': 'Özel açıklama yapabilirsiniz'
+  };
+
+
+const placeholder = placeholders[status] || 'Lütfen açıklama giriniz';
+$('#modal-revizyon textarea[name^="text"]').attr('placeholder', placeholder);
+}
+</script>
+<script type="text/javascript"><!--
+var store_id = '{{store_id}}';
+$('.auto-filter').on('change', function() {
+	$('#cover-spin').show(0);
+
+	url = 'index.php?route=customer/customer_staj&user_token={{ user_token }}';
+
+	if ($('input[name=\'filter_name\']').val()) {
+		url += '&filter_name=' + encodeURIComponent($('input[name=\'filter_name\']').val());
+	}
+
+	
+	if ($('select[name=\'filter_store\']').val()) {
+		url += '&filter_store=' + encodeURIComponent($('select[name=\'filter_store\']').val());
+	}
+	
+	if ($('select[name=\'filter_status\']').val() !== '') {
+		url += '&filter_status=' + encodeURIComponent($('select[name=\'filter_status\']').val());
+	}
+
+  if ($('select[name=\'limit\']').val() !== '') {
+		url += '&limit=' + encodeURIComponent($('select[name=\'limit\']').val());
+	}
+
+	location = url;
+});
+
+$('#button-clear').on('click', function() {
+	url = 'index.php?route=customer/customer_staj&user_token={{ user_token }}';
+	location = url;
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'filter_name\']').autocomplete({
+	 
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=customer/customer/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['customer_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		 $('input[name=\'filter_name\']').val(item['label']);
+     $('input[name=\'filter_name\']').trigger('change');
+	}
+
+	
+});
+</script>
+<script>
+var error_warning = '{{error_warning}}';
+var success = '{{success}}';
+$(document).ready(function() {
+     if(error_warning) {
+      alerterror(error_warning);
+     }
+
+     if (success) {
+	  alertsuccess(success);
+    }
+});
+</script>
