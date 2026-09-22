@@ -349,41 +349,53 @@
             }
 
             .spine {
+                --spine-thickness: 24px;
                 position: absolute;
-                height: 100%;
                 top: 0;
                 left: 0;
+                width: var(--spine-thickness);
+                height: 100%;
                 overflow: hidden;
-                transform-origin: left top;
-                transform: rotateY(90deg);
+                transform: rotateY(90deg) translateZ(-1px);
+                transform-origin: left center;
+                z-index: 25;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 background: linear-gradient(
                     90deg,
-                    rgba(0,0,0,0.12),
-                    var(--cover-color) 38%,
-                    var(--cover-shadow) 52%,
-                    var(--cover-color) 70%,
-                    rgba(0,0,0,0.12)
+                    rgba(0, 0, 0, 0.12),
+                    var(--cover-color) 36%,
+                    var(--cover-shadow) 54%,
+                    var(--cover-color) 68%,
+                    rgba(0, 0, 0, 0.12)
                 );
-                box-shadow: inset 2px 0 5px rgba(0,0,0,0.18), inset -2px 0 5px rgba(0,0,0,0.18);
+                box-shadow: inset 2px 0 5px rgba(0, 0, 0, 0.18), inset -2px 0 5px rgba(0, 0, 0, 0.18);
+            }
+
+            .spine::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(90deg, rgba(255,255,255,0.09), rgba(0,0,0,0.05), rgba(255,255,255,0.06));
+                pointer-events: none;
             }
 
             .spine-title {
                 position: relative;
-                z-index: 3;
+                z-index: 2;
                 writing-mode: vertical-rl;
                 text-orientation: mixed;
                 transform: rotate(180deg);
                 white-space: nowrap;
                 font-family: Georgia, "Times New Roman", serif;
                 font-weight: 900;
-                font-size: 13px;
-                letter-spacing: 2px;
+                font-size: clamp(7px, calc(var(--spine-thickness) * 0.42), 13px);
+                line-height: 1;
+                letter-spacing: 1.5px;
                 color: rgba(255, 255, 255, 0.96);
                 text-transform: uppercase;
-                text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45), 0 0 8px rgba(255, 255, 255, 0.2);
+                text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45), 0 0 8px rgba(255, 255, 255, 0.18);
             }
 
             .paper-block {
@@ -558,7 +570,7 @@
                     <img src="{{cover_back}}" alt="Arka Kapak" style="--cover-scale: {{ cover_back_scale }}" />
                 </div>
 
-                <div class="spine" id="spine">
+                <div class="spine" id="spine" aria-label="Kitap sırtı">
                     <div class="spine-title">VADİ YAYINLARI</div>
                 </div>
             </div>
@@ -688,7 +700,7 @@
                         document.documentElement.style.setProperty("--cover-shadow", shadowColor);
                     }
                 } catch (error) {
-                    // Ignore when cross-origin prevents canvas reading.
+                    // Ignore when cross-origin prevents canvas read.
                 }
             }
 
@@ -715,6 +727,7 @@
                 const pageCount = parseInt(pages, 10) || 100;
                 const thickness = Math.max(12, Math.min(90, Math.round(pageCount * 0.12)));
 
+                spine.style.setProperty("--spine-thickness", `${thickness}px`);
                 spine.style.width = `${thickness}px`;
                 coverBack.style.transform = `translateZ(-${thickness}px) rotateY(180deg)`;
 
