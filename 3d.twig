@@ -1,822 +1,97 @@
 <!doctype html>
 <html lang="tr">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>3D Kitap Görünümü</title>
-        <style>
-            * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-            }
-
-            body {
-                background: #050505;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-                perspective: 1800px;
-                position: relative;
-            }
-
-            body::before {
-                content: "";
-                position: absolute;
-                z-index: 1;
-                top: 50%;
-                left: 50%;
-                width: min(760px, 100vw);
-                height: min(820px, 100vh);
-                transform: translate(-50%, -52%);
-                background: radial-gradient(
-                    ellipse 240px 360px at 50% 44%,
-                    rgba(255, 232, 181, 0.3) 0%,
-                    rgba(255, 218, 143, 0.16) 34%,
-                    rgba(255, 205, 125, 0.05) 58%,
-                    transparent 76%
-                );
-                filter: blur(12px);
-                pointer-events: none;
-            }
-
-            .particles {
-                position: absolute;
-                inset: 0;
-                pointer-events: none;
-                z-index: 0;
-            }
-
-            .particle {
-                position: absolute;
-                background: radial-gradient(circle, rgba(255, 225, 180, 0.7) 0%, rgba(255, 225, 180, 0) 70%);
-                border-radius: 50%;
-                opacity: 0;
-                animation: softFloat var(--duration) ease-in-out infinite;
-                filter: blur(1.5px);
-            }
-
-            @keyframes softFloat {
-                0% {
-                    transform: translate(var(--startX), var(--startY)) scale(0.5);
-                    opacity: 0;
-                }
-                30% {
-                    opacity: var(--opacity);
-                    transform: translate(
-                            calc(var(--startX) + var(--driftX) * 0.3),
-                            calc(var(--startY) + var(--driftY) * 0.3)
-                        )
-                        scale(1);
-                }
-                70% {
-                    opacity: var(--opacity);
-                    transform: translate(
-                            calc(var(--startX) + var(--driftX) * 0.7),
-                            calc(var(--startY) + var(--driftY) * 0.7)
-                        )
-                        scale(0.9);
-                }
-                100% {
-                    transform: translate(calc(var(--startX) + var(--driftX)), calc(var(--startY) + var(--driftY)))
-                        scale(0.3);
-                    opacity: 0;
-                }
-            }
-
-            .book-container {
-                --closed-book-width: 300px;
-                --open-book-width: 640px;
-                width: var(--closed-book-width);
-                height: calc(var(--closed-book-width) * 1.563333);
-                position: relative;
-                perspective: 2000px;
-                cursor: grab;
-                user-select: none;
-                animation: idleFloat 6s ease-in-out infinite;
-                z-index: 10;
-                transition: width 1.2s cubic-bezier(0.25, 1, 0.5, 1), height 0.8s ease;
-                touch-action: none;
-            }
-
-            .book-container.open {
-                width: var(--open-book-width);
-                height: calc(var(--open-book-width) * 0.7328125);
-            }
-
-            .book-container.open .book {
-                width: 100%;
-                left: 0;
-                transform: none !important;
-                transition: width 0.8s ease;
-            }
-
-            .fairy-dust {
-                position: absolute;
-                z-index: 40;
-                inset: -30% -45%;
-                pointer-events: none;
-                overflow: visible;
-                mix-blend-mode: screen;
-                opacity: 0.9;
-                transform: translateX(var(--dust-shift, 0px));
-                transition: transform 0.12s linear;
-            }
-
-            .fairy-dust span {
-                position: absolute;
-                width: var(--dust-size);
-                height: var(--dust-size);
-                left: var(--dust-left);
-                top: var(--dust-top);
-                border-radius: 50%;
-                background: radial-gradient(circle, #fff9d1 0%, #ffd982 24%, rgba(255, 209, 116, 0) 72%);
-                box-shadow: 0 0 9px rgba(255, 216, 130, 0.95);
-                animation: fairyDrift var(--dust-duration) ease-in-out infinite;
-                animation-delay: var(--dust-delay);
-            }
-
-            @keyframes fairyDrift {
-                0%, 100% { transform: translate3d(0, 0, 0) scale(0.45); opacity: 0.1; }
-                50% { transform: translate3d(var(--dust-drift-x), var(--dust-drift-y), 0) scale(1); opacity: 0.95; }
-            }
-
-            .controls {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .rotation-hint {
-                color: rgba(255, 239, 195, 0.92);
-                font: 600 11px/1.2 Arial, sans-serif;
-                letter-spacing: 0.15px;
-                text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
-                transition: opacity 0.25s ease, transform 0.25s ease;
-                animation: hintPulse 1.8s ease-in-out infinite;
-            }
-
-            .rotation-hint.is-hidden {
-                opacity: 0;
-                transform: translateY(4px);
-                pointer-events: none;
-                animation: none;
-            }
-
-            @keyframes hintPulse {
-                50% { opacity: 0.55; }
-            }
-
-            .book-container::before {
-                content: "";
-                position: absolute;
-                z-index: 0;
-                top: -65px;
-                left: -135px;
-                width: var(--closed-book-width);
-                height: 100%;
-                background: radial-gradient(
-                    ellipse at 50% 44%,
-                    rgba(255, 238, 193, 0.22) 0%,
-                    rgba(255, 218, 143, 0.08) 42%,
-                    rgba(255, 210, 130, 0) 70%
-                );
-                filter: blur(14px);
-                pointer-events: none;
-            }
-
-            .book-container:active {
-                cursor: grabbing;
-                animation: none;
-            }
-
-            .book-container.rotation-active {
-                cursor: crosshair;
-                animation: none;
-            }
-
-            @keyframes idleFloat {
-                0%,
-                100% {
-                    transform: translateY(0);
-                }
-                50% {
-                    transform: translateY(-6px);
-                }
-            }
-
-            .book {
-                width: var(--closed-book-width);
-                height: 100%;
-                position: absolute;
-                left: 0;
-                top: 0;
-                transform-style: preserve-3d;
-                transform: rotateX(15deg) rotateY(-28deg) rotateZ(0deg);
-                transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
-                --light-x: 38%;
-                --light-y: 22%;
-                --light-angle: 125deg;
-                --shadow-x: 0px;
-                will-change: transform;
-            }
-
-            .book img {
-                -webkit-user-drag: none;
-                user-select: none;
-            }
-
-            .book::after {
-                content: "";
-                position: absolute;
-                bottom: -30px;
-                left: 5%;
-                width: 90%;
-                height: 40px;
-                background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 75%);
-                filter: blur(8px);
-                transform: rotateX(90deg) translateX(var(--shadow-x)) translateZ(-60px);
-                opacity: 0.72;
-                pointer-events: none;
-                transition: all 1.2s ease;
-            }
-
-            /* Sabit Sol Sayfa (Açıldığında görünür) */
-            .left-page {
-                position: absolute;
-                width: 50%;
-                height: 100%;
-                left: 0;
-                top: 0;
-                background: linear-gradient(to left, #d9c59e 0%, #f3e8cf 6%, #f1e5ca 94%, #d8c39b 100%);
-                border: 1px solid #d5c29b;
-                border-radius: 3px 0 0 3px;
-                padding: 24px 22px 20px 22px;
-                color: #3b2e20;
-                font-family: Georgia, "Times New Roman", serif;
-                font-size: 10.5px;
-                line-height: 1.5;
-                text-align: justify;
-                box-shadow: inset 10px 0 20px rgba(0, 0, 0, 0.06);
-                display: none;
-                z-index: 5;
-            }
-
-            .book.open .left-page {
-                display: block;
-            }
-
-            .page-content h2,
-            .left-page h2 {
-                margin-bottom: 8px;
-                color: #2b2016;
-                font-size: 13px;
-                font-weight: normal;
-                text-align: center;
-                letter-spacing: 0.5px;
-            }
-
-            .page-content p,
-            .left-page p {
-                margin-bottom: 6px;
-                text-indent: 10px;
-            }
-
-            .page-number {
-                position: absolute;
-                bottom: 8px;
-                left: 0;
-                right: 0;
-                font-size: 9px;
-                text-align: center;
-                color: #5a4835;
-            }
-
-            /* Sağ Sayfa (Arka planda bekler, kapak açılınca görünür) */
-            .right-page {
-                position: absolute;
-                width: 50%;
-                height: 100%;
-                right: 0;
-                top: 0;
-                background: linear-gradient(to right, #d9c59e 0%, #f3e8cf 6%, #f1e5ca 94%, #d8c39b 100%);
-                border: 1px solid #d5c29b;
-                border-radius: 0 3px 3px 0;
-                padding: 24px 22px 20px 22px;
-                color: #3b2e20;
-                font-family: Georgia, "Times New Roman", serif;
-                font-size: 10.5px;
-                line-height: 1.5;
-                text-align: justify;
-                box-shadow: inset -5px 0 15px rgba(0, 0, 0, 0.05);
-                display: none;
-                z-index: 5;
-            }
-
-            .book.open .right-page {
-                display: block;
-            }
-
-            .book.open .cover-group,
-            .book.open .cover.back,
-            .book.open .spine,
-            .book.open .paper-block,
-            .book.open::after {
-                display: none;
-            }
-
-            .book.open .left-page,
-            .book.open .right-page {
-                z-index: 5;
-                display: block;
-            }
-
-            /* Kapak Yapısı */
-            .cover-group {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                left: 0;
-                top: 0;
-                transform-origin: left center;
-                transform-style: preserve-3d;
-                transition: transform 1.8s cubic-bezier(0.25, 1, 0.5, 1);
-                z-index: 30;
-            }
-
-            .cover {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                border-radius: 0 4px 4px 0;
-                overflow: hidden;
-                transform-style: preserve-3d;
-                backface-visibility: hidden;
-                background: #1a1a1a;
-            }
-
-            .cover img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                object-position: center;
-                display: block;
-                transform: scale(var(--cover-scale, 1));
-            }
-
-            .cover.front-face {
-                z-index: 2;
-                transform: translateZ(0.5px);
-                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-            }
-
-            .cover.inner-face {
-                transform: rotateY(180deg) translateZ(0.5px);
-                background: #eadfc6;
-            }
-
-            .book.open .cover-group {
-                transform: rotateY(-180deg);
-            }
-
-            .cover.back {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                transform-origin: center;
-                box-shadow: -5px 10px 25px rgba(0, 0, 0, 0.5);
-                z-index: 1;
-                border-radius: 0 4px 4px 0;
-            }
-
-            .spine {
-                position: absolute;
-                height: 100%;
-                top: 0;
-                left: 0;
-                overflow: hidden;
-                transform-origin: left top;
-                transform: rotateY(90deg);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: #1a1a1a;
-            }
-
-            .spine-bg {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                filter: brightness(0.85);
-            }
-
-            .spine-overlay {
-                position: absolute;
-                inset: 0;
-                box-shadow:
-                    inset 2px 0 5px rgba(0, 0, 0, 0.4),
-                    inset -2px 0 5px rgba(0, 0, 0, 0.4);
-                z-index: 2;
-            }
-
-            .spine-title {
-                position: relative;
-                z-index: 3;
-                white-space: nowrap;
-                font-size: 13px;
-                letter-spacing: 2px;
-                color: #fff;
-                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
-                text-transform: uppercase;
-                transform: rotate(90deg) scaleY(-1);
-            }
-
-            /* Sayfa kenar kalınlık simülasyonu (Kapalıyken) */
-            .paper-block {
-                position: absolute;
-                background: #eee3c9;
-                box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.15);
-            }
-
-            .paper-front {
-                top: 2px;
-                right: 1px;
-                height: calc(100% - 4px);
-                transform-origin: right center;
-                transform: rotateY(-90deg);
-            }
-
-            .paper-top {
-                top: 1px;
-                left: 2px;
-                width: calc(100% - 4px);
-                transform-origin: top center;
-                transform: rotateX(-90deg);
-            }
-
-            .paper-bottom {
-                bottom: 1px;
-                left: 2px;
-                width: calc(100% - 4px);
-                transform-origin: bottom center;
-                transform: rotateX(90deg);
-            }
-
-            .shine {
-                position: absolute;
-                inset: 0;
-                background: radial-gradient(
-                        ellipse 38% 24% at var(--light-x) var(--light-y),
-                        rgba(255, 255, 255, 0.32) 0%,
-                        rgba(255, 240, 198, 0.12) 35%,
-                        rgba(255, 255, 255, 0) 100%
-                    ),
-                    linear-gradient(var(--light-angle), rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 42%);
-                pointer-events: none;
-                z-index: 5;
-                mix-blend-mode: screen;
-            }
-
-            .controls {
-                position: fixed;
-                bottom: max(20px, env(safe-area-inset-bottom));
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 100;
-            }
-
-            button {
-                padding: 12px 22px;
-                font-size: 12px;
-                font-weight: bold;
-                background-color: #fff;
-                color: #111;
-                border: none;
-                border-radius: 25px;
-                cursor: pointer;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-                transition: all 0.2s ease;
-            }
-
-            button:hover {
-                background-color: #eee;
-                transform: translateY(-2px);
-            }
-
-            @media (max-width: 700px) {
-                body {
-                    padding: 18px 0 76px;
-                    justify-content: center;
-                }
-
-                .book-container {
-                    --closed-book-width: min(72vw, 300px, calc((100vh - 112px) / 1.563333));
-                    --open-book-width: 94vw;
-                }
-
-                .book-container::before {
-                    top: -12%;
-                    left: -45%;
-                    width: 190%;
-                    height: 120%;
-                }
-
-                .left-page,
-                .right-page {
-                    padding: 16px 13px 18px;
-                    font-size: clamp(8px, 2.4vw, 10.5px);
-                    line-height: 1.38;
-                }
-
-                .page-content h2,
-                .left-page h2 {
-                    font-size: clamp(10px, 2.8vw, 13px);
-                    margin-bottom: 5px;
-                }
-
-                .controls {
-                    bottom: max(12px, env(safe-area-inset-bottom));
-                }
-
-                button {
-                    padding: 10px 17px;
-                    font-size: 11px;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="particles" id="particles"></div>
-
-        <div class="book-container" id="container">
-            <div class="fairy-dust" id="fairy-dust" aria-hidden="true"></div>
-            <div class="book" id="book" data-pages="{{sayfa_sayisi}}">
-                <!-- SOL SAYFA (Açıldığında görünür) -->
-                <div class="left-page">
-                    <h2>I. {{baslik}}</h2>
-                    <p>
-                        {{description1}}
-                    </p>
-                    
-                    <span class="page-number">118</span>
-                </div>
-
-                <!-- SAĞ SAYFA (Açıldığında görünür) -->
-                <div class="right-page">
-                    <h2>II. {{baslik}}</h2>
-                    <p>
-                        {{description2}}
-                    </p>
-                   
-                    <span class="page-number">119</span>
-                </div>
-
-                <!-- ÖN KAPAK GRUBU -->
-                <div class="cover-group">
-                    <div class="cover front-face">
-                        <img src="{{cover_front}}" alt="Ön Kapak" style="--cover-scale: {{ cover_front_scale }}" />
-                        <div class="shine"></div>
-                    </div>
-                    <div class="cover inner-face"></div>
-                </div>
-
-                <!-- SAYFA KENARLARI (Kapalıyken görünen kalınlık dokusu) -->
-                <div class="paper-block paper-front" id="paper-front"></div>
-                <div class="paper-block paper-top" id="paper-top"></div>
-                <div class="paper-block paper-bottom" id="paper-bottom"></div>
-
-                <!-- ARKA KAPAK -->
-                <div class="cover back" id="cover-back">
-                    <img src="{{cover_back}}" alt="Arka Kapak" style="--cover-scale: {{ cover_back_scale }}" />
-                </div>
-
-                <!-- KİTAP SIRTI -->
-                <div class="spine" id="spine">
-                    <img src="on.webp" class="spine-bg" alt="Sırt Dokusu" />
-                    <div class="spine-overlay"></div>
-                    <div class="spine-title">VADİ YAYINLARI</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="controls">
-            <span class="rotation-hint" id="rotation-hint">Döndürmek için kitaba tıklayın</span>
-            <button id="book-toggle" type="button" onclick="toggleBook()" aria-pressed="false">Kitabı Aç</button>
-        </div>
-
-        <script>
-            function createParticles() {
-                const particlesContainer = document.getElementById("particles");
-                const particleCount = 18;
-
-                for (let i = 0; i < particleCount; i++) {
-                    const particle = document.createElement("div");
-                    particle.classList.add("particle");
-
-                    const size = Math.random() * 3 + 1.5;
-                    const startX = Math.random() * 100;
-                    const startY = Math.random() * 100;
-                    const driftX = (Math.random() - 0.5) * 120;
-                    const driftY = (Math.random() - 0.5) * 120;
-                    const duration = Math.random() * 8 + 7;
-                    const delay = Math.random() * 6;
-                    const opacity = Math.random() * 0.25 + 0.1;
-
-                    particle.style.width = `${size}px`;
-                    particle.style.height = `${size}px`;
-                    particle.style.setProperty("--startX", `${startX}vw`);
-                    particle.style.setProperty("--startY", `${startY}vh`);
-                    particle.style.setProperty("--driftX", `${driftX}px`);
-                    particle.style.setProperty("--driftY", `${driftY}px`);
-                    particle.style.setProperty("--duration", `${duration}s`);
-                    particle.style.setProperty("--opacity", opacity);
-                    particle.style.animationDelay = `${-delay}s`;
-
-                    particlesContainer.appendChild(particle);
-                }
-            }
-
-            createParticles();
-
-            function createFairyDust() {
-                const dust = document.getElementById("fairy-dust");
-
-                for (let i = 0; i < 38; i++) {
-                    const mote = document.createElement("span");
-                    const size = Math.random() * 3.8 + 1.1;
-                    mote.style.setProperty("--dust-size", `${size}px`);
-                    mote.style.setProperty("--dust-left", `${Math.random() * 100}%`);
-                    mote.style.setProperty("--dust-top", `${Math.random() * 100}%`);
-                    mote.style.setProperty("--dust-drift-x", `${(Math.random() - 0.5) * 92}px`);
-                    mote.style.setProperty("--dust-drift-y", `${-25 - Math.random() * 86}px`);
-                    mote.style.setProperty("--dust-duration", `${4 + Math.random() * 5}s`);
-                    mote.style.setProperty("--dust-delay", `${-Math.random() * 6}s`);
-                    dust.appendChild(mote);
-                }
-            }
-
-            createFairyDust();
-
-            const book = document.getElementById("book");
-            const container = document.getElementById("container");
-            const spine = document.getElementById("spine");
-            const coverBack = document.getElementById("cover-back");
-            const paperFront = document.getElementById("paper-front");
-            const paperTop = document.getElementById("paper-top");
-            const paperBottom = document.getElementById("paper-bottom");
-            const toggleButton = document.getElementById("book-toggle");
-            const rotationHint = document.getElementById("rotation-hint");
-
-            let isOpen = false;
-            let activePointerId = null;
-            let mouseRotationActive = false;
-            let previousMousePosition = { x: 0, y: 0 };
-            let rotation = { x: 15, y: -28 };
-
-            function updateLighting() {
-                const lightX = Math.max(12, Math.min(88, 38 + rotation.y * 0.55));
-                const lightY = Math.max(12, Math.min(58, 22 - rotation.x * 0.28));
-                const lightAngle = 125 + rotation.y * 0.65;
-                const shadowX = Math.max(-34, Math.min(34, rotation.y * -0.75));
-
-                book.style.setProperty("--light-x", `${lightX}%`);
-                book.style.setProperty("--light-y", `${lightY}%`);
-                book.style.setProperty("--light-angle", `${lightAngle}deg`);
-                book.style.setProperty("--shadow-x", `${shadowX}px`);
-                container.style.setProperty("--dust-shift", `${Math.max(-24, Math.min(24, rotation.y * 0.25))}px`);
-            }
-
-            function updateThickness(pages) {
-                const pageCount = parseInt(pages);
-                const thickness = Math.max(12, Math.min(90, Math.round(pageCount * 0.12)));
-
-                spine.style.width = `${thickness}px`;
-                coverBack.style.transform = `translateZ(-${thickness}px) rotateY(180deg)`;
-
-                paperFront.style.width = `${thickness - 2}px`;
-                paperTop.style.height = `${thickness - 2}px`;
-                paperBottom.style.height = `${thickness - 2}px`;
-
-                book.setAttribute("data-pages", pageCount);
-            }
-
-            updateThickness(book.getAttribute("data-pages"));
-            updateLighting();
-
-            function toggleBook() {
-                isOpen = !isOpen;
-                if (isOpen) {
-                    disableMouseRotation();
-                    container.classList.add("open");
-                    book.classList.add("open");
-                    book.style.transform = "none";
-                    toggleButton.textContent = "Kitabı Kapat";
-                    toggleButton.setAttribute("aria-pressed", "true");
-                    updateLighting();
-                } else {
-                    container.classList.remove("open");
-                    book.classList.remove("open");
-                    rotation = { x: 15, y: -28 };
-                    book.style.transform = "translateX(0px) rotateX(15deg) rotateY(-28deg) rotateZ(0deg)";
-                    toggleButton.textContent = "Kitabı Aç";
-                    toggleButton.setAttribute("aria-pressed", "false");
-                    updateThickness(book.getAttribute("data-pages"));
-                    updateLighting();
-                }
-            }
-
-            function applyRotation() {
-                book.style.transform =
-                    "translateX(0px) rotateX(" +
-                    rotation.x +
-                    "deg) rotateY(" +
-                    rotation.y +
-                    "deg) rotateZ(0deg)";
-                updateLighting();
-            }
-
-            function disableMouseRotation() {
-                mouseRotationActive = false;
-                container.classList.remove("rotation-active");
-                book.style.transition = "";
-            }
-
-            function hideRotationHint() {
-                rotationHint.classList.add("is-hidden");
-            }
-
-            container.addEventListener("pointerdown", (e) => {
-                if (isOpen || (e.pointerType === "mouse" && e.button !== 0)) return;
-
-                e.preventDefault();
-                hideRotationHint();
-
-                // Farede basılı tutmak gerekmez: bir tıklama çevirme modunu açar,
-                // sonraki fare hareketleri kitabı döndürür. İkinci tıklama kapatır.
-                if (e.pointerType === "mouse") {
-                    mouseRotationActive = !mouseRotationActive;
-                    container.classList.toggle("rotation-active", mouseRotationActive);
-                    previousMousePosition = { x: e.clientX, y: e.clientY };
-                    book.style.transition = mouseRotationActive ? "none" : "";
-                    return;
-                }
-
-                // Dokunmatik ekranlarda faredeki gibi hover olmadığı için parmakla
-                // sürükleyerek kontrol korunur.
-                activePointerId = e.pointerId;
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-                book.style.transition = "none";
-                container.setPointerCapture(e.pointerId);
-            });
-
-            container.addEventListener("pointermove", (e) => {
-                const isMouseRotation = e.pointerType === "mouse" && mouseRotationActive;
-                const isTouchRotation = e.pointerId === activePointerId;
-
-                if (isOpen || (!isMouseRotation && !isTouchRotation)) return;
-
-                e.preventDefault();
-                const deltaX = e.clientX - previousMousePosition.x;
-                const deltaY = e.clientY - previousMousePosition.y;
-
-                // Eşik beklemeden küçük hareketleri de uygula.
-                rotation.y += deltaX * 1.15;
-                rotation.x -= deltaY * 1.15;
-                rotation.x = Math.max(-60, Math.min(60, rotation.x));
-                applyRotation();
-
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-            });
-
-            container.addEventListener("pointerenter", (e) => {
-                if (e.pointerType === "mouse" && mouseRotationActive) {
-                    previousMousePosition = { x: e.clientX, y: e.clientY };
-                }
-            });
-
-            function finishDrag(e) {
-                if (e.pointerId !== activePointerId) return;
-                activePointerId = null;
-                book.style.transition = "";
-                if (container.hasPointerCapture(e.pointerId)) {
-                    container.releasePointerCapture(e.pointerId);
-                }
-            }
-
-            container.addEventListener("pointerup", finishDrag);
-            container.addEventListener("pointercancel", finishDrag);
-            container.addEventListener("lostpointercapture", finishDrag);
-            container.addEventListener("dragstart", (e) => e.preventDefault());
-            window.addEventListener("keydown", (e) => {
-                if (e.key === "Escape") disableMouseRotation();
-            });
-        </script>
-    </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Kitap Görünümü</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --paper: #eee3c9; --ink: #3b2e20; }
+    body {
+      min-height: 100vh; overflow: hidden; position: relative; display: flex;
+      flex-direction: column; align-items: center; justify-content: center;
+      background: #050505; perspective: 1800px;
+    }
+    body::before {
+      content: ""; position: absolute; z-index: 1; top: 50%; left: 50%; pointer-events: none;
+      width: min(760px, 100vw); height: min(820px, 100vh); transform: translate(-50%, -52%);
+      background: radial-gradient(ellipse 240px 360px at 50% 44%, rgba(255,232,181,.3), rgba(255,218,143,.16) 34%, rgba(255,205,125,.05) 58%, transparent 76%);
+      filter: blur(12px);
+    }
+    .particles { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+    .particle { position: absolute; border-radius: 50%; opacity: 0; filter: blur(1.5px); background: radial-gradient(circle, rgba(255,225,180,.7), transparent 70%); animation: softFloat var(--duration) ease-in-out infinite; }
+    @keyframes softFloat { 0% { transform: translate(var(--startX),var(--startY)) scale(.5); opacity: 0; } 30%,70% { opacity: var(--opacity); } 30% { transform: translate(calc(var(--startX) + var(--driftX)*.3),calc(var(--startY) + var(--driftY)*.3)) scale(1); } 70% { transform: translate(calc(var(--startX) + var(--driftX)*.7),calc(var(--startY) + var(--driftY)*.7)) scale(.9); } 100% { transform: translate(calc(var(--startX) + var(--driftX)),calc(var(--startY) + var(--driftY))) scale(.3); opacity: 0; } }
+    .book-container { --closed-book-width: 300px; --open-book-width: 640px; width: var(--closed-book-width); height: calc(var(--closed-book-width)*1.563333); position: relative; perspective: 2000px; cursor: grab; user-select: none; z-index: 10; touch-action: none; animation: idleFloat 6s ease-in-out infinite; transition: width 1.2s cubic-bezier(.25,1,.5,1), height .8s ease; }
+    .book-container.open { width: var(--open-book-width); height: calc(var(--open-book-width)*.7328125); }
+    .book-container.open .book { width: 100%; left: 0; transform: none !important; transition: width .8s ease; }
+    @keyframes idleFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .book-container::before { content: ""; position: absolute; z-index: 0; top: -65px; left: -135px; width: var(--closed-book-width); height: 100%; pointer-events: none; background: radial-gradient(ellipse at 50% 44%, rgba(255,238,193,.22), rgba(255,218,143,.08) 42%, transparent 70%); filter: blur(14px); }
+    .book-container:active { cursor: grabbing; animation: none; }
+    .book-container.rotation-active { cursor: crosshair; animation: none; }
+    .book { width: var(--closed-book-width); height: 100%; position: absolute; inset: 0 auto auto 0; transform-style: preserve-3d; transform: rotateX(15deg) rotateY(-28deg); transition: transform 1.2s cubic-bezier(.25,1,.5,1); --light-x: 38%; --light-y: 22%; --light-angle: 125deg; --shadow-x: 0px; will-change: transform; }
+    .book img { display: block; user-select: none; -webkit-user-drag: none; }
+    .book::after { content: ""; position: absolute; bottom: -30px; left: 5%; width: 90%; height: 40px; pointer-events: none; background: radial-gradient(ellipse, rgba(0,0,0,.7), transparent 75%); filter: blur(8px); transform: rotateX(90deg) translateX(var(--shadow-x)) translateZ(-60px); opacity: .72; }
+    .left-page,.right-page { position: absolute; top: 0; width: 50%; height: 100%; display: none; z-index: 5; padding: 24px 22px 20px; color: var(--ink); font: 10.5px/1.5 Georgia,"Times New Roman",serif; text-align: justify; background: linear-gradient(to right, #d9c59e, #f3e8cf 6%, #f1e5ca 94%, #d8c39b); border: 1px solid #d5c29b; }
+    .left-page { left: 0; border-radius: 3px 0 0 3px; box-shadow: inset 10px 0 20px rgba(0,0,0,.06); background: linear-gradient(to left, #d9c59e, #f3e8cf 6%, #f1e5ca 94%, #d8c39b); }
+    .right-page { right: 0; border-radius: 0 3px 3px 0; box-shadow: inset -5px 0 15px rgba(0,0,0,.05); }
+    .book.open .left-page,.book.open .right-page { display: block; }
+    .left-page h2,.right-page h2 { margin-bottom: 8px; color: #2b2016; font-size: 13px; font-weight: normal; text-align: center; letter-spacing: .5px; }
+    .left-page p,.right-page p { margin-bottom: 6px; text-indent: 10px; }
+    .page-number { position: absolute; bottom: 8px; left: 0; right: 0; color: #5a4835; font-size: 9px; text-align: center; }
+    .book.open .cover-group,.book.open .cover.back,.book.open .spine,.book.open .paper-block,.book.open::after { display: none; }
+    .cover-group { position: absolute; inset: 0; transform-origin: left center; transform-style: preserve-3d; transition: transform 1.8s cubic-bezier(.25,1,.5,1); z-index: 30; }
+    .cover { position: absolute; inset: 0; overflow: hidden; transform-style: preserve-3d; backface-visibility: hidden; border-radius: 0 4px 4px 0; background: #1a1a1a; }
+    .cover img { width: 100%; height: 100%; object-fit: cover; object-position: center; transform: scale(var(--cover-scale,1)); }
+    .cover.front-face { z-index: 2; transform: translateZ(.5px); box-shadow: 2px 2px 10px rgba(0,0,0,.3); }
+    .cover.inner-face { transform: rotateY(180deg) translateZ(.5px); background: #eadfc6; }
+    .book.open .cover-group { transform: rotateY(-180deg); }
+    .cover.back { z-index: 1; transform-origin: center; box-shadow: -5px 10px 25px rgba(0,0,0,.5); }
+    /* The spine is deliberately image-free: using the front-cover bitmap here caused a
+       cropped logo/illustration to leak over the top of the spine. */
+    .spine { position: absolute; top: 0; left: 0; width: 24px; height: 100%; overflow: hidden; transform-origin: left top; transform: rotateY(90deg); background: linear-gradient(90deg, #19100e, #58382b 42%, #241511 100%); box-shadow: inset 2px 0 5px rgba(0,0,0,.45), inset -2px 0 5px rgba(0,0,0,.45); }
+    .paper-block { position: absolute; background: var(--paper); box-shadow: inset 0 0 8px rgba(0,0,0,.15); }
+    .paper-front { top: 2px; right: 1px; height: calc(100% - 4px); transform-origin: right center; transform: rotateY(-90deg); }
+    .paper-top { top: 1px; left: 2px; width: calc(100% - 4px); transform-origin: top center; transform: rotateX(-90deg); }
+    .paper-bottom { bottom: 1px; left: 2px; width: calc(100% - 4px); transform-origin: bottom center; transform: rotateX(90deg); }
+    .shine { position: absolute; inset: 0; pointer-events: none; z-index: 5; mix-blend-mode: screen; background: radial-gradient(ellipse 38% 24% at var(--light-x) var(--light-y), rgba(255,255,255,.32), rgba(255,240,198,.12) 35%, transparent), linear-gradient(var(--light-angle), rgba(255,255,255,.2), transparent 42%); }
+    .controls { position: fixed; bottom: max(20px,env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .rotation-hint { color: rgba(255,239,195,.92); font: 600 11px/1.2 Arial,sans-serif; text-shadow: 0 1px 8px #000; transition: opacity .25s,transform .25s; }
+    .rotation-hint.is-hidden { opacity: 0; transform: translateY(4px); pointer-events: none; }
+    button { padding: 12px 22px; border: 0; border-radius: 25px; background: #fff; color: #111; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,.3); }
+    button:hover { background: #eee; transform: translateY(-2px); }
+    @media (max-width:700px) { body { padding: 18px 0 76px; } .book-container { --closed-book-width: min(72vw,300px,calc((100vh - 112px)/1.563333)); --open-book-width: 94vw; } .left-page,.right-page { padding: 16px 13px 18px; font-size: clamp(8px,2.4vw,10.5px); line-height: 1.38; } .left-page h2,.right-page h2 { font-size: clamp(10px,2.8vw,13px); margin-bottom: 5px; } .controls { bottom: max(12px,env(safe-area-inset-bottom)); } button { padding: 10px 17px; font-size: 11px; } }
+    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+  <div class="book-container" id="container">
+    <div class="book" id="book" data-pages="{{sayfa_sayisi}}">
+      <div class="left-page"><h2>I. {{baslik}}</h2><p>{{description1}}</p><span class="page-number">118</span></div>
+      <div class="right-page"><h2>II. {{baslik}}</h2><p>{{description2}}</p><span class="page-number">119</span></div>
+      <div class="cover-group"><div class="cover front-face"><img src="{{cover_front}}" alt="Ön Kapak" style="--cover-scale: {{ cover_front_scale }}" /><div class="shine"></div></div><div class="cover inner-face"></div></div>
+      <div class="paper-block paper-front" id="paper-front"></div><div class="paper-block paper-top" id="paper-top"></div><div class="paper-block paper-bottom" id="paper-bottom"></div>
+      <div class="cover back" id="cover-back"><img src="{{cover_back}}" alt="Arka Kapak" style="--cover-scale: {{ cover_back_scale }}" /></div>
+      <div class="spine" id="spine" aria-hidden="true"></div>
+    </div>
+  </div>
+  <div class="controls"><span class="rotation-hint" id="rotation-hint">Döndürmek için kitaba tıklayın</span><button id="book-toggle" type="button" onclick="toggleBook()" aria-pressed="false">Kitabı Aç</button></div>
+  <script>
+    const particles = document.getElementById('particles');
+    for (let i = 0; i < 18; i++) { const p = document.createElement('div'); p.className = 'particle'; const s = Math.random()*3+1.5; p.style.width=p.style.height=`${s}px`; p.style.setProperty('--startX',`${Math.random()*100}vw`); p.style.setProperty('--startY',`${Math.random()*100}vh`); p.style.setProperty('--driftX',`${(Math.random()-.5)*120}px`); p.style.setProperty('--driftY',`${(Math.random()-.5)*120}px`); p.style.setProperty('--duration',`${Math.random()*8+7}s`); p.style.setProperty('--opacity',Math.random()*.25+.1); p.style.animationDelay=`-${Math.random()*6}s`; particles.appendChild(p); }
+    const book=document.getElementById('book'), container=document.getElementById('container'), spine=document.getElementById('spine'), coverBack=document.getElementById('cover-back'), paperFront=document.getElementById('paper-front'), paperTop=document.getElementById('paper-top'), paperBottom=document.getElementById('paper-bottom'), toggleButton=document.getElementById('book-toggle'), rotationHint=document.getElementById('rotation-hint');
+    let isOpen=false, activePointerId=null, mouseRotationActive=false, previous={x:0,y:0}, rotation={x:15,y:-28};
+    function updateLighting(){ book.style.setProperty('--light-x',`${Math.max(12,Math.min(88,38+rotation.y*.55))}%`); book.style.setProperty('--light-y',`${Math.max(12,Math.min(58,22-rotation.x*.28))}%`); book.style.setProperty('--light-angle',`${125+rotation.y*.65}deg`); book.style.setProperty('--shadow-x',`${Math.max(-34,Math.min(34,rotation.y*-.75))}px`); }
+    function updateThickness(value){ const pages=parseInt(value,10)||100, thickness=Math.max(12,Math.min(90,Math.round(pages*.12))); spine.style.width=`${thickness}px`; coverBack.style.transform=`translateZ(-${thickness}px) rotateY(180deg)`; paperFront.style.width=`${thickness-2}px`; paperTop.style.height=`${thickness-2}px`; paperBottom.style.height=`${thickness-2}px`; book.dataset.pages=pages; }
+    function applyRotation(){ book.style.transform=`translateX(0) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(0deg)`; updateLighting(); }
+    function disableMouseRotation(){ mouseRotationActive=false; container.classList.remove('rotation-active'); book.style.transition=''; }
+    function hideHint(){ rotationHint.classList.add('is-hidden'); }
+    function toggleBook(){ isOpen=!isOpen; disableMouseRotation(); container.classList.toggle('open',isOpen); book.classList.toggle('open',isOpen); if(isOpen){ book.style.transform='none'; toggleButton.textContent='Kitabı Kapat'; toggleButton.setAttribute('aria-pressed','true'); } else { rotation={x:15,y:-28}; applyRotation(); toggleButton.textContent='Kitabı Aç'; toggleButton.setAttribute('aria-pressed','false'); updateThickness(book.dataset.pages); } }
+    container.addEventListener('pointerdown',e=>{ if(isOpen||(e.pointerType==='mouse'&&e.button!==0)) return; e.preventDefault(); hideHint(); previous={x:e.clientX,y:e.clientY}; if(e.pointerType==='mouse'){ mouseRotationActive=!mouseRotationActive; container.classList.toggle('rotation-active',mouseRotationActive); book.style.transition=mouseRotationActive?'none':''; } else { activePointerId=e.pointerId; book.style.transition='none'; container.setPointerCapture(e.pointerId); } });
+    container.addEventListener('pointermove',e=>{ const active=(e.pointerType==='mouse'&&mouseRotationActive)||e.pointerId===activePointerId; if(isOpen||!active) return; e.preventDefault(); rotation.y+=(e.clientX-previous.x)*1.15; rotation.x-=(e.clientY-previous.y)*1.15; rotation.x=Math.max(-60,Math.min(60,rotation.x)); previous={x:e.clientX,y:e.clientY}; applyRotation(); });
+    function finish(e){ if(e.pointerId!==activePointerId) return; activePointerId=null; book.style.transition=''; if(container.hasPointerCapture(e.pointerId)) container.releasePointerCapture(e.pointerId); }
+    container.addEventListener('pointerup',finish); container.addEventListener('pointercancel',finish); container.addEventListener('lostpointercapture',finish); container.addEventListener('dragstart',e=>e.preventDefault()); window.addEventListener('keydown',e=>{if(e.key==='Escape')disableMouseRotation();});
+    updateThickness(book.dataset.pages); updateLighting();
+  </script>
+</body>
 </html>
